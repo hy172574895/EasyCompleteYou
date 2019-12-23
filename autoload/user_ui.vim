@@ -1,4 +1,4 @@
-function s:Init() abort
+function user_ui#Init() abort
   "{{{ var init
   let s:is_vim = !has('nvim')
   let s:preview_windows_nr = get(s:,'preview_windows_nr',-1)
@@ -728,4 +728,3 @@ function! s:ChooseSource_vim() abort
 "}}}
 endfunction
 
-call s:Init()
