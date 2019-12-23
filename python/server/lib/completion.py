@@ -10,6 +10,7 @@ class Operate(object):
         self.completion_items = {'Server_name': 'nothing', 'Lists': []}
 
     def DoCompletion(self, source_obj, version):
+        # we get regex from instance
         source_info = source_obj.GetInfo()
 
         # get full items
@@ -20,6 +21,8 @@ class Operate(object):
             self.FindStart(pre_words, source_info['Regex'])
         current_start_postion = \
             {'Line': version['StartPosition']['Line'], 'Colum': current_colum}
+        version['Filter_words'] = filter_words
+        version['Filter_start_position'] = current_start_postion
 
         if source_info['Name'] not in self.start_position:
             # init

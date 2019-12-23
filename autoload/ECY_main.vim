@@ -169,7 +169,7 @@ function! s:GetCurrentPosition() abort
 "}}}
 endfunction
 
-function! s:UsingSpecicalSource(completor_name,invoke_key) abort
+function! s:UsingSpecicalSource(completor_name,invoke_key, is_replace) abort
 "{{{
   if ECY_main#IsECYWorksAtCurrentBuffer()
     let l:curren_file_type = &filetype
@@ -181,8 +181,12 @@ function! s:UsingSpecicalSource(completor_name,invoke_key) abort
       if item == a:completor_name
         let g:ECY_file_type_info[l:curren_file_type]['filetype_using']
               \ = a:completor_name
-        let g:ECY_file_type_info[l:curren_file_type]['special_position'] = 
-              \s:GetCurrentPosition()
+        if a:is_replace
+          let g:ECY_file_type_info[l:curren_file_type]['special_position'] = 
+                \s:GetCurrentPosition()
+        else
+          let g:ECY_file_type_info[l:curren_file_type]['special_position'] = {}
+        endif
       endif
     endfor
   endif
@@ -196,45 +200,50 @@ function! s:SetVariable() abort
 
   " this debug option will start another server with socket port 1234 and
   " HMAC_KEY 1234, and output logging to file where server dir is. 
-  let g:ECY_debug                                   
+  let g:ECY_debug
         \= get(g:, 'ECY_debug',0)
 
-  let g:ECY_select_items                    
+  let g:ECY_select_items
         \= get(g:, 'ECY_select_items',['<Tab>','<S-TAB>'])
 
-  let g:ECY_show_switching_source_popup                    
+  let g:ECY_show_switching_source_popup
         \= get(g:,'ECY_show_switching_source_popup','<Tab>')
 
   " ECY have special key for triggering snippets, but the mapping of jumping to 
   " next or previous item is same as the snippets-plugin.
-  let g:ECY_expand_snippets_key                    
+  let g:ECY_expand_snippets_key
         \= get(g:,'ECY_expand_snippets_key','<CR>')
 
   let g:ECY_choose_special_source_key
-        \= get(g:,'ECY_choose_special_source_key',[{'source_name':'snippets','invoke_key':'~'},{'source_name':'label','invoke_key':'!'}])
+        \= get(g:,'ECY_choose_special_source_key',
+        \[{'source_name':'snippets','invoke_key':'~','is_replace': v:true},
+        \{'source_name':'path','invoke_key':'/','is_replace': v:false},
+        \{'source_name':'label','invoke_key':'!','is_replace': v:true}])
+
   let g:ECY_python3_cmd                               
         \= get(g:,'ECY_python3_cmd','python')
 
-  let g:ECY_file_type_info                            
+  let g:ECY_file_type_info
         \= get(g:,'ECY_file_type_info',{})
 
-  let g:ycm_autoclose_preview_window_after_completion 
+  let g:ycm_autoclose_preview_window_after_completion
         \= get(g:,'ycm_autoclose_preview_window_after_completion',1)
 
-  let g:ECY_working_setting                           
+  let g:ECY_working_setting
         \= get(g:,'ECY_working_setting',
         \{'vim':'ecy','html':'ecy','css':'ecy','xhtml':'ecy','php':'ecy',
         \'md':'ecy'})
 
-  let s:back_to_source_key                    
+  let s:back_to_source_key
         \= get(s:,'back_to_source_key',['<Space>'])
 
-  let g:ECY_event_and_trigger_key                    
+  let g:ECY_event_and_trigger_key
         \= get(g:,'ECY_event_and_trigger_key',{'<Space>':function('s:Back2LastSource')})
 
-  let g:ECY_triggering_length                            
+  let g:ECY_triggering_length
         \= get(g:,'ECY_triggering_length',1)
 
+  " we put this at here to accelarate the starting time
   try
     call UltiSnips#SnippetsInCurrentScope(1)
     let g:has_ultisnips_support = v:true
@@ -292,6 +301,7 @@ function! s:SetUpPython() abort
     call s:Do("import Main_client", v:false)
     call s:Do("ECY_Client_ = Main_client.ECY_Client()", v:false)
   else
+    " TODO
     " don't need to use python
   endif
 "}}}
@@ -627,7 +637,7 @@ function! s:SetMapping() abort
 
   for key in g:ECY_choose_special_source_key
     exe 'inoremap <expr>' . key['invoke_key'] . 
-          \' <SID>UsingSpecicalSource( "'.key['source_name'].'","\' . key['invoke_key'] . '" )'
+          \' <SID>UsingSpecicalSource( "'.key['source_name'].'","\' . key['invoke_key'] . '",' . key['is_replace'] . ' )'
   endfor
 
   for key in s:back_to_source_key

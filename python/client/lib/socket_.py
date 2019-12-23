@@ -29,11 +29,11 @@ class Socket_(object):
             self.tcpCliSock.connect(self.ADDR)
             self._isconnected = True
             self._HMAC_KEY = bytes(str(self._HMAC_KEY), encoding='utf-8')
-            print("connect successfully")
+            print("[ECY] Started.")
         except: # noqa
-            print("failed to connect")
-            raise
+            print("[ECY] failed to connect server.")
             self._isconnected = False
+            raise
 
     def ConnectSocket(self):
         threading.Thread(target=self._connect_socket).start()

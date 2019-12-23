@@ -21,10 +21,9 @@ function! s:CheckRequires() abort
 "{{{
   if exists( "g:loaded_easycomplete" )
     call s:Finish(v:true, '')
+
   elseif v:version < 704 || (v:version == 704 && !has( 'patch1578' ))
-    echohl WarningMsg |
-          \ echomsg "EasyCompletion unavailable: requires Vim 7.4.1578+." |
-          \ echohl None
+
     call s:Finish(v:true, 'EasyCompletion unavailable: requires Vim 7.4.1578+.')
     if v:version == 704 && has( 'patch8056' )
       " Very very special case for users of the default Vim on macOS. For some
@@ -38,6 +37,7 @@ function! s:CheckRequires() abort
             \ . "Please consider MacVim, homebrew Vim or a self-built Vim that "
             \ . "satisfies the minimum requirement.")
     endif
+
   elseif &encoding !~? 'utf-\?8'
     call s:Finish(v:true, "EasyCompletion unavailable: supports UTF-8 encoding only. "
           \ ."Put the line 'set encoding=utf-8' into your vimrc.")

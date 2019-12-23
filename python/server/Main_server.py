@@ -13,7 +13,7 @@ parser.add_argument('--port', help='the port of socket')
 parser.add_argument('--log_dir', help='the file of log to output')
 g_args = parser.parse_args()
 # for my testing:
-# D:\gvim\vimfiles\myplug\python_version\python\server\Main_server.py --hmac 1234 --port 1234 --input_with_socket
+# D:\gvim\vimfiles\myplug\ECY_new\python\server\Main_server.py --hmac 1234 --port 1234 --input_with_socket
 if g_args.input_with_socket:
     from socket import *    # noqa
     from base64 import b64decode
