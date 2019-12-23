@@ -49,8 +49,15 @@ function! s:CheckRequires() abort
 "}}}
 endfunction
 
+" main:
+let g:ECY_starttime = reltimefloat(reltime())
+
 call s:CheckRequires()
+call user_ui#Init()
 call ECY_main#Start()
 
+let g:ECY_endtime = reltimefloat(reltime())
+let g:ECY_start_time = g:ECY_endtime - g:ECY_starttime
+
 " This is basic vim plugin boilerplate
-call s:Finish(v:false)
+call s:Finish(v:false, '')

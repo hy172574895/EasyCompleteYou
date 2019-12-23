@@ -736,9 +736,3 @@ function! ECY_main#Start() abort
   call s:StartCommunication()
   call s:SetMapping()
 endfunction
-
-let g:ECY_starttime = reltimefloat(reltime())
-call user_ui#Init()
-call ECY_main#Start()
-let g:ECY_endtime = reltimefloat(reltime())
-let g:ECY_start_time = g:ECY_endtime - g:ECY_starttime
