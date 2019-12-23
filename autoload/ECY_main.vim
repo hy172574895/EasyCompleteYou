@@ -197,7 +197,7 @@ function! s:SetVariable() abort
   " this debug option will start another server with socket port 1234 and
   " HMAC_KEY 1234, and output logging to file where server dir is. 
   let g:ECY_debug                                   
-        \= get(g:, 'ECY_debug',1)
+        \= get(g:, 'ECY_debug',0)
 
   let g:ECY_select_items                    
         \= get(g:, 'ECY_select_items',['<Tab>','<S-TAB>'])
@@ -243,6 +243,7 @@ function! s:SetVariable() abort
   endtry
 
   let  s:isSelecting          = v:false
+  let  s:indentexpr           = &indentexpr
   let  s:completeopt_temp     = &completeopt
   let  s:completeopt_fuc_temp = &completefunc
   " if has('patch-8.1.0818')
