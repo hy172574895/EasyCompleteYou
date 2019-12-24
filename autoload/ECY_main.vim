@@ -174,9 +174,13 @@ function! s:UsingSpecicalSource(completor_name,invoke_key, is_replace) abort
   if ECY_main#IsECYWorksAtCurrentBuffer()
     let l:curren_file_type = &filetype
     let l:temp = g:ECY_file_type_info[l:curren_file_type]['filetype_using']
-    let s:last_used_completor                = {}
-    let s:last_used_completor['source_name'] = l:temp
-    let s:last_used_completor['file_type']   = l:curren_file_type
+    if !exists('s:last_used_completor') 
+          \|| a:completor_name != l:temp
+      let s:last_used_completor                = {}
+      let s:last_used_completor['source_name'] = l:temp
+      let s:last_used_completor['file_type']   = l:curren_file_type
+    endif
+    let g:abc = s:last_used_completor
     for item in g:ECY_file_type_info[l:curren_file_type]['available_sources']
       if item == a:completor_name
         let g:ECY_file_type_info[l:curren_file_type]['filetype_using']
