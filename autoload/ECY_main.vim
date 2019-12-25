@@ -403,7 +403,7 @@ endfunction
 function! s:ErroCode_cb(msg) abort
 "{{{
   try
-    if a:msg['ErroCode'] == 1
+    if a:msg['ErroCode'] != 1
       echo '[ECY] ' . ECY_main#GetCurrentUsingSourceName() . ', ' .a:msg['Event'] . ' ' .a:msg['Description']
     endif
   endtry
@@ -490,7 +490,7 @@ function! s:Integration_cb(msg) abort
   if ECY_main#GetVersionID() != a:msg['ID'] 
         \|| mode() == 'i'
     " stop a useless poll
-    echo 'An event: '.a:msg['Integration_event'] .
+    echo '[ECY] An event: '.a:msg['Integration_event'] .
           \' was abandoned. Trigger it again if you really want it.'
     return
   endif
@@ -741,6 +741,18 @@ function! ECY_main#Execute(event) abort
 "{{{
   let g:ECY_do_something_event = a:event
   call s:Do("Integration", v:true)
+"}}}
+endfunction
+
+function! ECY_main#GetBufferWorkSpace(...) abort
+"{{{
+  if a:000 == 0
+    let l:bufnr = bufnr('%')
+  else
+    let l:bufnr = a:1
+  endif
+
+  let l:workspace = getcwd(l:bufnr)
 "}}}
 endfunction
 

@@ -11,6 +11,10 @@ class Event(object):
 
         self._trigger_len = vim_lib.GetVariableValue("g:ECY_triggering_length")
         self.has_ultisnippet_support = vim_lib.GetVariableValue("g:has_ultisnips_support")
+        self._workspace = None
+
+    def GetCurrentWorkSpace(self):
+        return vim_lib.CallEval("rooter#GetCurrentBufferWorkSpace()")
 
     def ChangeSourceName(self, source_name):
         self.source_name = source_name
@@ -22,6 +26,7 @@ class Event(object):
         return self._pack(msg, 'DoCompletion')
 
     def OnBufferEnter(self):
+        self._workspace = self.GetCurrentWorkSpace()
         return self._pack({}, 'OnBufferEnter')
         
     def _pack(self, msg, event_name):
@@ -52,5 +57,6 @@ class Event(object):
         start_position         = {
             'Line': vim_lib.CurrenLineNr(), 'Colum': vim_lib.CurrentColumn()}
         msg['StartPosition'] = start_position
-        msg['SourceName'] = self.source_name
+        msg['SourceName']    = self.source_name
+        msg['WorkSpace']     = self._workspace
         return msg

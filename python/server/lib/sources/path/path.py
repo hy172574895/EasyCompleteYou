@@ -14,7 +14,7 @@ class Operate(scope_.Source_interface):
     def GetInfo(self):
         # the key of 'Regex' is the regular of filter
         temp = {'Name': self._name, 'WhiteList': ['all'],
-                    'Regex': r'[\w\-\.\~]', 'TriggerKey': ['/','\\']}
+                    'Regex': r'[\w\-\.\~\&\$]', 'TriggerKey': ['/','\\']}
         if self._current_system() == 'Windows':
             # such as 'C:\windows\gvim\'
             temp['TriggerKey'] = ['/','\\',':']
@@ -29,7 +29,7 @@ class Operate(scope_.Source_interface):
         # TODO:
         # working_space = version['WorkingSpace']
         pre_words = current_line_text[:current_colum]
-        temp = r'[\w\-\.\~\/\\]'
+        temp = r'[\w\-\.\~\/\\\&\$]'
         is_id = False
         if self._current_system() == 'Windows':
             temp = r'[\w\-\.\~\/\\\:]'
