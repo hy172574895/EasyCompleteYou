@@ -220,9 +220,9 @@ function! s:SetVariable() abort
 
   let g:ECY_choose_special_source_key
         \= get(g:,'ECY_choose_special_source_key',
-        \[{'source_name':'snippets','invoke_key':'~','is_replace': v:true},
+        \[{'source_name':'snippets','invoke_key':'@','is_replace': v:true},
         \{'source_name':'path','invoke_key':'/','is_replace': v:false},
-        \{'source_name':'label','invoke_key':'!','is_replace': v:true}])
+        \{'source_name':'label','invoke_key':'#','is_replace': v:true}])
 
   let g:ECY_python3_cmd                               
         \= get(g:,'ECY_python3_cmd','python')

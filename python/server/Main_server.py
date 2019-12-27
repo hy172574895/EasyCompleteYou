@@ -204,11 +204,15 @@ class GetTodo(object):
 
 class EventHandler(object):
     def __init__(self, vim_queue):
-        self.completion = completion.Operate()
-        self.pass_2_vim_queue = vim_queue
-        self.source_manager = sources_manager.Operate()
-        self.on_buffer = buffer_things.Operate()
-        self.integration = integration.Operate()
+        try:
+            self.completion = completion.Operate()
+            self.pass_2_vim_queue = vim_queue
+            self.source_manager = sources_manager.Operate()
+            self.on_buffer = buffer_things.Operate()
+            self.integration = integration.Operate()
+        except Exception as e:
+            g_logger.opt(exception=True).debug("exception:")
+            raise
 
     def Pass2Hanlder(self, version_dict):
         version_dict = version_dict['Msg']

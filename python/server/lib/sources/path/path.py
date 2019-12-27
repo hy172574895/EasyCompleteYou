@@ -22,25 +22,50 @@ class Operate(scope_.Source_interface):
 
     def DoCompletion(self, version):
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
-
+        addtional_data = {}
         line_text = version['AllTextList']
         current_line_text = version['CurrentLineText']
         current_colum = version['Filter_start_position']['Colum']
-        # TODO:
-        # working_space = version['WorkingSpace']
+        workspace = version['WorkSpace']
         pre_words = current_line_text[:current_colum]
-        temp = r'[\w\-\.\~\/\\\&\$]'
+        temp = r'[\w\-\.\~\/\\]'
         is_id = False
         if self._current_system() == 'Windows':
             temp = r'[\w\-\.\~\/\\\:]'
         # only return 2 values
         current_colum, path = self.FindStart(pre_words, temp)
+
         try:
-            os.chdir(path)
-            file_list = os.listdir(os.curdir)
+            if workspace is not None :
+                if path[0] in ['~', '.']:
+                    # most of the language like "~/gvim" ro ".\gvim"
+                    path_temp = workspace + path[1:]
+                else:
+                    # such as html
+                    if path[0] in ['\\','/']:
+                        path_temp = workspace + path
+                    else:
+                        path_temp = workspace + "/" + path
         except Exception as e:
-            is_id = True
-            file_list = list(set(re.findall(r'\w+', line_text)))
+            # the path is uncertain, so will we try at here
+            pass
+        # if not using WorkSpace, we set it None
+        addtional_data['UsingWorkSpace'] = None
+        try:
+            # this will raise if workspace is None that is path_temp not define
+            os.chdir(path_temp)
+            file_list = os.listdir(os.curdir)
+            addtional_data['Path'] = path_temp
+            addtional_data['UsingWorkSpace'] = workspace
+        except Exception as e:
+            try:
+                os.chdir(path)
+                file_list = os.listdir(os.curdir)
+                addtional_data['Path'] = path
+            except Exception as e:
+                is_id = True
+                file_list = list(set(re.findall(r'\w+', line_text)))
+                addtional_data['Path'] = None
 
         results_list = []
         for item in file_list:
@@ -65,6 +90,7 @@ class Operate(scope_.Source_interface):
                     results_format['kind'] = '[Mount]'
             results_list.append(results_format)
         return_['Lists'] = results_list
+        return_['AddtionalData'] = addtional_data
         return return_
 
     def _current_system(self):

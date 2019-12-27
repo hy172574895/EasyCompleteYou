@@ -14,7 +14,10 @@ class Event(object):
         self._workspace = None
 
     def GetCurrentWorkSpace(self):
-        return vim_lib.CallEval("rooter#GetCurrentBufferWorkSpace()")
+        temp = vim_lib.CallEval("rooter#GetCurrentBufferWorkSpace()")
+        if temp is '':
+            temp = None
+        return temp
 
     def ChangeSourceName(self, source_name):
         self.source_name = source_name

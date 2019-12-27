@@ -70,8 +70,7 @@ class Operate(object):
                 self.sources_info[completor_name] = module_
             return module_
         except Exception as e:
-            # TODO
-            return e
+            raise
 
     def InstallSource(self, source_path):
         """this method will not check if it's runable.

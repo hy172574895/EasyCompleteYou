@@ -52,9 +52,13 @@ class Operate(object):
                     all_list,isreturn_match_point=isIndent,
                     isindent=isIndent)
 
+        addtional_data = None
+        if 'AddtionalData' in self.completion_items.keys():
+            addtional_data = self.completion_items['AddtionalData']
         return {'Event': 'do_completion', 'Version_ID': version['VersionID'],
                 'Lists': return_, 'StartPosition': current_start_postion,
                 'Server_name': source_info['Name'],
+                'AddtionalData': addtional_data,
                 'Filter_words': filter_words}
 
     def FindStart(self, text, reg):

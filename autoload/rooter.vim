@@ -185,10 +185,10 @@ function! rooter#GetCurrentBufferWorkSpace()
   endif
 
   if !s:ChangeDirectoryForBuffer()
-    return ""
+    return ''
   endif
 
-  return string(s:RootDirectory())
+  return s:RootDirectory()
 endfunction
 
 command! Rooter :call <SID>ChangeToRootDirectory()
