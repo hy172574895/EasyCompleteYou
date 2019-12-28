@@ -413,13 +413,23 @@ endfunction
 function! s:SetFileTypeSource_cb(msg) abort
 "{{{
   let g:ECY_file_type_info[a:msg['FileType']] = {}
-  let g:ECY_file_type_info[a:msg['FileType']]['available_sources'] = 
-        \a:msg['Dicts']['available_sources']
-  let g:ECY_file_type_info[a:msg['FileType']]['filetype_using'] = 
+  let l:available_sources = a:msg['Dicts']['available_sources']
+  let g:ECY_file_type_info[a:msg['FileType']]['available_sources'] =
+        \l:available_sources
+  let g:ECY_file_type_info[a:msg['FileType']]['filetype_using']    =
         \a:msg['Dicts']['using_source']
-  let g:ECY_file_type_info[a:msg['FileType']]['special_position'] = 
+  let g:ECY_file_type_info[a:msg['FileType']]['special_position']  =
         \{}
-
+  " check if snippets is installed
+  if g:has_ultisnips_support == v:true && !exists('g:ECY_is_installed_snippets')
+    for item in l:available_sources
+      if item == 'snippets'
+        let g:ECY_is_installed_snippets = v:true
+        return
+      endif
+    endfor
+    call ECY_main#Install('Snippets')
+  endif
 "}}}
 endfunction
 
@@ -570,7 +580,7 @@ function! ECY_main#SelectItems(next_or_pre) abort
 endfunction
 
 function! s:ExpandSnippet() abort
-"{{{
+"{{{ this function will not tirgger when there are no UltiSnips plugin.
   if ECY_main#IsECYWorksAtCurrentBuffer() && user_ui#IsCompletionPopupWindowsOpen() 
     " we can see that we require every item of completion must contain full
     " infos which is a dict with all key.
