@@ -59,6 +59,7 @@ class Operate(scope_.Source_interface):
             addtional_data['UsingWorkSpace'] = workspace
         except Exception as e:
             try:
+                path_temp = path
                 os.chdir(path)
                 file_list = os.listdir(os.curdir)
                 addtional_data['Path'] = path
@@ -88,6 +89,17 @@ class Operate(scope_.Source_interface):
                     results_format['kind'] = '[Link]'
                 elif os.path.ismount(item):
                     results_format['kind'] = '[Mount]'
+                else:
+                    results_format['kind'] = 'Unkown'
+
+                if addtional_data['UsingWorkSpace'] is not None: 
+                    results_format['menu'] = results_format['kind']
+                    full_path = path_temp + item
+                    if results_format['kind'] == '[Dir]':
+                        full_path += '/'
+                    results_format['info'] = full_path.replace("\\\\",'/')
+                    results_format['info'] = full_path.replace("\\",'/')
+                    results_format['info'] = results_format['info'].split('\n')
             results_list.append(results_format)
         return_['Lists'] = results_list
         return_['AddtionalData'] = addtional_data
