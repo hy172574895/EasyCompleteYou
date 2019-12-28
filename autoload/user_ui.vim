@@ -10,7 +10,6 @@ function user_ui#Init() abort
         \get(g:,'ecy_fileter_search_items_keyword','')
   let g:ECY_use_floating_windows_to_be_popup_windows = 
         \get(g:,'ECY_use_floating_windows_to_be_popup_windows',v:true)
-
   let g:ECY_PreviewWindows_style = 
         \get(g:,'ECY_PreviewWindows_style','append')
 
@@ -29,14 +28,14 @@ function user_ui#Init() abort
     hi ECY_normal_matched_word		guifg=#945596	guibg=#073642	ctermfg=red	  ctermbg=darkBlue gui=bold
     hi ECY_normal_items		        guifg=#839496	guibg=#073642	ctermfg=white	ctermbg=darkBlue
 
-    hi ECY_selected_matched_word	guifg=#FFFF99	guibg=#586e75	ctermfg=white	ctermbg=green    gui=bold
-    hi ECY_selected_item	        guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=green
+    hi ECY_selected_matched_word	guifg=#FFFF99	guibg=#586e75	ctermfg=red	ctermbg=Blue    gui=bold
+    hi ECY_selected_item	        guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
 
     let g:ECY_highlight_normal_matched_word   = get(g:,'ECY_highlight_normal_matched_word', 'ECY_normal_matched_word')
-    let g:ECY_highlight_normal_items          = get(g:,'ECY_highlight_normal_items',        'ECY_normal_items')
+    let g:ECY_highlight_normal_items          = get(g:,'ECY_highlight_normal_items', 'ECY_normal_items')
 
-    let g:ECY_highlight_selected_matched_word = get(g:,'ECY_highlight_selected_matched_word',       'ECY_selected_matched_word')
-    let g:ECY_highlight_selected_item         = get(g:,'ECY_highlight_selected_item',       'ECY_selected_item')
+    let g:ECY_highlight_selected_matched_word = get(g:,'ECY_highlight_selected_matched_word','ECY_selected_matched_word')
+    let g:ECY_highlight_selected_item         = get(g:,'ECY_highlight_selected_item', 'ECY_selected_item')
 
     call prop_type_add('item_normal_matched', {'highlight': g:ECY_highlight_normal_matched_word})
     call prop_type_add('item_normal', {'highlight': g:ECY_highlight_normal_items})
