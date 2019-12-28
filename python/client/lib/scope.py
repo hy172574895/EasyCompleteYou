@@ -28,6 +28,12 @@ class Event(object):
         msg['ReturnMatchPoint'] = self._isReturn_match_point
         return self._pack(msg, 'DoCompletion')
 
+    def InstallSource(self):
+        msg = {}
+        msg['SourcePath'] = vim_lib.\
+                GetVariableValue('g:ecy_source_name_2_install')
+        return self._pack(msg, 'InstallSource')
+
     def OnBufferEnter(self):
         self._workspace = self.GetCurrentWorkSpace()
         return self._pack({}, 'OnBufferEnter')
@@ -63,3 +69,4 @@ class Event(object):
         msg['SourceName']    = self.source_name
         msg['WorkSpace']     = self._workspace
         return msg
+

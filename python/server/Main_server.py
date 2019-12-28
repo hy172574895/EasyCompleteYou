@@ -257,7 +257,7 @@ class EventHandler(object):
                 object_, version_dict))
         elif event_ == 'debug':
             results_.append(None)
-        elif event_ == 'install_source':
+        elif event_ == 'InstallSource':
             temp = self.source_manager.InstallSource(version_dict['SourcePath'])
             results_.append(temp)
             available_sources = self.source_manager.\

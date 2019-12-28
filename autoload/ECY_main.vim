@@ -404,7 +404,7 @@ function! s:ErroCode_cb(msg) abort
 "{{{
   try
     if a:msg['ErroCode'] != 1
-      echo '[ECY] ' . ECY_main#GetCurrentUsingSourceName() . ', ' .a:msg['Event'] . ' ' .a:msg['Description']
+      echo '[ECY] [Code-' . a:msg['ErroCode'] ."]". ECY_main#GetCurrentUsingSourceName() . ' ' .a:msg['Event'] . ' ' .a:msg['Description']
     endif
   endtry
 "}}}
@@ -537,7 +537,7 @@ function! s:EventSort(id, data, event) abort
         call s:Integration_cb(l:data_dict)
       elseif l:Event == 'install_source'
         redraw
-        echo '[ECY] ' . l:data_dict['Description']
+        echo '[ECY] [' . l:data_dict['Name'] .'] '.l:data_dict['Description']
       endif
     endfor
   " catch

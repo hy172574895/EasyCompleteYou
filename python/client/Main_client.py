@@ -20,13 +20,6 @@ class _do(object):
         #     using_source = 'nothing'
         return using_source
 
-    def InstallSource(self):
-        todo = self._basic()
-        todo['Event'] = 'install_source'
-        todo['SourcePath'] = vim_lib.\
-                GetVariableValue('g:ecy_source_name_2_install')
-        return todo
-
     def Integration(self):
         todo = self._basic()
         todo['Event'] = 'integration'

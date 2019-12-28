@@ -43,6 +43,7 @@ class Operate(object):
             fp = open(path_temp, mode="w", encoding='utf-8')
             installed_completor = \
                 {'lib.sources.label.Label': 'label',
+                 'lib.sources.path.path': 'path',
                  'lib.sources.python.python': 'python_jedi'}
             self.conf['installed_completor'] = installed_completor
             self.conf['filetype_using'] = {}
@@ -86,11 +87,13 @@ class Operate(object):
             fp.close()
             return {'Event': 'install_source',
                     'Status': 0,
+                    'Name': source_path,
                     'Description': 'Installation succeed.'}
         except: # noqa
             # TODO
             return {'Event': 'install_source',
                     'Status': 1,
+                    'Name': source_path,
                     'Description': 'failed to load source, check out logging.'}
 
     def GetAvailableSourceForFiletype(self, file_type):
