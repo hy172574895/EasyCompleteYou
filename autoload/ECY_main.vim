@@ -588,14 +588,13 @@ function! s:ExpandSnippet() abort
           \g:ECY_use_floating_windows_to_be_popup_windows == v:true
       let l:selecting_item_nr = 
             \g:ECY_current_popup_windows_info['selecting_item']
-      if l:selecting_item_nr == 0
-        return ''
+      if l:selecting_item_nr != 0
+        let l:item_info = 
+              \g:ECY_current_popup_windows_info['items_info'][l:selecting_item_nr - 1]
+        let l:item_kind          = l:item_info['kind']
+        let l:user_data_index    = l:item_info['user_data']
+        let l:item_name_selected = l:item_info['word']
       endif
-      let l:item_info = 
-            \g:ECY_current_popup_windows_info['items_info'][l:selecting_item_nr - 1]
-      let l:item_kind          = l:item_info['kind']
-      let l:user_data_index    = l:item_info['user_data']
-      let l:item_name_selected = l:item_info['word']
     else
       let l:item_kind          = v:completed_item['kind']
       let l:user_data_index    = v:completed_item['user_data']
@@ -612,10 +611,13 @@ function! s:ExpandSnippet() abort
       endif
     catch
     endtry
-    if l:item_kind == '[Snippet]'
-      call UltiSnips#ExpandSnippet() 
-      return ''
-    endif
+    try
+      if l:item_kind == '[Snippet]'
+        call UltiSnips#ExpandSnippet() 
+        return ''
+      endif
+    catch
+    endtry
   endif
   call s:SendKeys(g:ECY_expand_snippets_key)
   return ''
