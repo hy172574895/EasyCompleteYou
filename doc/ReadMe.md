@@ -11,6 +11,7 @@
 ─██░░░░░░░░░░██─██░░░░░░░░░░██───────██░░██───────
 ─██████████████─██████████████───────██████───────
 ──────────────────────────────────────────────────
+
               EASILY COMPLETE YOU.
 # Brief Introduction
 1. Collaborate with ycm, can be a extend for YCM.
@@ -39,19 +40,45 @@ Put the line into your vimrc, then install it.
 #### Options 2:  
 download the whole repository and put it into vim's starting dir  
 
-### Usage  
+# Usage  
 
 After the install ECY successfully, there are two buildin completion source that
 is `Label` and `Snippets`.  
-Firstly ECY will detect the filetype of your buffer that you using. Knowing the 
-filetype, then ECY asks the server what sources are available on this filetype.  
-So if you want a specific source work on a buffer, you can change the filetype 
-by the vim that `set &filetype=java` on the buffer you want to change.
+Firstly ECY will detect the filetype of your buffer that you areusing.  
+Knowing the filetype, then ECY asks the server what sources are available 
+on this filetype.  
+So if you want a specific source works on a buffer, you can change the filetype 
+by the vim that `set &filetype=java` on the buffer you want to change.  
 
-#### Enable more.
+## Enable more.
 
-there only two sources in ECY after you installed ECY. If you want ECY work  
-on `python`, you can activate a source by:  
-`:call ECY_Installer('Python')` in vim  
+there only three buildin sources which is `label`,`python`,`path`
+after you installed ECY.  
+If you want ECY work on `HTML`, you can activate a source by:  
+`:call ECY_Installer('HTML_LSP')` in vim  
+*Importance*: There are might dependence while you install a need source of ECY
+So check out the Doc carefully and install the dependence before you install one.
 
 Here the full list of sources that ECY supports. 
+
+# Q&A
+Q: Why there are a few of Snippets options to complete? I need more.
+A: ECY rely on `ultisnips` which is a engine that fill in the snippets fragment.
+What snippets you provide to `ultisnips`, what completion options you got in ECY.
+So there are so many nice and mature snippets that made by other fellows such as
+`honza/vim-snippets` `CoreyMSchafer/code_snippets`. If you want more, install 
+the snippets you admire and `ultisnips` will analize that snippets then provide
+to ECY and last provide to users.
+
+Q: Why I need to install `Leaderf`, and only `Leaderf`?
+A: There are so many tools like `Leaderf` such as `fzf-vim` `ctrlP`, that's true
+. And the answer is same as "Why ECY only supports ultisnips?"   
+Firstly, they are all rely on python same as ECY. Secondly, according to me,
+they are the best solutions in vim. Thirdly, supporting so many different plugins
+could be a disadvantage of ECY, that make ECY so heavy.
+`Anything can be located by fuzzy search` that is one of ECY's principles, that
+`Leaderf` hightly fit with ECY.
+*Importance*: ECY will not support any plugin that functions resemble with `Leaderf`
+and `ultisnips` unless there are critical demands.
+
+Q: 
