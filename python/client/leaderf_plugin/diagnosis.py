@@ -51,7 +51,7 @@ class ECYDiagnosisExplorer(Explorer):
                     abbr += "| "
                 temp += abbr
                 k += 1
-            temp += str(j)
+            temp += " " + str(j)
             results.append(temp)
             j += 1
         return results

@@ -321,7 +321,6 @@ function! s:SetUpLeaderf() abort
     " Leaderf Plugin
     return
   endif
-  call s:Do("from leaderf_plugin.symbols import *", v:false)
   call s:Do("from leaderf_plugin.diagnosis import *", v:false)
 
   " In order to be listed by :LeaderfSelf
