@@ -177,10 +177,14 @@ class Operate(scope_.Source_interface):
         lists = []
         for item in definitions:
             position = item._name.tree_name.get_definition()
-            position = position.start_pos
-            temp = {'abbr':item.name,
-                    'path':version['FilePath'], 'kind':item.type, 
-                    'position': position}
+            (start_line, start_column) = position.start_pos
+            item = [{'name':'1','content':{'abbr':item.name, 'highlight':'ECY_blue'}},
+                    {'name':'2','content':{'abbr':item.type, 'highlight':'ECY_green'}},
+                    {'name':'3','content':{'abbr':str(position.start_pos), 'highlight':'ECY_yellow'}}]
+            position = {'line':start_line,'colum':start_column,'path':version['FilePath'].replace('\\','/')}
+            temp = {'items':item,
+                    'type':'symbol',
+                    'position':position}
             lists.append(temp)
         return_['Results'] = lists
         return return_

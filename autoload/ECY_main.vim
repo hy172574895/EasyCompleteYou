@@ -304,10 +304,48 @@ function! s:SetUpPython() abort
     call s:Do(l:temp, v:false)
     call s:Do("import Main_client", v:false)
     call s:Do("ECY_Client_ = Main_client.ECY_Client()", v:false)
+
+    call s:SetUpLeaderf()
   else
     " TODO
-    " don't need to use python
+    " don't need to use python as client.
   endif
+"}}}
+endfunction
+
+function! s:SetUpLeaderf() abort
+"{{{
+  " Importance: so, at plugin manageer such as vunble or plug-vim
+  " the leaderf must be put upon ECY.
+  if !exists('g:leaderf_loaded')
+    " Leaderf Plugin
+    return
+  endif
+  call s:Do("from leaderf_plugin.symbols import *", v:false)
+  call s:Do("from leaderf_plugin.diagnosis import *", v:false)
+
+  " In order to be listed by :LeaderfSelf
+  call g:LfRegisterSelf("ECY_symbols", "Plugin of EasyCompleteYou")
+  call g:LfRegisterSelf("ECY_diagnosis", "Plugin of EasyCompleteYou")
+
+  " In order to make this plugin in Leaderf available 
+  let l:extension = {
+              \   "name": "ECY_symbols",
+              \   "help": "check out Doc of ECY",
+              \   "registerFunc": "symbols#register",
+              \   "arguments": [
+              \   ]
+              \ }
+  call g:LfRegisterPythonExtension(l:extension.name, l:extension)
+
+  let l:extension = {
+              \   "name": "ECY_diagnosis",
+              \   "help": "check out Doc of ECY",
+              \   "registerFunc": "symbols#register",
+              \   "arguments": [
+              \   ]
+              \ }
+  call g:LfRegisterPythonExtension(l:extension.name, l:extension)
 "}}}
 endfunction
 
@@ -404,7 +442,7 @@ function! s:ErroCode_cb(msg) abort
 "{{{
   try
     if a:msg['ErroCode'] != 1
-      echo '[ECY] [Code-' . a:msg['ErroCode'] ."]". ECY_main#GetCurrentUsingSourceName() . ' ' .a:msg['Event'] . ' ' .a:msg['Description']
+      echo '[ECY] [' . ECY_main#GetCurrentUsingSourceName() . ' - ' . a:msg['ErroCode'] ."] " . ' ' .a:msg['Description']
     endif
   endtry
 "}}}

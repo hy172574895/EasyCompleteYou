@@ -10,6 +10,7 @@ function user_ui#Init() abort
         \get(g:,'ecy_fileter_search_items_keyword','')
   let g:ECY_use_floating_windows_to_be_popup_windows = 
         \get(g:,'ECY_use_floating_windows_to_be_popup_windows',v:true)
+  " TODO:
   let g:ECY_PreviewWindows_style = 
         \get(g:,'ECY_PreviewWindows_style','append')
 
@@ -328,17 +329,55 @@ endfunction
 "}}}
 
 function! user_ui#Search(items_2_show) abort
-"{{{
-  if g:has_floating_windows_support == 'has_no'
-    " this is the jobs of others plugin such as fzf-vim, unite, CtrlP.
-    return
-  endif
-  if g:has_floating_windows_support == 'vim'
-    call s:Search_vim(a:items_2_show)
-  else
-    
-  endif
+"{{{ handle a symbol event.
+"a symbol's infos must contain a line to show
+
+" this will invoke leaderf plugin in python to handle g:ECY_items_data
+  let g:ECY_items_data = a:items_2_show
+  call timer_start(100, 'CallLeaderF')
+  return
 "}}}
+endfunction
+
+function! CallLeaderF(timer)
+  call leaderf_ECY#diagnosis#Start()
+endfunction
+
+function! user_ui#MoveTo(line, colum, path, modes)
+"{{{
+  if a:modes == 'h'
+    " new a windows
+  elseif a:modes == 'v'
+    " new a windows
+  elseif a:modes == 't'
+    " new a windows and a tab
+  else
+    " do nothing
+    " work at current windows
+  endif
+  exe "hide edit " .  a:path
+  exe a:line
+  " exe a:colum . "|"
+"}}}
+endfunction
+
+function! s:CheckResultsAtWindows(position, modes)
+  call user_ui#MoveTo(a:position['line'], a:position['colum'], a:position['path'], a:modes)
+endfunction
+
+function! user_ui#LeaderF_cb(line, event, nr, ...)
+  let l:data  = g:ECY_items_data[a:nr]
+  if a:event == 'acceptSelection' || a:event == 'previewResult'
+    if exists("l:data['position']")
+      " a:1 is modes
+      let l:modes = a:1
+      if a:event == 'previewResult'
+        " preview at current windows
+        let l:modes = 'nothing'
+      endif
+      call s:CheckResultsAtWindows(l:data['position'],l:modes)
+    endif
+  endif
 endfunction
 
 function! user_ui#CheckGoto(items,using_filetype) abort
@@ -566,7 +605,7 @@ function s:ShowGoto_vim(items,using_filetype) abort
 "}}}
 endfunction
 
-function! s:GetLoadedFile() abort
+function! user_ui#GetLoadedFile() abort
 "{{{
   "return the loaded file with path
   let l:list_of_buf = []

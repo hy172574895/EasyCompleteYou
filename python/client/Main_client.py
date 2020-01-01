@@ -20,23 +20,6 @@ class _do(object):
         #     using_source = 'nothing'
         return using_source
 
-    def Integration(self):
-        todo = self._basic()
-        todo['Event'] = 'integration'
-        todo['Integration_event'] = vim_lib.GetVariableValue(
-            'g:ECY_do_something_event')
-        if todo['Integration_event'] == 'filter_search_items':
-            todo['KeyWords'] = vim_lib.\
-                    GetVariableValue('g:ecy_fileter_search_items_keyword')
-        return todo
-
-        # try:
-        #     vim_lib.CallEval('UltiSnips#SnippetsInCurrentScope( 1 )')
-        #     opts_temp['Ultisnips_snippets'] = vim_lib.\
-        #         GetVariableValue('g:current_ulti_dict_info')
-        # except: # noqa
-        #     pass
-
 class ECY_Client(_do):
     """interface
     """
