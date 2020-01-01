@@ -330,15 +330,6 @@ function! s:SetUpLeaderf() abort
 
   " In order to make this plugin in Leaderf available 
   let l:extension = {
-              \   "name": "ECY_symbols",
-              \   "help": "check out Doc of ECY",
-              \   "registerFunc": "symbols#register",
-              \   "arguments": [
-              \   ]
-              \ }
-  call g:LfRegisterPythonExtension(l:extension.name, l:extension)
-
-  let l:extension = {
               \   "name": "ECY_diagnosis",
               \   "help": "check out Doc of ECY",
               \   "registerFunc": "symbols#register",
