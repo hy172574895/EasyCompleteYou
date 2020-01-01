@@ -370,10 +370,11 @@ function! user_ui#LeaderF_cb(line, event, nr, ...)
   if a:event == 'acceptSelection' || a:event == 'previewResult'
     if exists("l:data['position']")
       " a:1 is modes
-      let l:modes = a:1
       if a:event == 'previewResult'
         " preview at current windows
         let l:modes = 'nothing'
+      else
+        let l:modes = a:1
       endif
       call s:CheckResultsAtWindows(l:data['position'],l:modes)
     endif
