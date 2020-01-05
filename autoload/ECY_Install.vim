@@ -27,5 +27,5 @@ function! ECY_Install#YCM()
   if !ECY_main#HasYCM()
     return {'status':'-1','description':"ECY failed to install it. You missing YCM. Please install that plugin, firstly. "}
   endif
-  return {'status':'0','description':"ok",'name':'lib.sources.YCM.YCM'}
+  return {'status':'0','description':"ok",'name':'lib.sources.youcompleteme.ycm'}
 endfunction

@@ -381,6 +381,8 @@ function! s:YCMCompatible(is_ycm) abort
       exe 'inoremap <expr>' . key .
             \ ' pumvisible() ? "\<C-n>" : "\' . key .'"'
     endfor
+    " tell server to save the setting
+    call s:Do("OnBufferEnter", v:true)
   else
     set completefunc=ECY_main#CompleteFunc
     call s:MappingSelection()
