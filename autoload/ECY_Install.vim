@@ -23,9 +23,9 @@ function! ECY_Install#Snippets()
   return {'status':'0','description':"ok",'name':'lib.sources.snippets.snippets'}
 endfunction
 
-function! ECY_Install#Tags()
-  if !exists('g:loaded_gutentags')
-    return {'status':'-1','description':"ECY failed to install it. You missing gutentags plugin. Please install that plugin, firstly. "}
+function! ECY_Install#YCM()
+  if !ECY_main#HasYCM()
+    return {'status':'-1','description':"ECY failed to install it. You missing YCM. Please install that plugin, firstly. "}
   endif
-  return {'status':'0','description':"ok",'name':'lib.sources.snippets.snippets'}
+  return {'status':'0','description':"ok",'name':'lib.sources.YCM.YCM'}
 endfunction

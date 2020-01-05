@@ -233,11 +233,6 @@ function! s:SetVariable() abort
   let g:ycm_autoclose_preview_window_after_completion
         \= get(g:,'ycm_autoclose_preview_window_after_completion',1)
 
-  let g:ECY_working_setting
-        \= get(g:,'ECY_working_setting',
-        \{'vim':'ecy','html':'ecy','css':'ecy','xhtml':'ecy','php':'ecy',
-        \'md':'ecy'})
-
   let s:back_to_source_key
         \= get(s:,'back_to_source_key',['<Space>'])
 
@@ -364,28 +359,73 @@ function! s:ShowPopup(fliter_words,list_info) abort
 "}}}
 endfunction
 
-function! ECY_main#IsECYWorksAtCurrentBuffer() abort 
-  "{{{
-  "if user have no ycm, so ecy will work at every file
-  "return 0 means not working.
+function! ECY_main#HasYCM() abort
+"{{{
   if exists('g:loaded_youcompleteme')
-    if g:loaded_youcompleteme != 1
-      return 1
+    if g:loaded_youcompleteme == 1
+      return v:true
     endif
+  endif
+  return v:false
+"}}}
+endfunction
+
+function! s:YCMCompatible(is_ycm) abort
+"{{{ switch to YCM or ECY
+  if a:is_ycm
+    set completefunc=youcompleteme#CompleteFunc
+    for key in g:ycm_key_list_select_completion
+      " With this command, when the completion window is visible, the tab key
+      " (default) will select the next candidate in the window. In vim, this also
+      " changes the typed-in text to that of the candidate completion.
+      exe 'inoremap <expr>' . key .
+            \ ' pumvisible() ? "\<C-n>" : "\' . key .'"'
+    endfor
   else
-    return 1
+    set completefunc=ECY_main#CompleteFunc
+    call s:MappingSelection()
+  endif
+"}}}
+endfunction
+
+function! s:MappingSelection() abort
+"{{{ Make mapping for ECY
+  if g:has_floating_windows_support == 'has_no' || 
+        \g:ECY_use_floating_windows_to_be_popup_windows == v:false
+    exe 'inoremap <expr>' . g:ECY_select_items[0] .
+          \ ' pumvisible() ? "\<C-n>" : "\' . g:ECY_select_items[0] .'"'
+    exe 'inoremap <expr>' . g:ECY_select_items[1] .
+          \ ' pumvisible() ? "\<C-p>" : "\' . g:ECY_select_items[1] .'"'
+  else
+    exe 'inoremap <silent> ' . g:ECY_select_items[0].' <C-R>=ECY_main#SelectItems(0,"\' . g:ECY_select_items[0] . '")<CR>'
+    exe 'inoremap <silent> ' . g:ECY_select_items[1].' <C-R>=ECY_main#SelectItems(1,"\' . g:ECY_select_items[1] . '")<CR>'
+  endif
+"}}}
+endfunction
+
+function! ECY_main#IsECYWorksAtCurrentBuffer() abort 
+"{{{
+
+  if !ECY_main#HasYCM()
+    "if user have no ycm, so ecy will work at every file
+    "return 0 means not working.
+    return v:true
   endif
 
-  " accordding the user's settings to optionally complete.
+  " according the user's settings to optionally complete.
   let l:filetype = &filetype
-  if has_key(g:ECY_working_setting,l:filetype)
-    if g:ECY_working_setting[l:filetype]=='' || 
-          \g:ECY_working_setting[l:filetype]!='ycm'
-      let g:ycm_filetype_blacklist[l:filetype]=1
-      return 1
+  if ECY_main#GetCurrentUsingSourceName() == 'youcompleteme'
+    if exists('g:ycm_filetype_blacklist[l:filetype]')
+      unlet g:ycm_filetype_blacklist[l:filetype]
+      call s:YCMCompatible(v:true)
     endif
+    return v:false
   endif
-  return 0
+  if !exists('g:ycm_filetype_blacklist[l:filetype]')
+    let g:ycm_filetype_blacklist[l:filetype] = 1
+    call s:YCMCompatible(v:false)
+  endif
+  return v:true
   "}}}
 endfunction
 
@@ -448,15 +488,36 @@ function! s:SetFileTypeSource_cb(msg) abort
         \a:msg['Dicts']['using_source']
   let g:ECY_file_type_info[a:msg['FileType']]['special_position']  =
         \{}
+
   " check if snippets is installed
   if g:has_ultisnips_support == v:true && !exists('g:ECY_is_installed_snippets')
+    let l:is_has = v:false
     for item in l:available_sources
       if item == 'snippets'
-        let g:ECY_is_installed_snippets = v:true
-        return
+        let l:is_has = v:true
+        break
       endif
     endfor
-    call ECY_main#Install('Snippets')
+    if l:is_has == v:false
+      " only install once
+      call ECY_main#Install('Snippets')
+      let g:ECY_is_installed_snippets = v:true
+    endif
+  endif
+
+  if ECY_main#HasYCM() && !exists('g:ECY_is_working_with_YCM')
+    let l:is_has = v:false
+    for item in l:available_sources
+      if item == 'youcompleteme'
+        let l:is_has = v:true
+        break
+      endif
+    endfor
+    if l:is_has == v:false
+      " only install once
+      call ECY_main#Install('YCM')
+      let g:ECY_is_working_with_YCM = v:true
+    endif
   endif
 "}}}
 endfunction
@@ -584,7 +645,7 @@ function! s:EventSort(id, data, event) abort
   "}}}
 endfunction
 
-function! ECY_main#SelectItems(next_or_pre) abort
+function! ECY_main#SelectItems(next_or_pre, send_key) abort
 "{{{ will only be trrigered when there are floating windows and
   " g:ECY_use_floating_windows_to_be_popup_windows is true in vim.
   " only for floating windows, every typing event will close the pre floating 
@@ -601,7 +662,8 @@ function! ECY_main#SelectItems(next_or_pre) abort
     " a callback
     call s:OnSelectingMenu()
   else
-    call s:SendKeys(g:ECY_select_items[a:next_or_pre])
+    " call s:SendKeys(g:ECY_select_items[a:next_or_pre])
+    call s:SendKeys(a:send_key)
   endif
   return ''
 "}}}
@@ -654,20 +716,8 @@ endfunction
 
 function! s:SetMapping() abort
 "{{{
-  if g:has_floating_windows_support == 'has_no' || 
-        \g:ECY_use_floating_windows_to_be_popup_windows == v:false
-    exe 'inoremap <expr>' . g:ECY_select_items[0] .
-          \ ' pumvisible() ? "\<C-n>" : "\' . g:ECY_select_items[0] .'"'
-    exe 'inoremap <expr>' . g:ECY_select_items[1] .
-          \ ' pumvisible() ? "\<C-p>" : "\' . g:ECY_select_items[1] .'"'
-  else
-    exe 'inoremap <silent> ' . g:ECY_select_items[0].
-        \ ' <C-R>=ECY_main#SelectItems(0)<CR>'
-    exe 'inoremap <silent> ' . g:ECY_select_items[1].
-        \ ' <C-R>=ECY_main#SelectItems(1)<CR>'
-    exe 'let g:ECY_select_items[0] = "\'.g:ECY_select_items[0].'"'
-    exe 'let g:ECY_select_items[1] = "\'.g:ECY_select_items[1].'"'
-  endif
+
+  call s:MappingSelection()
 
   exe 'nmap ' . g:ECY_show_switching_source_popup .
         \ ' :call user_ui#ChooseSource()<CR>'
