@@ -42,8 +42,8 @@ download the whole repository and put it into vim's starting dir
 
 # Usage  
 
-After the install ECY successfully, there are two buildin completion source that
-is `Label` and `Snippets`.  
+After the install ECY successfully, there are 3 buildin completion source that
+is `label`, `path` and `python`.  
 Firstly ECY will detect the filetype of your buffer that you areusing.  
 Knowing the filetype, then ECY asks the server what sources are available 
 on this filetype.  
@@ -72,12 +72,13 @@ And ECY had done that for you, after you enable ECY, it will change
 g:UltiSnipsExpandTrigger to '<F1>' automatically. you can also expand a snippet  
 by `g:ECY_expand_snippets_key` that default values is '<CR>' when you are   
 choosing a snippet in ECY popup windows.  
-Some useful default mappings of Ultisnips.
-`g:UltiSnipsJumpForwardTrigger          <c-j>`
-`g:UltiSnipsJumpBackwardTrigger         <c-k>`
-How to change the default value to you want.
-All of them are variables of vimL, so you can put a line like  
-`let g:ECY_expand_snippets_key = '<F7>'` into your vimrc.
+
+Some useful default mappings of Ultisnips.  
+`g:UltiSnipsJumpForwardTrigger          <c-j>`  
+`g:UltiSnipsJumpBackwardTrigger         <c-k>`  
+How to change the default value to you want.  
+All of them are variables of vimL, so you can put a line like    
+`let g:ECY_expand_snippets_key = '<F7>'` into your vimrc.  
 
 # Q&A
 Q: Why there are a few of Snippets options to complete? I need more.
