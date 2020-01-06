@@ -44,11 +44,19 @@ download the whole repository and put it into vim's starting dir
 
 After the install ECY successfully, there are 3 buildin completion source that
 is `label`, `path` and `python`.  
-Firstly ECY will detect the filetype of your buffer that you areusing.  
+Firstly ECY will detect the filetype of your buffer that you are using.  
 Knowing the filetype, then ECY asks the server what sources are available 
 on this filetype.  
 So if you want a specific source works on a buffer, you can change the filetype 
-by the vim that `set &filetype=java` on the buffer you want to change.  
+by the vim that `:set &filetype=java` on the buffer you want to change.  
+
+you can also check available sources of ECY by  pressing `<Tab>` in normal mode.
+It will show a floating windows containing all the sources you can use in current
+buffera. change `<Tab>`  by `g:ECY_show_switching_source_popup`
+
+### How to change the default value to you want.  
+All of them are variables of vimL, so you can put a line such as     
+`let g:ECY_expand_snippets_key = '<F7>'` into your vimrc.  
 
 ## Enable more.
 
@@ -73,16 +81,13 @@ g:UltiSnipsExpandTrigger to '<F1>' automatically. you can also expand a snippet
 by `g:ECY_expand_snippets_key` that default values is '<CR>' when you are   
 choosing a snippet in ECY popup windows.  
 
-Some useful default mappings of Ultisnips.  
+Some useful default mappings of Ultisnips. Check doc of ultisnips for more.  
 `g:UltiSnipsJumpForwardTrigger          <c-j>`  
 `g:UltiSnipsJumpBackwardTrigger         <c-k>`  
-How to change the default value to you want.  
-All of them are variables of vimL, so you can put a line like    
-`let g:ECY_expand_snippets_key = '<F7>'` into your vimrc.  
 
 # Q&A
 
-**Q: Why there are a few of Snippets options to complete? I need more.**
+### Q: Why there are a few of Snippets options to complete? I need more.  
 A: ECY rely on `ultisnips` which is a engine that fill in the snippets fragment.  
 What snippets you provide to `ultisnips`, what completion options you got in ECY.  
 So there are so many nice and mature snippets that made by other fellows such as  
@@ -90,7 +95,7 @@ So there are so many nice and mature snippets that made by other fellows such as
 the snippets you admire and `ultisnips` will analize that snippets then provide  
 to ECY and last provide to users.  
 
-**Q: Why I need to install `Leaderf`, and only `Leaderf`?**  
+### Q: Why I need to install `Leaderf`, and only `Leaderf`?    
 A: There are so many tools like `Leaderf` such as `fzf-vim` `ctrlP`, that's true  
 . And the answer is same as "Why ECY only supports ultisnips?"     
 Firstly, they are all rely on python same as ECY. Secondly, according to me,  
