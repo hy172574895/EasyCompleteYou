@@ -495,9 +495,10 @@ function! s:SetFileTypeSource_cb(msg) abort
   if g:has_ultisnips_support == v:true && !exists('g:ECY_is_installed_snippets')
     let l:is_has = v:false
     for item in l:available_sources
+      " snippet work at all filetype, so it's ok to check at here
       if item == 'snippets'
         let l:is_has = v:true
-        if g:UltiSnipsExpandTrigger == g:ECY_select_items
+        if g:UltiSnipsExpandTrigger == g:ECY_select_items[0]
           let g:UltiSnipsExpandTrigger = '<F1>'
         endif
         break
@@ -585,10 +586,6 @@ function! s:Completion_cb(msg) abort
 "}}}
 endfunction
 
-function! ECY_main#GetVersionID() abort
-  let l:temp = "ECY_Client_.GetVersionID_NotChange()"
-  return s:PythonEval(l:temp)
-endfunction
 
 function! s:Integration_cb(msg) abort
 "{{{
@@ -618,6 +615,13 @@ function! s:Integration_cb(msg) abort
 endfunction
 
 "}}}
+
+function! ECY_main#GetVersionID() abort
+"{{{
+  let l:temp = "ECY_Client_.GetVersionID_NotChange()"
+  return s:PythonEval(l:temp)
+"}}}
+endfunction
 
 function! s:EventSort(id, data, event) abort
   "{{{ classify events.
