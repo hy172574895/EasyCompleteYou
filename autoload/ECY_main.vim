@@ -497,14 +497,18 @@ function! s:SetFileTypeSource_cb(msg) abort
     for item in l:available_sources
       if item == 'snippets'
         let l:is_has = v:true
+        if g:UltiSnipsExpandTrigger == g:ECY_select_items
+          let g:UltiSnipsExpandTrigger = '<F1>'
+        endif
         break
       endif
     endfor
     if l:is_has == v:false
       " only install once
       call ECY_main#Install('Snippets')
-      let g:ECY_is_installed_snippets = v:true
     endif
+    " only check once
+    let g:ECY_is_installed_snippets = v:true
   endif
 
   if ECY_main#HasYCM() && !exists('g:ECY_is_working_with_YCM')
@@ -518,8 +522,9 @@ function! s:SetFileTypeSource_cb(msg) abort
     if l:is_has == v:false
       " only install once
       call ECY_main#Install('YCM')
-      let g:ECY_is_working_with_YCM = v:true
     endif
+    " only check once
+    let g:ECY_is_working_with_YCM = v:true
   endif
 "}}}
 endfunction
