@@ -82,7 +82,7 @@ All of them are variables of vimL, so you can put a line like
 
 # Q&A
 
-*Q: Why there are a few of Snippets options to complete? I need more.*  
+**Q: Why there are a few of Snippets options to complete? I need more.**
 A: ECY rely on `ultisnips` which is a engine that fill in the snippets fragment.  
 What snippets you provide to `ultisnips`, what completion options you got in ECY.  
 So there are so many nice and mature snippets that made by other fellows such as  
@@ -90,7 +90,7 @@ So there are so many nice and mature snippets that made by other fellows such as
 the snippets you admire and `ultisnips` will analize that snippets then provide  
 to ECY and last provide to users.  
 
-*Q: Why I need to install `Leaderf`, and only `Leaderf`?*  
+**Q: Why I need to install `Leaderf`, and only `Leaderf`?**  
 A: There are so many tools like `Leaderf` such as `fzf-vim` `ctrlP`, that's true  
 . And the answer is same as "Why ECY only supports ultisnips?"     
 Firstly, they are all rely on python same as ECY. Secondly, according to me,  
