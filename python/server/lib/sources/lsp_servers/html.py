@@ -32,9 +32,9 @@ class Operate(scope_.Source_interface):
 
                 # capabilities_dict = self._lsp.BuildCapabilities()
                 # capabilities_dict['completion']['dynamicRegistration'] = True
-                temp = self._lsp.initialize(
+                init_msg = self._lsp.initialize(
                     initializationOptions=None, rootUri=None)
-                self._lsp.GetResponse(temp['Method'])
+                self._lsp.GetResponse(init_msg['Method'])
                 self.is_server_start = 1
         except: # noqa
             self.is_server_start = 2
@@ -62,13 +62,14 @@ class Operate(scope_.Source_interface):
         while 1:
             try:
                 # GetTodo() will only wait for 5s,
-                # after that will raise an erro
+                # after that, it will raise an erro
                 self.return_data = None
                 self.return_data = self._lsp.GetResponse(method_)
                 if self.return_data['id'] == version_id:
                     break
             except: # noqa
                 self._log.exception("a timeout queue.")
+                # return None
                 break
         return self.return_data
         # }}}

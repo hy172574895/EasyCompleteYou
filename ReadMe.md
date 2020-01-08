@@ -29,6 +29,7 @@
 
 1. Python >= 3.0  
 strongly suggest to use python3.6+  
+[How to get python support for vim?](https://vi.stackexchange.com/questions/11526/how-to-enable-python-feature-in-vim)
 2. Vim >= 8.0  
 strongly suggest to use the newest one(Vim 8.2).  
 

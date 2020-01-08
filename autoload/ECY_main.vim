@@ -237,10 +237,13 @@ function! s:SetVariable() abort
         \= get(s:,'back_to_source_key',['<Space>'])
 
   let g:ECY_event_and_trigger_key
-        \= get(g:,'ECY_event_and_trigger_key',{'<Space>':function('s:Back2LastSource')})
+        \= get(g:,'ECY_event_and_trigger_key',{'<Space>': function('s:Back2LastSource')})
 
   let g:ECY_triggering_length
         \= get(g:,'ECY_triggering_length',1)
+
+  let g:ECY_disable_for_files_larger_than_kb
+        \= get(g:,'ycm_disable_for_files_larger_than_kb',1000)
 
   " we put this at here to accelarate the starting time
   try
@@ -408,6 +411,9 @@ endfunction
 function! ECY_main#IsECYWorksAtCurrentBuffer() abort 
 "{{{
 
+  if ECY_main#IsCurrentBufferBigFile()
+    return v:false
+  endif
   if !ECY_main#HasYCM()
     "if user have no ycm, so ecy will work at every file
     "return 0 means not working.
@@ -431,12 +437,29 @@ function! ECY_main#IsECYWorksAtCurrentBuffer() abort
   "}}}
 endfunction
 
+function! ECY_main#IsCurrentBufferBigFile()
+"{{{ we use same variable as YCM's one
+  if exists( 'b:ycm_largefile' )
+    return b:ycm_largefile
+  endif
+  let threshold = g:ECY_disable_for_files_larger_than_kb * 1024
+  let b:ycm_largefile =
+        \ threshold > 0 && getfsize(expand('%')) > threshold
+  if b:ycm_largefile
+    " only echo once because this will only check once
+    echo "ECY unavailable: the file exceeded the max size."
+  endif
+  return b:ycm_largefile
+"}}}
+endfunction
+
 function! ECY_main#GetCurrentUsingSourceName() abort
 "{{{
-  if !exists("g:ECY_file_type_info[".string(&filetype)."]")
+  let l:filetype = &filetype
+  if !exists("g:ECY_file_type_info[".string(l:filetype)."]")
     return ''
   endif
-  return g:ECY_file_type_info[&filetype]['filetype_using']
+  return g:ECY_file_type_info[l:filetype]['filetype_using']
 "}}}
 endfunction
 
