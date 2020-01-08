@@ -399,20 +399,25 @@ endfunction
 
 function! g:ChooseSource_cb(id, key) abort
 "{{{popup callback in vim can't be a local function
+  let l:filetype = &filetype
   if a:key == 'j' || a:key == 'k'
     if a:key == 'k'
       let l:temp = (s:using_source['current']-1)%len(s:using_source['list'])
-      call ECY_main#ChooseSource(&filetype,'pre')
+      call ECY_main#ChooseSource(l:filetype,'pre')
     else
       let l:temp = (s:using_source['current']+1)%len(s:using_source['list'])
-      call ECY_main#ChooseSource(&filetype,'next')
+      call ECY_main#ChooseSource(l:filetype,'next')
     endif
     let s:using_source['current'] = l:temp
 
-    " have to clear it then reset the text for now.
+    " have to clear it then reset the text for new.
+    " maybe this a bug of vim.
     call popup_settext(a:id,'')
     call popup_settext(a:id,s:BuildLoopingList(s:using_source))
     return 1
+  elseif a:key == "\<ESC>"
+    " a callback
+    call ECY_main#AfterUserChooseASource()
   endif
   " No shortcut, pass to generic filter. vim default to handle some keys such
   " as <Enter> <Bs> x and <Esc> for us.
@@ -689,13 +694,14 @@ endfunction
 
 function! s:ChooseSource_Echoing() abort
 "{{{ the versatitle way. could be used in many versions of vim or neovim.
-  let l:info  = g:ECY_file_type_info[&filetype]
+  let l:filetype = &filetype
+  let l:info  = g:ECY_file_type_info[l:filetype]
   while 1
     if len(l:info['available_sources']) == 0
       " show erro
       break
     endif
-    let l:text1 = "Detected FileTpye--[".&filetype."], available completor's sources:\n"
+    let l:text1 = "Detected FileTpye--[".l:filetype."], available completor's sources:\n"
     let l:text2 = "(Press ".'j/k'." to switch item that you want)\n------------------------------------------\n"
     let l:i     = 1
     for support_complete_name in l:info['available_sources']
@@ -713,9 +719,9 @@ function! s:ChooseSource_Echoing() abort
     let l:c = nr2char(getchar())
     redraw!
     if l:c == "j"
-      call ECY_main#ChooseSource(&filetype,'next')
+      call ECY_main#ChooseSource(l:filetype,'next')
     elseif l:c == "k"
-      call ECY_main#ChooseSource(&filetype,'pre')
+      call ECY_main#ChooseSource(l:filetype,'pre')
     else
       return
     endif
@@ -743,7 +749,8 @@ endfunction
 
 function! s:ChooseSource_vim() abort
 "{{{
-  let l:info  = g:ECY_file_type_info[&filetype]
+  let l:filetype = &filetype
+  let l:info  = g:ECY_file_type_info[l:filetype]
   let l:i = 0
   " the g:ECY_file_type_info has no index number, but has using source's name.
   for item in l:info['available_sources']

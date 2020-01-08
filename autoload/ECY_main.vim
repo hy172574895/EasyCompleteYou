@@ -94,23 +94,30 @@ function! s:OnBufferEnter() abort
   let  s:indentexpr           = &indentexpr
   let  s:completeopt_temp     = &completeopt
   let  s:completeopt_fuc_temp = &completefunc
+  call s:SetUpCompleteopt()
+  call s:Do("OnBufferEnter", v:true)
 
+  "}}}
+endfunction
+
+function! s:SetUpCompleteopt() abort 
+"{{{
   " can't format here:
   if g:has_floating_windows_support == 'vim' && 
         \g:ECY_use_floating_windows_to_be_popup_windows == v:true
+    " use ours popup windows
     set completeopt-=menuone
     set completeopt+=menu
   else
     set completeopt-=menu
     set completeopt+=menuone
   endif
+  set completeopt-=longest
   set shortmess+=c
   set completefunc=ECY_main#CompleteFunc
-
-  call s:Do("OnBufferEnter", v:true)
-
-  "}}}
+"}}}
 endfunction
+
 
 function! s:OnTextChangedInsertMode() abort 
   "{{{ invoke pop menu
@@ -180,7 +187,6 @@ function! s:UsingSpecicalSource(completor_name,invoke_key, is_replace) abort
       let s:last_used_completor['source_name'] = l:temp
       let s:last_used_completor['file_type']   = l:curren_file_type
     endif
-    let g:abc = s:last_used_completor
     for item in g:ECY_file_type_info[l:curren_file_type]['available_sources']
       if item == a:completor_name
         let g:ECY_file_type_info[l:curren_file_type]['filetype_using']
@@ -373,10 +379,12 @@ function! ECY_main#HasYCM() abort
 "}}}
 endfunction
 
-function! s:YCMCompatible(is_ycm) abort
+function! s:YCMCompatible(is_YCM) abort
 "{{{ switch to YCM or ECY
-  if a:is_ycm
+  if a:is_YCM
     set completefunc=youcompleteme#CompleteFunc
+    set completeopt-=menu
+    set completeopt+=menuone
     for key in g:ycm_key_list_select_completion
       " With this command, when the completion window is visible, the tab key
       " (default) will select the next candidate in the window. In vim, this also
@@ -384,10 +392,10 @@ function! s:YCMCompatible(is_ycm) abort
       exe 'inoremap <expr>' . key .
             \ ' pumvisible() ? "\<C-n>" : "\' . key .'"'
     endfor
-    " tell server to save the setting
+    " tell ECY's server to save the setting
     call s:Do("OnBufferEnter", v:true)
   else
-    set completefunc=ECY_main#CompleteFunc
+    call s:SetUpCompleteopt()
     call s:MappingSelection()
   endif
 "}}}
@@ -410,31 +418,17 @@ endfunction
 
 function! ECY_main#IsECYWorksAtCurrentBuffer() abort 
 "{{{
-
+"return v:false means not working.
   if ECY_main#IsCurrentBufferBigFile()
     return v:false
   endif
-  if !ECY_main#HasYCM()
-    "if user have no ycm, so ecy will work at every file
-    "return 0 means not working.
-    return v:true
-  endif
 
-  " according the user's settings to optionally complete.
-  let l:filetype = &filetype
-  if ECY_main#GetCurrentUsingSourceName() == 'youcompleteme'
-    if exists('g:ycm_filetype_blacklist[l:filetype]')
-      unlet g:ycm_filetype_blacklist[l:filetype]
-      call s:YCMCompatible(v:true)
-    endif
+  if ECY_main#HasYCM() && ECY_main#GetCurrentUsingSourceName() == 'youcompleteme'
+    "if user have no ycm, so ecy will work at that file
     return v:false
   endif
-  if !exists('g:ycm_filetype_blacklist[l:filetype]')
-    let g:ycm_filetype_blacklist[l:filetype] = 1
-    call s:YCMCompatible(v:false)
-  endif
   return v:true
-  "}}}
+"}}}
 endfunction
 
 function! ECY_main#IsCurrentBufferBigFile()
@@ -464,13 +458,14 @@ function! ECY_main#GetCurrentUsingSourceName() abort
 endfunction
 
 function! ECY_main#ChooseSource(file_type,next_or_pre) abort
-"{{{
-  if !exists("g:ECY_file_type_info[".string(&filetype)."]")
+"{{{ this will call by 'user_ui.vim'
+  let l:filetype = &filetype
+  if !exists("g:ECY_file_type_info[".string(l:filetype)."]")
     " server should init it first
     return
   endif
-  let l:available_sources = g:ECY_file_type_info[&filetype]['available_sources']
-  let l:current_using     = g:ECY_file_type_info[&filetype]['filetype_using']
+  let l:available_sources = g:ECY_file_type_info[l:filetype]['available_sources']
+  let l:current_using     = g:ECY_file_type_info[l:filetype]['filetype_using']
   let l:available_sources_len = len(l:available_sources)
   let l:index             = 0
   for item in l:available_sources
@@ -482,12 +477,38 @@ function! ECY_main#ChooseSource(file_type,next_or_pre) abort
   let l:choosing_source_index = 0
 
   if a:next_or_pre == 'next'
-    let l:choosing_source_index=(l:index+1)%l:available_sources_len
+    let l:choosing_source_index = (l:index+1) % l:available_sources_len
   else
-    let l:choosing_source_index=(l:index-1)%l:available_sources_len
+    let l:choosing_source_index = (l:index-1) % l:available_sources_len
   endif
   let l:choosing_source_index = l:available_sources[l:choosing_source_index]
-  let g:ECY_file_type_info[&filetype]['filetype_using'] = l:choosing_source_index
+  let g:ECY_file_type_info[l:filetype]['filetype_using'] = l:choosing_source_index
+"}}}
+endfunction
+
+function! ECY_main#AfterUserChooseASource() abort
+"{{{ a callback for pressing <ESC>
+  let l:current_source = ECY_main#GetCurrentUsingSourceName()
+  let g:abc = l:current_source
+  if ECY_main#HasYCM()
+    " according the user's settings to optionally complete.
+    let l:filetype = &filetype
+    if l:current_source == 'youcompleteme'
+      if exists('g:ycm_filetype_blacklist[l:filetype]')
+        unlet g:ycm_filetype_blacklist[l:filetype]
+      endif
+      call s:YCMCompatible(v:true)
+      do BufEnter youcompleteme
+      " will not call ECY's Event
+      return
+    endif
+    if !exists('g:ycm_filetype_blacklist[l:filetype]')
+      let g:ycm_filetype_blacklist[l:filetype] = 1
+      call s:YCMCompatible(v:false)
+      " available at current buffer, so we don't return
+    endif
+  endif
+  do BufEnter EasyCompleteYou
 "}}}
 endfunction
 
@@ -608,7 +629,6 @@ function! s:Completion_cb(msg) abort
   call s:ShowPopup(a:msg['Filter_words'], l:results_list)
 "}}}
 endfunction
-
 
 function! s:Integration_cb(msg) abort
 "{{{
@@ -791,7 +811,6 @@ function! s:StartCommunication() abort
   endif
 
   try
-    let g:abc = l:start_cmd
     let s:server_job_id = job#ECY_Start(l:start_cmd, {
         \ 'on_stdout': function('s:EventSort')
         \ })
