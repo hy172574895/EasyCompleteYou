@@ -29,3 +29,7 @@ function! ECY_Install#YCM()
   endif
   return {'status':'0','description':"ok",'name':'lib.sources.youcompleteme.ycm'}
 endfunction
+
+function! ECY_Install#Pygment()
+  return {'status':'0','description':"ok",'name':'lib.sources.pygment.pygment'}
+endfunction
