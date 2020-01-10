@@ -12,7 +12,9 @@ from lib.event import *
 class _do(object):
     def __init__(self):
         import lib.event.genernal as genernal
-        self.event_obj = {'genernal': genernal.GenernalEvent('genernal')}
+        import lib.event.html_lsp as html_lsp
+        self.event_obj = {'genernal': genernal.GenernalEvent('genernal'),
+                          'html_lsp': html_lsp.HtmlLSPEvent('html_lsp')}
 
     def GetCurrentSource(self):
         using_source = vim_lib.CallEval('ECY_main#GetCurrentUsingSourceName()')
@@ -84,24 +86,28 @@ class ECY_Client(_do):
         return self._HMAC_KEY.decode('utf-8')
 # }}}
 
-    def _add(self, method):
+    def _add(self, event):
         version_id = self.GetVersionID_change()
-        threading.Thread(target=self._go(method, version_id)).start()
+        threading.Thread(target=self._go(event, version_id)).start()
 
-    def _go(self, method, version_id):
+    def _get(self, event):
+        # do
+        source_name = self.GetCurrentSource()
+        if source_name in self.event_obj.keys():
+            method = getattr(self.event_obj[source_name], event, None)
+        else:
+            self.event_obj['genernal'].ChangeSourceName(source_name)
+            method = getattr(self.event_obj['genernal'], event, None)
+        # return a dict
+        return method()
+
+    def _go(self, event, version_id):
         try:
             self._lock.acquire()
-            # do
-            source_name = self.GetCurrentSource()
-            if source_name in self.event_obj.keys():
-                method = getattr(self.event_obj[source_name], method, None)
-            else:
-                self.event_obj['genernal'].ChangeSourceName(source_name)
-                method = getattr(self.event_obj['genernal'], method, None)
+            todo = self._get(event)
             if self.GetVersionID_NotChange() != version_id:
                 # we filter some usless requests at here
-                return
-            todo = method()
+                return None
             todo['VersionID'] = version_id
             if self.isdebug:
                 self._debug_server.AddTodo(todo)

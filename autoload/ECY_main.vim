@@ -211,7 +211,7 @@ function! s:SetVariable() abort
   " this debug option will start another server with socket port 1234 and
   " HMAC_KEY 1234, and output logging to file where server dir is. 
   let g:ECY_debug
-        \= get(g:, 'ECY_debug',0)
+        \= get(g:, 'ECY_debug',1)
 
   let g:ECY_select_items
         \= get(g:, 'ECY_select_items',['<Tab>','<S-TAB>'])
@@ -226,9 +226,9 @@ function! s:SetVariable() abort
 
   let g:ECY_choose_special_source_key
         \= get(g:,'ECY_choose_special_source_key',
-        \[{'source_name':'snippets','invoke_key':'@','is_replace': v:true},
-        \{'source_name':'path','invoke_key':'/','is_replace': v:false},
-        \{'source_name':'label','invoke_key':'#','is_replace': v:true}])
+        \[{'source_name':'snippets','invoke_key':'@', 'is_replace': v:true},
+        \{'source_name':'path','invoke_key':'/', 'is_replace': v:false},
+        \{'source_name':'label','invoke_key':'^', 'is_replace': v:true}])
 
   let g:ECY_python3_cmd                               
         \= get(g:,'ECY_python3_cmd','python')
@@ -280,7 +280,7 @@ function! s:Back2LastSource(typing_key) abort
 "{{{ and clear popup windows
   if exists('s:last_used_completor')
     let l:curren_file_type = s:last_used_completor['file_type']
-    let g:ECY_file_type_info[l:curren_file_type]['filetype_using']=
+    let g:ECY_file_type_info[l:curren_file_type]['filetype_using'] =
           \s:last_used_completor['source_name']
     unlet s:last_used_completor
     let g:ECY_file_type_info[l:curren_file_type]['special_position'] = {}
@@ -818,7 +818,7 @@ function! s:StartCommunication() abort
       call s:PythonEval("ECY_Client_.ConnectSocketServer()")
       if g:ECY_debug
         " this is a another socket server that inputed with socket
-        call s:PythonEval("ECY_Client_.StartDebugServer()")
+        " call s:PythonEval("ECY_Client_.StartDebugServer()")
       endif
     endif
   catch
@@ -866,6 +866,7 @@ function! s:Do(cmd, is_event) abort
 "{{{ask the server to do something with python3
 if a:is_event
   if s:is_using_stdio
+    " stdio is under TODO
     let l:Fuc  = function('genernal' . '#'. a:cmd)
     let l:temp = l:Fuc()
     let l:temp = "{'Method': 'receive_all_msg','Msg':".l:temp."}\n"

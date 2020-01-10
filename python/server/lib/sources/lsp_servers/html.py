@@ -9,24 +9,32 @@ class Operate(scope_.Source_interface):
         self._name = 'html_lsp'
         self._did_open_list = {}
         self._lsp = lsp.LSP()
-        self.is_server_start = 0
+        self.is_server_start = 'not started'
         self._deamon_queue = None
+        self._starting_server_cmd = None
 
     def GetInfo(self):
         return {'Name': self._name, 'WhiteList': ['html', 'xhtml'],
                 'Regex': r'[\w-]',
                 'TriggerKey': ['.', ':', '"', '\'', '<', '=', '/']}
 
-    def _erro_handler(self):
+    def _check(self):
+        ''' check Environment and start LSP server. 
+        Return True means that checking is pass.
+        Return False means that checking is fail.
+        ''' 
+        # will only start once
         self._start_server()
-        if self.is_server_start == 2:
+        if self.is_server_start == 'started':
             return True
         return False
 
     def _start_server(self):
         try:
-            if self.is_server_start == 0:
-                self._lsp.StartJob('html-languageserver --stdio')
+            if self.is_server_start == 'not started':
+                # cmd = "html-languageserver --stdio"
+                # cmd = "node D:/gvim/nodejs/node-v10.13.0-win-x86/node_modules/vscode-html-languageserver-bin/htmlServerMain.js --stdio"
+                self._lsp.StartJob(self._starting_server_cmd)
 
                 # you can change the capabilities of init request like this:
 
@@ -35,9 +43,13 @@ class Operate(scope_.Source_interface):
                 init_msg = self._lsp.initialize(
                     initializationOptions=None, rootUri=None)
                 self._lsp.GetResponse(init_msg['Method'])
-                self.is_server_start = 1
+                self.is_server_start = 'started'
         except: # noqa
-            self.is_server_start = 2
+            self.is_server_start = 'failed to start'
+            if self._deamon_queue is not None:
+                temp = {'ID': -1, 'Results': 'ok', 'ErroCode': 2,
+                 'Event':'erro_code', 'Description':'Failed to start LSP server. Check Log file of server to get more details.'} 
+                self._deamon_queue.put(temp)
 
     def _did_open_or_change(self, uri, text):
         '''update text to server
@@ -76,11 +88,14 @@ class Operate(scope_.Source_interface):
 
     def OnBufferEnter(self, version):
         self._deamon_queue = version['DeamonQueue']
-        if not self._erro_handler():
+        if self._starting_server_cmd is None:
+            if 'StartingCMD' in version.keys():
+                self._starting_server_cmd = version['StartingCMD']
+        if not self._check():
             uri_ = self._lsp.PathToUri(version['FilePath'])
             line_text = version['AllTextList']
             self._did_open_or_change(uri_, line_text)
-        # return self._erro_handler()
+        # every event must return something. 'None' means send nothing to client
         return None
 
     def _return_label(self, all_text_list):
