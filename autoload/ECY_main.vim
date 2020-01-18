@@ -118,7 +118,6 @@ function! s:SetUpCompleteopt() abort
 "}}}
 endfunction
 
-
 function! s:OnTextChangedInsertMode() abort 
   "{{{ invoke pop menu
   if !ECY_main#IsECYWorksAtCurrentBuffer()
@@ -441,7 +440,7 @@ function! ECY_main#IsCurrentBufferBigFile()
         \ threshold > 0 && getfsize(expand('%')) > threshold
   if b:ycm_largefile
     " only echo once because this will only check once
-    echo "ECY unavailable: the file exceeded the max size."
+    call user_ui#ShowMsg("ECY unavailable: the file exceeded the max size.", 2)
   endif
   return b:ycm_largefile
 "}}}
@@ -518,8 +517,9 @@ function! s:ErroCode_cb(msg) abort
 "{{{
   try
     if a:msg['ErroCode'] != 1
-      echo '[ECY] [' . ECY_main#GetCurrentUsingSourceName() . ' - ' . a:msg['ErroCode'] ."] " . ' ' .a:msg['Description']
+      call user_ui#ShowMsg('[ECY] [' . ECY_main#GetCurrentUsingSourceName() . ' - ' . a:msg['ErroCode'] ."] " . ' ' .a:msg['Description'], 2)
     endif
+  catch
   endtry
 "}}}
 endfunction
@@ -577,7 +577,7 @@ endfunction
 function! s:Completion_cb(msg) abort
 "{{{
   if ECY_main#GetVersionID() != a:msg['Version_ID'] 
-        \ || mode()!='i'
+        \ || mode() != 'i'
     " stop a useless poll
     return
   endif
@@ -634,10 +634,10 @@ function! s:Integration_cb(msg) abort
 "{{{
 
   if ECY_main#GetVersionID() != a:msg['ID'] 
-        \|| mode() == 'i'
+        \ || mode() == 'i'
     " stop a useless poll
-    echo '[ECY] An event: '.a:msg['Integration_event'] .
-          \' was abandoned. Trigger it again if you really want it.'
+    call user_ui#ShowMsg('[ECY] An event: '.a:msg['Integration_event'] .
+          \' was abandoned. Trigger it again if you really want it.', 2)
     return
   endif
   let l:event = a:msg['Integration_event']
@@ -690,7 +690,7 @@ function! s:EventSort(id, data, event) abort
         call s:Integration_cb(l:data_dict)
       elseif l:Event == 'install_source'
         redraw
-        echo '[ECY] [' . l:data_dict['Name'] .'] '.l:data_dict['Description']
+        call user_ui#ShowMsg('[ECY] [' . l:data_dict['Name'] .'] '.l:data_dict['Description'], 2)
       endif
     endfor
   " catch
@@ -844,21 +844,21 @@ function! ECY_main#Install(name) abort
   try
     let l:install_return = function(l:name)()
   catch
-    echo '[ECY] have no "'.a:name.'" supported.'
+    call user_ui#ShowMsg('[ECY] have no "'.a:name.'" supported.', 2)
     return 
   endtry
   if l:install_return['status'] == 0
     " refleshing all the running completor to make new completor work at every
     " where.
-    echo '[ECY] checked the requires of "'.l:install_return['name'].'" successfully.'
+    call user_ui#ShowMsg('[ECY] checked the requires of "'.l:install_return['name'].'" successfully.', 2)
   else
     "failed while check.
-    echo l:install_return['description']
+    call user_ui#ShowMsg(l:install_return['description'], 2)
     return
   endif
   let g:ecy_source_name_2_install = l:install_return['name']
   call s:Do("InstallSource", v:true)
-  echo '[ECY] installing "'.l:install_return['name'].'".'
+  call user_ui#ShowMsg('[ECY] installing "'.l:install_return['name'].'".', 2)
 "}}}
 endfunction
 

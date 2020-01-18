@@ -624,6 +624,23 @@ function! user_ui#GetLoadedFile() abort
 "}}}
 endfunction
 
+function! user_ui#ShowMsg(msg, style) abort
+"{{{
+  " if a:style == 1 means erro with no redraw
+  " a:style == 2 warning with no redraw
+  " a:style == 3 erro with redraw
+  " a:style == 4 warning with redraw
+    if a:style == 3 || a:style == 4
+      redraw!
+    endif
+    if a:style == 2 || a:style == 4
+      echohl WarningMsg |
+            \ echomsg a:msg |
+            \ echohl None
+    endif
+"}}}
+endfunction
+
 function s:PreviewWindows_vim(msg,using_filetype) abort
 "{{{ return a floating_win_nr
 
