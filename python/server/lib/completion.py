@@ -32,7 +32,7 @@ class Operate(object):
                 or self.completion_items['Server_name'] != source_info['Name']:
             # reflesh cache
             return_ = source_obj.DoCompletion(version)
-            if 'ErroCode' in return_:
+            if  return_ is None or 'ErroCode' in return_:
                 return return_
             self.completion_items = return_
             self.start_position[source_info['Name']] = current_start_postion

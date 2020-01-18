@@ -818,7 +818,7 @@ function! s:StartCommunication() abort
       call s:PythonEval("ECY_Client_.ConnectSocketServer()")
       if g:ECY_debug
         " this is a another socket server that inputed with socket
-        " call s:PythonEval("ECY_Client_.StartDebugServer()")
+        call s:PythonEval("ECY_Client_.StartDebugServer()")
       endif
     endif
   catch

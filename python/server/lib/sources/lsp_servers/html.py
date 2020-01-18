@@ -24,7 +24,8 @@ class Operate(scope_.Source_interface):
         Return False means that checking is fail.
         ''' 
         # will only start once
-        self._start_server()
+        if self._starting_server_cmd is not None:
+            self._start_server()
         if self.is_server_start == 'started':
             return True
         return False
@@ -91,7 +92,9 @@ class Operate(scope_.Source_interface):
         if self._starting_server_cmd is None:
             if 'StartingCMD' in version.keys():
                 self._starting_server_cmd = version['StartingCMD']
-        if not self._check():
+        if self._check():
+            # OnBufferEnter is a notification
+            # so we return nothing
             uri_ = self._lsp.PathToUri(version['FilePath'])
             line_text = version['AllTextList']
             self._did_open_or_change(uri_, line_text)
@@ -112,6 +115,8 @@ class Operate(scope_.Source_interface):
         return results_list
 
     def DoCompletion(self, version):
+        if not self._check():
+            return None
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         uri_ = self._lsp.PathToUri(version['FilePath'])
         line_text = version['AllTextList']
