@@ -673,15 +673,15 @@ function! s:EventSort(id, data, event) abort
     for item in a:data
       if item == ''
         " an additional part when splitting line with '\n'
-        return
+        continue
       endif
       let l:data_dict = json_decode(item)
       if exists("l:data_dict['ErroCode']")
         " the source have no process for this event
         call s:ErroCode_cb(l:data_dict)
-        return 
+        continue
       endif
-      let l:Event     = l:data_dict['Event']
+      let l:Event = l:data_dict['Event']
       if l:Event == 'do_completion'
         call s:Completion_cb(l:data_dict)
       elseif l:Event == 'set_file_type_available_source'
@@ -689,7 +689,6 @@ function! s:EventSort(id, data, event) abort
       elseif l:Event == 'integration'
         call s:Integration_cb(l:data_dict)
       elseif l:Event == 'install_source'
-        redraw
         call user_ui#ShowMsg('[ECY] [' . l:data_dict['Name'] .'] '.l:data_dict['Description'], 2)
       endif
     endfor
