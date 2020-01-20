@@ -215,65 +215,40 @@ class EventHandler(object):
             raise
 
     def Pass2Hanlder(self, version_dict):
+        # the following key is needed all the way.
         version_dict = version_dict['Msg']
         event_ = version_dict['Event']
         file_type = version_dict['FileType']
+        source_name = version_dict['SourceName']
+
+
         results_ = []
+        # all the request must choose a source, when it's omit, we will give it
+        # one
+        if event_ == 'GetAvailableSources':
+            temp = self.source_manager.GetAvailableSourceForFiletype(file_type)
+            results_.append(temp)
+            return results_
 
         # we passing that queue to let source handle asyn by itself.
         # if the source's event will block for a while, the source can return
         # None, and then put the result into deamon_queue when it finished
         version_dict['DeamonQueue'] = self.pass_2_vim_queue
-
-        # all the request must choose a source, when it's omit, we will give it
-        # one
-        if 'SourceName' in version_dict \
-                and version_dict['SourceName'] is not '':
-            completor_name = version_dict['SourceName']
-            self.source_manager.SetSource4FileType(
-                file_type, source_name=completor_name)
-        else:
-            # init then give it a default completor
-            available_sources = self.source_manager.\
-                    GetAvailableSourceForFiletype(file_type)
-            completor_name = available_sources['Dicts']['using_source']
-            results_.append(available_sources)
-        if completor_name in self.source_manager.sources_info:
-            object_ = self.source_manager.\
-                    sources_info[completor_name]['Object']
-        else:
-            raise
+        object_ = self.source_manager.GetSourceObjByName(source_name, file_type)
 
         # all the event must return something, if returning None
         # means returning nothing that do not need to send back to vim's side.
         if event_ == 'DoCompletion':
-            results_.append(self.completion.DoCompletion(
-                object_, version_dict))
+            temp = self.completion.DoCompletion(object_, version_dict)
         elif event_ == 'OnBufferEnter':
-            available_sources = self.source_manager.\
-                    GetAvailableSourceForFiletype(file_type)
-            results_.append(available_sources)
-            results_.append(self.on_buffer.OnBufferEnter(
-                object_, version_dict))
-        elif event_ == 'debug':
-            results_.append(None)
+            temp = self.on_buffer.OnBufferEnter(object_, version_dict)
+        elif event_ == 'integration':
+            temp = self.integration.HandleIntegration(object_, version_dict)
         elif event_ == 'InstallSource':
             temp = self.source_manager.InstallSource(version_dict['SourcePath'])
             results_.append(temp)
-            available_sources = self.source_manager.\
-                    GetAvailableSourceForFiletype(file_type)
-            results_.append(available_sources)
-        elif event_ == 'on_buffer_closing':
-            pass
-        elif event_ == 'on_insert_mode_entering':
-            pass
-        elif event_ == 'on_insert_mode_leaving':
-            pass
-        elif event_ == 'buffer_after_modified':
-            pass
-        elif event_ == 'integration':
-            results_.append(self.integration.HandleIntegration(
-                object_, version_dict))
+            temp = self.source_manager.GetAvailableSourceForFiletype(file_type)
+        results_.append(temp)
         return results_
 
 

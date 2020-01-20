@@ -27,17 +27,17 @@ class Operate(object):
             path_temp = __file__
             if os.path.isfile(path_temp):
                 path_temp = os.path.dirname(path_temp)
-            path_temp = path_temp+'/user_cache/'
+            path_temp = path_temp + '/user_cache/'
             if not os.path.exists(path_temp):
+                # if there are no user_cache dir then make one
                 os.mkdir(path_temp)
-            self._cache_file_name = path_temp+'/ECY_config.ini'
+            self._cache_file_name = path_temp + '/ECY_config.ini'
         return self._cache_file_name
 
-    def _loadConfig(self):
+    def _load_config(self):
         """
         """
         path_temp = self._get_cache_file()
-        installed_completor = {}
         if not os.path.exists(path_temp):
             # default config
             fp = open(path_temp, mode="w", encoding='utf-8')
@@ -59,17 +59,20 @@ class Operate(object):
         """
         try:
             if specify is None:
-                loading_source_temp = self._loadConfig()
+                loading_source_temp = self._load_config()
             else:
                 loading_source_temp = [specify]
-            for name_ in loading_source_temp:
-                module_ = importlib.import_module(name_)
-                obj_ = module_.Operate()
-                module_ = obj_.GetInfo()
-                module_['Object'] = obj_
-                completor_name = module_['Name']
-                self.sources_info[completor_name] = module_
-            return module_
+
+            for name_temp in loading_source_temp:
+                # e.g.
+                # name_temp = 'lib.sources.label.Label'
+                module_temp = importlib.import_module(name_temp)
+                obj_temp = module_temp.Operate()
+                module_temp = obj_temp.GetInfo() # return a dict
+                module_temp['Object'] = obj_temp
+                completor_name = module_temp['Name']
+                self.sources_info[completor_name] = module_temp
+            return module_temp
         except Exception as e:
             raise
 
@@ -127,8 +130,7 @@ class Operate(object):
                 'FileType': file_type,
                 'Dicts': self.file_type_available_source[file_type]}
 
-    def SetSource4FileType(self, file_type, source_name=None, is_next_or_pre='next'): # noqa
-
+    def SetSourceForFileType(self, file_type, source_name=None, is_next_or_pre='next'): # noqa
         # init, firstly
         self.GetAvailableSourceForFiletype(file_type)
 
@@ -153,7 +155,7 @@ class Operate(object):
 
         if setting_source_name is not \
                 self.file_type_available_source[file_type]['using_source']:
-            # write to the dick
+            # write back to the dick
             self.file_type_available_source[file_type]['using_source'] = \
                 setting_source_name
             self.conf.read(self._get_cache_file())
@@ -163,3 +165,10 @@ class Operate(object):
             fp.close()
 
         return {'Current_source': setting_source_name}
+
+    def GetSourceObjByName(self, source_name, file_type):
+        if source_name not in self.sources_info:
+            # while user provide a SourceName we don't have.
+            raise
+        self.SetSourceForFileType(file_type, source_name=source_name)
+        return self.sources_info[source_name]['Object']

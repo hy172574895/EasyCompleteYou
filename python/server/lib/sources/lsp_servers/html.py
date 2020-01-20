@@ -18,12 +18,16 @@ class Operate(scope_.Source_interface):
                 'Regex': r'[\w-]',
                 'TriggerKey': ['.', ':', '"', '\'', '<', '=', '/']}
 
-    def _check(self):
+    def _check(self, version):
         ''' check Environment and start LSP server. 
         Return True means that checking is pass.
         Return False means that checking is fail.
+        And this 'check' make sure the server was started.
         ''' 
-        # will only start once
+        self._deamon_queue = version['DeamonQueue']
+        if self._starting_server_cmd is None:
+            if 'StartingCMD' in version.keys():
+                self._starting_server_cmd = version['StartingCMD']
         if self._starting_server_cmd is not None:
             self._start_server()
         if self.is_server_start == 'started':
@@ -31,6 +35,8 @@ class Operate(scope_.Source_interface):
         return False
 
     def _start_server(self):
+        ''' will only start once
+        '''
         try:
             if self.is_server_start == 'not started':
                 # cmd = "html-languageserver --stdio"
@@ -88,11 +94,7 @@ class Operate(scope_.Source_interface):
         # }}}
 
     def OnBufferEnter(self, version):
-        self._deamon_queue = version['DeamonQueue']
-        if self._starting_server_cmd is None:
-            if 'StartingCMD' in version.keys():
-                self._starting_server_cmd = version['StartingCMD']
-        if self._check():
+        if self._check(version):
             # OnBufferEnter is a notification
             # so we return nothing
             uri_ = self._lsp.PathToUri(version['FilePath'])
@@ -115,7 +117,7 @@ class Operate(scope_.Source_interface):
         return results_list
 
     def DoCompletion(self, version):
-        if not self._check():
+        if not self._check(version):
             return None
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         uri_ = self._lsp.PathToUri(version['FilePath'])

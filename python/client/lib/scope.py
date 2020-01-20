@@ -43,6 +43,9 @@ class Event(object):
         msg['Integration_event'] = vim_lib.\
                 GetVariableValue('g:ECY_do_something_event')
         return self._pack(msg, 'integration')
+
+    def GetAvailableSources(self):
+        return self._pack({}, 'GetAvailableSources')
         
     def _pack(self, msg, event_name):
         msg = self._basic(msg)

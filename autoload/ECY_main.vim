@@ -96,7 +96,6 @@ function! s:OnBufferEnter() abort
   let  s:completeopt_fuc_temp = &completefunc
   call s:SetUpCompleteopt()
   call s:Do("OnBufferEnter", v:true)
-
   "}}}
 endfunction
 
@@ -210,7 +209,7 @@ function! s:SetVariable() abort
   " this debug option will start another server with socket port 1234 and
   " HMAC_KEY 1234, and output logging to file where server dir is. 
   let g:ECY_debug
-        \= get(g:, 'ECY_debug',1)
+        \= get(g:, 'ECY_debug',0)
 
   let g:ECY_select_items
         \= get(g:, 'ECY_select_items',['<Tab>','<S-TAB>'])
@@ -238,9 +237,6 @@ function! s:SetVariable() abort
   let g:ycm_autoclose_preview_window_after_completion
         \= get(g:,'ycm_autoclose_preview_window_after_completion',1)
 
-  let s:back_to_source_key
-        \= get(s:,'back_to_source_key',['<Space>'])
-
   let g:ECY_event_and_trigger_key
         \= get(g:,'ECY_event_and_trigger_key',{'<Space>': function('s:Back2LastSource')})
 
@@ -249,6 +245,11 @@ function! s:SetVariable() abort
 
   let g:ECY_disable_for_files_larger_than_kb
         \= get(g:,'ycm_disable_for_files_larger_than_kb',1000)
+
+  " 1 means ask diagnosis when there are changes not including user in insert mode
+  " 2 means ask diagnosis when there are changes including user in insert mode
+  let g:ECY_update_diagnosis_mode
+        \= get(g:,'ECY_update_diagnosis_mode',1)
 
   " we put this at here to accelarate the starting time
   try
@@ -262,16 +263,18 @@ function! s:SetVariable() abort
   let  s:indentexpr           = &indentexpr
   let  s:completeopt_temp     = &completeopt
   let  s:completeopt_fuc_temp = &completefunc
+  let  s:back_to_source_key
+         \= get(s:,'back_to_source_key',['<Space>'])
   " if has('patch-8.1.0818')
   "   let  s:is_using_stdio = v:true
   " else
   "   " because there are bugs of job communication of vim before patch-8.1.0818
   "   let  s:is_using_stdio = v:false
   " endif
+
   " we suggest to use socket, because we the results of testing the job is 
   " too slow.
   let  s:is_using_stdio = v:false
-  " let  s:is_using_stdio = v:true
 "}}}
 endfunction
 
@@ -400,6 +403,55 @@ function! s:YCMCompatible(is_YCM) abort
 "}}}
 endfunction
 
+function! s:DefaultSourcesCheck(current_sources_list) abort
+"{{{
+  " to make ECY more out of the box.
+
+  " check if snippets is installed
+  if g:has_ultisnips_support == v:true && !exists('g:ECY_is_installed_snippets')
+    let l:is_has = v:false
+    for item in a:current_sources_list
+      " snippet work at all filetype, so it's ok to check at here
+      if item == 'snippets'
+        let l:is_has = v:true
+        if g:UltiSnipsExpandTrigger == g:ECY_select_items[0]
+          let g:UltiSnipsExpandTrigger = '<F1>'
+        endif
+        break
+      endif
+    endfor
+    if l:is_has == v:false
+      " only install once
+      call ECY_main#Install('Snippets')
+    endif
+    " only check once
+    let g:ECY_is_installed_snippets = v:true
+  endif
+
+  if ECY_main#HasYCM() && !exists('g:ECY_is_working_with_YCM')
+    let l:is_has = v:false
+    for item in a:current_sources_list
+      if item == 'youcompleteme'
+        let l:is_has = v:true
+        break
+      endif
+    endfor
+    if l:is_has == v:false
+      " only install once
+      call ECY_main#Install('YCM')
+    endif
+    " only check once
+    let g:ECY_is_working_with_YCM = v:true
+  endif
+"}}}
+endfunction
+
+function! s:GetCurrentBufferAvailableSources() abort
+"{{{ will do something in callback.
+  call s:Do("GetAvailableSources", v:true)
+"}}}
+endfunction
+
 function! s:MappingSelection() abort
 "{{{ Make mapping for ECY
   if g:has_floating_windows_support == 'has_no' || 
@@ -418,11 +470,18 @@ endfunction
 function! ECY_main#IsECYWorksAtCurrentBuffer() abort 
 "{{{
 "return v:false means not working.
+  let l:current_source = ECY_main#GetCurrentUsingSourceName()
+  if l:current_source == ''
+    " ask the server to get available source, firstly
+    call s:GetCurrentBufferAvailableSources()
+    return v:false
+  endif
+
   if ECY_main#IsCurrentBufferBigFile()
     return v:false
   endif
 
-  if ECY_main#HasYCM() && ECY_main#GetCurrentUsingSourceName() == 'youcompleteme'
+  if ECY_main#HasYCM() &&  l:current_source == 'youcompleteme'
     "if user have no ycm, so ecy will work at that file
     return v:false
   endif
@@ -486,13 +545,12 @@ function! ECY_main#ChooseSource(file_type,next_or_pre) abort
 endfunction
 
 function! ECY_main#AfterUserChooseASource() abort
-"{{{ a callback for pressing <ESC>
-  let l:current_source = ECY_main#GetCurrentUsingSourceName()
-  let g:abc = l:current_source
+"{{{ a callback for pressing <ESC> at choosing sources or firstly get sources
+" lists
   if ECY_main#HasYCM()
     " according the user's settings to optionally complete.
     let l:filetype = &filetype
-    if l:current_source == 'youcompleteme'
+    if ECY_main#GetCurrentUsingSourceName() == 'youcompleteme'
       if exists('g:ycm_filetype_blacklist[l:filetype]')
         unlet g:ycm_filetype_blacklist[l:filetype]
       endif
@@ -534,45 +592,11 @@ function! s:SetFileTypeSource_cb(msg) abort
         \a:msg['Dicts']['using_source']
   let g:ECY_file_type_info[a:msg['FileType']]['special_position']  =
         \{}
-
-  " check if snippets is installed
-  if g:has_ultisnips_support == v:true && !exists('g:ECY_is_installed_snippets')
-    let l:is_has = v:false
-    for item in l:available_sources
-      " snippet work at all filetype, so it's ok to check at here
-      if item == 'snippets'
-        let l:is_has = v:true
-        if g:UltiSnipsExpandTrigger == g:ECY_select_items[0]
-          let g:UltiSnipsExpandTrigger = '<F1>'
-        endif
-        break
-      endif
-    endfor
-    if l:is_has == v:false
-      " only install once
-      call ECY_main#Install('Snippets')
-    endif
-    " only check once
-    let g:ECY_is_installed_snippets = v:true
-  endif
-
-  if ECY_main#HasYCM() && !exists('g:ECY_is_working_with_YCM')
-    let l:is_has = v:false
-    for item in l:available_sources
-      if item == 'youcompleteme'
-        let l:is_has = v:true
-        break
-      endif
-    endfor
-    if l:is_has == v:false
-      " only install once
-      call ECY_main#Install('YCM')
-    endif
-    " only check once
-    let g:ECY_is_working_with_YCM = v:true
-  endif
+  call s:DefaultSourcesCheck(l:available_sources)
+  call ECY_main#AfterUserChooseASource()
 "}}}
 endfunction
+
 
 function! s:Completion_cb(msg) abort
 "{{{
