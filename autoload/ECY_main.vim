@@ -243,8 +243,12 @@ function! s:SetVariable() abort
   let g:ECY_triggering_length
         \= get(g:,'ECY_triggering_length',1)
 
-  let g:ECY_disable_for_files_larger_than_kb
-        \= get(g:,'ycm_disable_for_files_larger_than_kb',1000)
+  if exists('g:ycm_disable_for_files_larger_than_kb')
+    let g:ECY_disable_for_files_larger_than_kb = g:ycm_disable_for_files_larger_than_kb
+  else
+    let g:ECY_disable_for_files_larger_than_kb
+          \= get(g:,'ECY_disable_for_files_larger_than_kb',1000)
+  endif
 
   " 1 means ask diagnosis when there are changes not including user in insert mode
   " 2 means ask diagnosis when there are changes including user in insert mode
