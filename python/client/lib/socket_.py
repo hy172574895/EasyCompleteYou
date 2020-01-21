@@ -29,9 +29,7 @@ class Socket_(object):
             self.tcpCliSock.connect(self.ADDR)
             self._isconnected = True
             self._HMAC_KEY = bytes(str(self._HMAC_KEY), encoding='utf-8')
-            print("[ECY] Started.")
         except: # noqa
-            print("[ECY] failed to connect server.")
             self._isconnected = False
             raise
 
@@ -64,7 +62,7 @@ class Socket_(object):
                 todo = self.callback_queue.get()
                 self.BuildMsg(todo)
         except:# noqa
-            print("something wrong with Socket_.")
+            pass
         finally:
             if self._isconnected:
                 self._isconnected = False

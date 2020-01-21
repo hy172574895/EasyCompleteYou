@@ -15,7 +15,7 @@ class Event(object):
 
     def GetCurrentWorkSpace(self):
         temp = vim_lib.CallEval("rooter#GetCurrentBufferWorkSpace()")
-        if temp is '':
+        if temp == '':
             temp = None
         return temp
 
@@ -28,10 +28,12 @@ class Event(object):
         msg['ReturnMatchPoint'] = self._isReturn_match_point
         return self._pack(msg, 'DoCompletion')
 
+    def Diagnosis(self):
+        return self._pack({}, 'OnBufferEnter')
+
     def InstallSource(self):
         msg = {}
-        msg['SourcePath'] = vim_lib.\
-                GetVariableValue('g:ecy_source_name_2_install')
+        msg['SourcePath'] = vim_lib.GetVariableValue('g:ecy_source_name_2_install')
         return self._pack(msg, 'InstallSource')
 
     def OnBufferEnter(self):
@@ -40,13 +42,12 @@ class Event(object):
 
     def Integration(self):
         msg = {}
-        msg['Integration_event'] = vim_lib.\
-                GetVariableValue('g:ECY_do_something_event')
+        msg['Integration_event'] = vim_lib.GetVariableValue('g:ECY_do_something_event')
         return self._pack(msg, 'integration')
 
     def GetAvailableSources(self):
         return self._pack({}, 'GetAvailableSources')
-        
+
     def _pack(self, msg, event_name):
         msg = self._basic(msg)
         msg['Event'] = event_name
@@ -67,15 +68,15 @@ class Event(object):
         return results
 
     def _basic(self, msg):
-        msg['AllTextList']     = vim_lib.CurrenBufferText()
+        msg['AllTextList'] = vim_lib.CurrenBufferText()
         msg['CurrentLineText'] = vim_lib.CurrentLineContents()
-        msg['FileType']        = vim_lib.GetCurrentBufferType()
-        msg['FilePath']        = vim_lib.GetCurrentBufferFilePath()
+        msg['FileType'] = vim_lib.GetCurrentBufferType()
+        msg['FilePath'] = vim_lib.GetCurrentBufferFilePath()
         # vim_lib.CurrentColumn is 0-based, and also CurrenLineNr()
-        start_position         = {
+        start_position = {
             'Line': vim_lib.CurrenLineNr(), 'Colum': vim_lib.CurrentColumn()}
         msg['StartPosition'] = start_position
-        msg['SourceName']    = self.source_name
-        msg['WorkSpace']     = self._workspace
+        msg['SourceName'] = self.source_name
+        msg['WorkSpace'] = self._workspace
         return msg
 

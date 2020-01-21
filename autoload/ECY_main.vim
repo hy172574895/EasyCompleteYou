@@ -12,6 +12,7 @@ function! s:SetUpEvent() abort
     autocmd BufLeave      * call s:OnBufferLeave()
     autocmd InsertLeave   * call s:OnInsertModeLeave()
     autocmd TextChanged   * call s:OnTextChangedNormalMode()
+    autocmd VimLeavePre   * call s:OnVIMLeave()
 
     " invoked after typing a character into the buffer or user sept in insert mode  
     autocmd InsertEnter   * call s:OnInsertMode()
@@ -63,7 +64,7 @@ function! s:OnTextChangedNormalMode() abort
   if !ECY_main#IsECYWorksAtCurrentBuffer()
     return
   endif
-  call s:DoCompletion()
+  call s:AskDiagnosis()
   "}}}
 endfunction
 
@@ -76,12 +77,19 @@ function! s:OnInsertMode() abort
   "}}}
 endfunction
 
+function! s:OnVIMLeave() abort 
+  "{{{ clean all legacy of ECY.
+  call user_ui#UnPlaceAllSign()
+  "}}}
+endfunction
+
 function! s:OnInsertModeLeave() abort 
   "{{{
   if !ECY_main#IsECYWorksAtCurrentBuffer()
     return
   endif
   call s:Back2LastSource(-1)
+  call s:AskDiagnosis()
   call user_ui#ClosePreviewWindows()
   "}}}
 endfunction
@@ -96,7 +104,28 @@ function! s:OnBufferEnter() abort
   let  s:completeopt_fuc_temp = &completefunc
   call s:SetUpCompleteopt()
   call s:Do("OnBufferEnter", v:true)
+  call s:AskDiagnosis()
   "}}}
+endfunction
+
+function! s:OnTextChangedInsertMode() abort 
+  "{{{ invoke pop menu
+  if !ECY_main#IsECYWorksAtCurrentBuffer()
+    return
+  endif
+  call s:DoCompletion()
+  call s:AskDiagnosis()
+  "}}}
+endfunction
+" ==============================================================================
+function! s:AskDiagnosis() abort 
+"{{{
+  call user_ui#CleanAllSignHighlight()
+  if mode() == 'i' && g:ECY_update_diagnosis_mode == 1
+    return
+  endif
+  call s:Do("Diagnosis", v:true)
+"}}}
 endfunction
 
 function! s:SetUpCompleteopt() abort 
@@ -115,15 +144,6 @@ function! s:SetUpCompleteopt() abort
   set shortmess+=c
   set completefunc=ECY_main#CompleteFunc
 "}}}
-endfunction
-
-function! s:OnTextChangedInsertMode() abort 
-  "{{{ invoke pop menu
-  if !ECY_main#IsECYWorksAtCurrentBuffer()
-    return
-  endif
-  call s:DoCompletion()
-  "}}}
 endfunction
 
 function! s:DoCompletion() abort
@@ -601,7 +621,6 @@ function! s:SetFileTypeSource_cb(msg) abort
 "}}}
 endfunction
 
-
 function! s:Completion_cb(msg) abort
 "{{{
   if ECY_main#GetVersionID() != a:msg['Version_ID'] 
@@ -675,12 +694,8 @@ function! s:Integration_cb(msg) abort
     " TODO
   elseif l:event == 'get_symbols'
     call user_ui#Search(a:msg['Results'])
-  elseif l:event == 'Diagnostics'
-    " if there are ale, we should make it not working, because ale will do the 
-    " repeat works thar ECY had done.
-    let l:curren_file_type = &filetype
-    let g:ale_filetype_blacklist = get(g:, 'ale_filetype_blacklist', [])
-    call add(g:ale_filetype_blacklist,l:curren_file_type)
+  elseif l:event == 'diagnostics'
+    call user_ui#Diagnosis(a:msg['Results'])
   endif
 "}}}
 endfunction

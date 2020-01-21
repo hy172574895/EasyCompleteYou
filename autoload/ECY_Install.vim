@@ -5,7 +5,8 @@ let g:ECY_available_sources_lists = ['HTML_LSP', 'Snippets', 'YCM', 'Pygment']
 function! ECY_Install#HTML_LSP()
 "{{{
   " options: 1. cmd for starting Server
-  if !executable('html-languageserver')
+  let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
+  if !executable(l:temp)
     if !executable('npm')
       return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
     endif
