@@ -96,7 +96,7 @@ Some useful command of `LeaderF` are follow.
 
 > :LeaderfFile or \<leader\>f  
 
-Especially the `Ctage` support of `LeaderF`
+Especially the `ctags` support of `LeaderF`
 
 # Q&A
 
