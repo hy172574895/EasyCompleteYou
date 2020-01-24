@@ -19,11 +19,11 @@ class Operate(scope_.Source_interface):
                 'TriggerKey': ['.', ':', '"', '\'', '<', '=', '/']}
 
     def _check(self, version):
-        ''' check Environment and start LSP server. 
+        ''' check Environment and start LSP server.
         Return True means that checking is pass.
         Return False means that checking is fail.
         And this 'check' make sure the server was started.
-        ''' 
+        '''
         self._deamon_queue = version['DeamonQueue']
         if self._starting_server_cmd is None:
             if 'StartingCMD' in version.keys():
@@ -55,7 +55,9 @@ class Operate(scope_.Source_interface):
             self.is_server_start = 'failed to start'
             if self._deamon_queue is not None:
                 temp = {'ID': -1, 'Results': 'ok', 'ErroCode': 2,
-                 'Event':'erro_code', 'Description':'Failed to start LSP server. Check Log file of server to get more details.'} 
+                        'Event': 'erro_code',
+                        'Description':
+                        'Failed to start LSP server. Check Log file of server to get more details.'}
                 self._deamon_queue.put(temp)
 
     def _did_open_or_change(self, uri, text):

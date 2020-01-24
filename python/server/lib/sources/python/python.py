@@ -4,6 +4,7 @@ import re
 
 import utils.interface as scope_
 
+
 class Operate(scope_.Source_interface):
     def __init__(self):
         # FIXME:when completing the last line of a method or a class will
@@ -102,14 +103,13 @@ class Operate(scope_.Source_interface):
         return snippet
     # }}}
 
-
     def _return_label(self, all_text_list):
-        items_list = list(set(re.findall(r'\w+', all_text_list )))
+        items_list = list(set(re.findall(r'\w+', all_text_list)))
         results_list = []
         for item in items_list:
             # the results_format must at least contain the following keys.
             results_format = {'abbr': '', 'word': '', 'kind': '',
-                    'menu': '', 'info': '','user_data':''}
+                              'menu': '', 'info': '', 'user_data': ''}
             results_format['abbr'] = item
             results_format['word'] = item
             results_format['kind'] = '[ID]'
@@ -171,20 +171,20 @@ class Operate(scope_.Source_interface):
 
     def GetSymbol(self, version):
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
-        definitions = jedi.api.names(source=version['AllTextList'], 
-                all_scopes=True, definitions=True, 
-                references=False,path=version['FilePath'])
+        definitions = jedi.api.names(source=version['AllTextList'],
+                                     all_scopes=True, definitions=True,
+                                     references=False, path=version['FilePath'])
         lists = []
         for item in definitions:
             position = item._name.tree_name.get_definition()
             (start_line, start_column) = position.start_pos
-            item = [{'name':'1','content':{'abbr':item.name, 'highlight':'ECY_blue'}},
-                    {'name':'2','content':{'abbr':item.type, 'highlight':'ECY_green'}},
-                    {'name':'3','content':{'abbr':str(position.start_pos), 'highlight':'ECY_yellow'}}]
-            position = {'line':start_line,'colum':start_column,'path':version['FilePath'].replace('\\','/')}
-            temp = {'items':item,
-                    'type':'symbol',
-                    'position':position}
+            item = [{'name': '1', 'content': {'abbr': item.name, 'highlight': 'ECY_blue'}},
+                    {'name': '2', 'content': {'abbr': item.type, 'highlight': 'ECY_green'}},
+                    {'name': '3', 'content': {'abbr': str(position.start_pos),  'highlight':'ECY_yellow'}}]
+            position = {'line': start_line, 'colum': start_column, 'path': version['FilePath'].replace('\\', '/')}
+            temp = {'items': item,
+                    'type': 'symbol',
+                    'position': position}
             lists.append(temp)
         return_['Results'] = lists
         return return_

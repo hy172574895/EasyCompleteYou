@@ -2,7 +2,7 @@
 " must put these outside a function
 let  s:python_script_folder_path = expand( '<sfile>:p:h:h' ).'\python'
 let  s:python_script_folder_path = escape( s:python_script_folder_path, '\' )
-
+  
 function! s:SetUpEvent() abort
 "{{{
   augroup EasyCompleteYou
@@ -55,7 +55,7 @@ endfunction
 
 function! s:OnBufferLeave() abort 
   "{{{
-  call s:Back2LastSource(-1)
+  call s:BackToLastSource(-1)
   "}}}
 endfunction
 
@@ -64,7 +64,7 @@ function! s:OnTextChangedNormalMode() abort
   if !ECY_main#IsECYWorksAtCurrentBuffer()
     return
   endif
-  call s:AskDiagnosis()
+  call s:AskDiagnosis('OnTextChangedNormalMode')
   "}}}
 endfunction
 
@@ -78,8 +78,7 @@ function! s:OnInsertMode() abort
 endfunction
 
 function! s:OnVIMLeave() abort 
-  "{{{ clean all legacy of ECY.
-  call user_ui#UnPlaceAllSign()
+  "{{{ clean all legacy of ECY before existing.
   "}}}
 endfunction
 
@@ -88,8 +87,9 @@ function! s:OnInsertModeLeave() abort
   if !ECY_main#IsECYWorksAtCurrentBuffer()
     return
   endif
-  call s:Back2LastSource(-1)
-  call s:AskDiagnosis()
+  " order matters
+  call s:BackToLastSource(-1)
+  call s:AskDiagnosis('OnInsertModeLeave')
   call user_ui#ClosePreviewWindows()
   "}}}
 endfunction
@@ -102,9 +102,10 @@ function! s:OnBufferEnter() abort
   let  s:indentexpr           = &indentexpr
   let  s:completeopt_temp     = &completeopt
   let  s:completeopt_fuc_temp = &completefunc
+  let  s:buffer_has_changed   = 0
   call s:SetUpCompleteopt()
   call s:Do("OnBufferEnter", v:true)
-  call s:AskDiagnosis()
+  call s:AskDiagnosis('OnBufferEnter')
   "}}}
 endfunction
 
@@ -114,13 +115,20 @@ function! s:OnTextChangedInsertMode() abort
     return
   endif
   call s:DoCompletion()
-  call s:AskDiagnosis()
+  call s:AskDiagnosis('OnTextChangedInsertMode')
   "}}}
 endfunction
 " ==============================================================================
-function! s:AskDiagnosis() abort 
+function! s:AskDiagnosis(event) abort 
 "{{{
-  call user_ui#CleanAllSignHighlight()
+  if a:event == 'OnTextChangedInsertMode' || a:event == 'OnTextChangedNormalMode'
+    call diagnosis#CleanAllSignHighlight()
+    let s:buffer_has_changed = 1
+  endif
+  if a:event == 'OnInsertModeLeave' && s:buffer_has_changed == 1
+    call diagnosis#UnPlaceAllSignInBuffer(bufnr("$"))
+    let s:buffer_has_changed = 0
+  endif
   if mode() == 'i' && g:ECY_update_diagnosis_mode == 1
     return
   endif
@@ -257,9 +265,6 @@ function! s:SetVariable() abort
   let g:ycm_autoclose_preview_window_after_completion
         \= get(g:,'ycm_autoclose_preview_window_after_completion',1)
 
-  let g:ECY_event_and_trigger_key
-        \= get(g:,'ECY_event_and_trigger_key',{'<Space>': function('s:Back2LastSource')})
-
   let g:ECY_triggering_length
         \= get(g:,'ECY_triggering_length',1)
 
@@ -302,7 +307,7 @@ function! s:SetVariable() abort
 "}}}
 endfunction
 
-function! s:Back2LastSource(typing_key) abort
+function! s:BackToLastSource(typing_key) abort
 "{{{ and clear popup windows
   if exists('s:last_used_completor')
     let l:curren_file_type = s:last_used_completor['file_type']
@@ -571,6 +576,9 @@ endfunction
 function! ECY_main#AfterUserChooseASource() abort
 "{{{ a callback for pressing <ESC> at choosing sources or firstly get sources
 " lists
+  " order matters
+  call diagnosis#CleanAllSignHighlight()
+  call diagnosis#UnPlaceAllSignInBuffer(bufnr("$"))
   if ECY_main#HasYCM()
     " according the user's settings to optionally complete.
     let l:filetype = &filetype
@@ -637,7 +645,7 @@ function! s:Completion_cb(msg) abort
     if l:temp['Line'] == (line('.')-1)
       let s:show_item_position = l:temp['Colum']
     else
-      call s:Back2LastSource(-1)
+      call s:BackToLastSource(-1)
     endif
   endif
 
@@ -695,7 +703,7 @@ function! s:Integration_cb(msg) abort
   elseif l:event == 'get_symbols'
     call user_ui#Search(a:msg['Results'])
   elseif l:event == 'diagnostics'
-    call user_ui#Diagnosis(a:msg['Results'])
+    call diagnosis#PlaceSign(a:msg['Results'])
   endif
 "}}}
 endfunction
@@ -831,7 +839,7 @@ function! s:SetMapping() abort
   endfor
 
   for key in s:back_to_source_key
-    exe 'inoremap <expr>' . key . ' <SID>Back2LastSource( "\' . key . '" )'
+    exe 'inoremap <expr>' . key . ' <SID>BackToLastSource( "\' . key . '" )'
   endfor
 
 "}}}

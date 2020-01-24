@@ -50,18 +50,6 @@ function user_ui#Init() abort
     call prop_type_add('symbol_position', {'highlight': 'NonText'})
     call prop_type_add('symbol_kind', {'highlight': 'Normal'})
   endif
-  hi ECY_diagnosis_erro  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
-  hi ECY_diagnosis_warn  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
-  hi ECY_diagnosis_highlight  term=undercurl gui=undercurl guisp=DarkRed cterm=underline
-  call sign_define("ECY_diagnosis_erro", {
-    \ "text" : ">>",
-    \ "texthl" : "ECY_diagnosis_erro"})
-  call sign_define("ECY_diagnosis_warn", {
-    \ "text" : "!!",
-    \ "texthl" : "ECY_diagnosis_warn"})
-  " exe ":sign define ECY_diagnosis_erro text=>> texthl=ECY_diagnosis_erro"
-  " exe ":sign define ECY_diagnosis_warn text=!! texthl=ECY_diagnosis_warn"
-  let g:ECY_sign_lists = []
   "}}}
 endfunction
 
@@ -652,87 +640,6 @@ function! user_ui#ShowMsg(msg, style) abort
             \ echomsg a:msg |
             \ echohl None
     endif
-"}}}
-endfunction
-
-function! s:PlaceSign(position, diagnosis, style) abort
-"{{{
-  " a:position = {'path': 'c:/xxx/df/foo.c', 'line': 10, 'range': {'start': { 'line': 5, 'colum': 23 },'end' : { 'line': 6, 'colum': 0 } }}
-  " a:diagnosis = {'item':{'1':'asdf', '2':'sdf'}}
-  if a:style == 1
-    let l:style = 'ECY_diagnosis_erro'
-  else
-    let l:style = 'ECY_diagnosis_warn'
-  endif
-  let l:sign_id = sign_place(0,'',l:style, a:position['path'], {'lnum' : a:position['line']})
-  let l:highlight_list = matchaddpos("ECY_diagnosis_highlight", [[23, 24], 34])
-  let l:temp = {'position': a:position, 
-        \'id': l:sign_id,
-        \'diagnosis': a:diagnosis,
-        \'highlight_list': l:highlight_list,
-        \'kind': l:style}
-  call add(g:ECY_sign_lists, l:temp)
-"}}}
-endfunction
-
-function! s:HighlightRange(range, highlights) abort
-"{{{ return a list of `matchaddpos` e.g. [match_point1, match_point2]
- let l:line = range['start']['line'] - range['end']['line']
- let l:colum = range['start']['colum'] - range['end']['colum']
- let l:lists = []
- if l:line == 0
-   call add(l:lists, matchaddpos(a:highlights, l:colum))
- else
-   let i = 0
-   while i <= l:line
-     call add(l:lists, matchaddpos(a:highlights, l:colum))
-     call matchaddpos(a:highlights, range['start']['line'] + i)
-     let i += 1
-   endw
- endif
- return l:lists
-"}}}
-endfunction
-
-function! s:UnPlaceSign(sign_id) abort
-"{{{
-  let i = 0
-  for item in g:ECY_sign_lists
-    if item['id'] == a:sign_id
-      call sign_unplace('', {'buffer' : item['position']['path'], 'id' : a:sign_id})
-      unlet g:ECY_sign_lists[i]
-      return
-    endif
-    let i += 1
-  endfor
-  return 'not found'
-"}}}
-endfunction
-
-function! user_ui#UnPlaceAllSign() abort
-"{{{
-  for item in g:ECY_sign_lists
-    call s:UnPlaceSign(item['id'])
-  endfor
-"}}}
-endfunction
-
-function! user_ui#CleanAllSignHighlight() abort
-"{{{ should be called after text had been changed.
-  for item in g:ECY_sign_lists
-    for line in item['highlight_list']
-      call matchdelete(line)
-    endfor
-  endfor
-"}}}
-endfunction
-
-function! user_ui#Diagnosis(msg) abort
-"{{{
-  if len(a:msg['Items']) > 100
-    call user_ui#ShowMsg("[ECY] Diagnosis will not be highlighted: the erros/warnnings are too much.", 2)
-    return
-  endif
 "}}}
 endfunction
 

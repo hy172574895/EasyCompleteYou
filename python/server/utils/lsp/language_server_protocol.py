@@ -16,11 +16,17 @@ class LSP(conec.Operate):
         self._waitting_response = {}
         super().__init__()
         threading.Thread(target=self._classify_response, daemon=True).start()
+        self._debug = False
+
+    def Debug(self):
+        self._debug = not self._debug
 
     def _classify_response(self):
         while 1:
             todo = self.GetTodo()
             todo = json.loads(todo['data'])
+            if self._debug:
+                print(todo)
             if 'id' not in todo.keys():
                 # a notification send from server
                 self._add_queue(todo['method'], todo)
@@ -47,7 +53,7 @@ class LSP(conec.Operate):
             return self._queue_dict[_method_name].get(timeout=timeout_)
 
     def _add_queue(self, _method_name, _todo):
-        if _method_name == None:
+        if _method_name is None:
             return None
         if _method_name in self._queue_dict:
             obj_ = self._queue_dict[_method_name]
