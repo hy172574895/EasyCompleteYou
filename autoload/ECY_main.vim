@@ -356,15 +356,14 @@ function! s:SetUpLeaderf() abort
     " Leaderf Plugin
     return
   endif
-  call s:Do("from leaderf_plugin.diagnosis import *", v:false)
+  call s:Do("from leaderf_plugin.selecting import *", v:false)
 
   " In order to be listed by :LeaderfSelf
-  call g:LfRegisterSelf("ECY_symbols", "Plugin of EasyCompleteYou")
-  call g:LfRegisterSelf("ECY_diagnosis", "Plugin of EasyCompleteYou")
+  call g:LfRegisterSelf("ECY_selecting", "Plugin for EasyCompleteYou")
 
   " In order to make this plugin in Leaderf available 
   let l:extension = {
-              \   "name": "ECY_diagnosis",
+              \   "name": "ECY_selecting",
               \   "help": "check out Doc of ECY",
               \   "registerFunc": "symbols#register",
               \   "arguments": [

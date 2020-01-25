@@ -81,7 +81,7 @@ class ECYDiagnosisManager(Manager):
         return ECYDiagnosisExplorer
 
     def _defineMaps(self):
-        lfCmd("call leaderf_ECY#diagnosis#Maps()")
+        lfCmd("call leaderf_ECY#items_selecting#Maps()")
 
     def _acceptSelection(self, *args, **kwargs):
         if len(args) == 0:
@@ -173,6 +173,6 @@ class ECYDiagnosisManager(Manager):
 #*****************************************************
 # ECYDiagnosisManager is a singleton
 #*****************************************************
-ECY_leaderf_diagnosis = ECYDiagnosisManager()
+ECY_leaderf_selecting = ECYDiagnosisManager()
 
-__all__ = ['ECY_leaderf_diagnosis']
+__all__ = ['ECY_leaderf_selecting']

@@ -337,12 +337,12 @@ function! user_ui#Search(items_2_show) abort
 " this will invoke leaderf plugin in python to handle g:ECY_items_data
   let g:ECY_items_data = a:items_2_show
   " must be called by a timer.
-  call timer_start(100, 's:CallLeaderF')
+  call timer_start(100, 'user_ui#UsingTimerStartingSelectingWindows')
 "}}}
 endfunction
 
-function! s:CallLeaderF(timer)
-  call leaderf_ECY#diagnosis#Start()
+function! user_ui#UsingTimerStartingSelectingWindows(timer)
+  call leaderf_ECY#items_selecting#Start()
 endfunction
 
 function! user_ui#MoveTo(line, colum, path, modes)
