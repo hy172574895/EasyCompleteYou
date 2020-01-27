@@ -13,8 +13,10 @@ class _do(object):
     def __init__(self):
         import lib.event.genernal as genernal
         import lib.event.html_lsp as html_lsp
+        import lib.event.snippets as snippets
         self.event_obj = {'genernal': genernal.GenernalEvent('genernal'),
-                          'html_lsp': html_lsp.HtmlLSPEvent('html_lsp')}
+                          'html_lsp': html_lsp.HtmlLSPEvent('html_lsp'),
+                          'snippets': snippets.SnippetsEvent('snippets')}
 
     def GetCurrentSource(self):
         using_source = vim_lib.CallEval('ECY_main#GetCurrentUsingSourceName()')
