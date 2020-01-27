@@ -24,7 +24,7 @@ class ThreadOfJob(object):
         self._content_size = -1
         self._data_temp = ""
         self._data = ''
-        self.get_length = re.compile('Content\-Length: '+'(.*?)'+'\r\n')
+        self.get_length = re.compile('Content-Length: '+'(.*?)'+'\r\n')
         while self.IsServerAlive():
             try:
                 self._data_temp = self._read_stdout(self._content_size)
