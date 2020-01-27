@@ -280,6 +280,12 @@ function! s:SetVariable() abort
   let g:ECY_update_diagnosis_mode
         \= get(g:,'ECY_update_diagnosis_mode',1)
 
+  let g:ECY_rolling_key_of_floating_windows
+        \= get(g:,'ECY_rolling_key_of_floating_windows',['<C-h>', '<C-l>'])
+
+  let g:ECY_disable_diagnosis
+        \= get(g:,'ECY_disable_diagnosis', v:false)
+
   " we put this at here to accelarate the starting time
   try
     call UltiSnips#SnippetsInCurrentScope(1)
@@ -292,18 +298,16 @@ function! s:SetVariable() abort
   let  s:indentexpr           = &indentexpr
   let  s:completeopt_temp     = &completeopt
   let  s:completeopt_fuc_temp = &completefunc
-  let  s:back_to_source_key
-         \= get(s:,'back_to_source_key',['<Space>'])
+  let  s:back_to_source_key   = get(s:,'back_to_source_key',['<Space>'])
+  " we suggest to use socket, because we the results of testing the job is 
+  " too slow.
+  let  s:is_using_stdio = v:false
   " if has('patch-8.1.0818')
   "   let  s:is_using_stdio = v:true
   " else
   "   " because there are bugs of job communication of vim before patch-8.1.0818
   "   let  s:is_using_stdio = v:false
   " endif
-
-  " we suggest to use socket, because we the results of testing the job is 
-  " too slow.
-  let  s:is_using_stdio = v:false
 "}}}
 endfunction
 
@@ -498,14 +502,15 @@ endfunction
 function! ECY_main#IsECYWorksAtCurrentBuffer() abort 
 "{{{
 "return v:false means not working.
+
+  if ECY_main#IsCurrentBufferBigFile()
+    return v:false
+  endif
+
   let l:current_source = ECY_main#GetCurrentUsingSourceName()
   if l:current_source == ''
     " ask the server to get available source, firstly
     call s:GetCurrentBufferAvailableSources()
-    return v:false
-  endif
-
-  if ECY_main#IsCurrentBufferBigFile()
     return v:false
   endif
 
@@ -630,8 +635,7 @@ endfunction
 
 function! s:Completion_cb(msg) abort
 "{{{
-  if ECY_main#GetVersionID() != a:msg['Version_ID'] 
-        \ || mode() != 'i'
+  if ECY_main#GetVersionID() != a:msg['Version_ID'] || mode() != 'i'
     " stop a useless poll
     return
   endif
@@ -679,7 +683,7 @@ function! s:Completion_cb(msg) abort
     let l:i += 1
   endwhile
 
-  " evoke
+  " invoke
   call s:ShowPopup(a:msg['Filter_words'], l:results_list)
 "}}}
 endfunction
@@ -687,8 +691,7 @@ endfunction
 function! s:Integration_cb(msg) abort
 "{{{
 
-  if ECY_main#GetVersionID() != a:msg['ID'] 
-        \ || mode() == 'i'
+  if ECY_main#GetVersionID() != a:msg['ID'] || mode() == 'i'
     " stop a useless poll
     call user_ui#ShowMsg('[ECY] An event: '.a:msg['Integration_event'] .
           \' was abandoned. Trigger it again if you really want it.', 2)
@@ -700,7 +703,7 @@ function! s:Integration_cb(msg) abort
   elseif l:event == 'GoToDefinition'
     " TODO
   elseif l:event == 'get_symbols'
-    call user_ui#Search(a:msg['Results'])
+    call user_ui#SearchSymbols(a:msg['Results'])
   elseif l:event == 'diagnostics'
     call diagnosis#PlaceSign(a:msg['Results'])
   endif
