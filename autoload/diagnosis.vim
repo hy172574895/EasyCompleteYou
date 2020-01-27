@@ -91,7 +91,7 @@ function! diagnosis#UnPlaceAllSign() abort
 "}}}
 endfunction
 
-function! s:PlaceSign(position, diagnosis, style) abort
+function! s:PlaceSign(position, diagnosis, items, style) abort
 "{{{ place a sign in current buffer.
   " a:position = {'line': 10, 'range': {'start': { 'line': 5, 'colum': 23 },'end' : { 'line': 6, 'colum': 0 } }}
   " a:diagnosis = {'item':{'1':'asdf', '2':'sdf'}}
@@ -108,6 +108,7 @@ function! s:PlaceSign(position, diagnosis, style) abort
   let l:temp = {'position': a:position, 
         \'id': l:sign_id,
         \'buffer_nr': l:buffer_nr,
+        \'items': a:items,
         \'buffer_name': l:buffer_name,
         \'diagnosis': a:diagnosis,
         \'kind': l:style}
@@ -120,13 +121,18 @@ function! diagnosis#PlaceSign(msg) abort
   " order matters
   call diagnosis#CleanAllSignHighlight()
   call diagnosis#UnPlaceAllSignInBuffer(bufnr("$"))
-  let l:items = a:msg['Items']
+  let l:items = a:msg['Lists']
   if len(l:items) > 100
     call user_ui#ShowMsg("[ECY] Diagnosis will not be highlighted: the erros/warnnings are too much.", 2)
     return
   endif
   for item in l:items
-    call s:PlaceSign(item['Position'], item['Diagnosis'], 1)
+    " item = {'items':[
+    " {'name':'1', 'content': {'abbr': 'xxx'}},
+    " {'name':'2', 'content': {'abbr': 'yyy'}}
+    "  ],
+    " 'position':{...}, 'diagnosis': 'strings'}
+    call s:PlaceSign(item['position'], item['diagnosis'], item['items'], 1)
   endfor
 "}}}
 endfunction
@@ -143,6 +149,14 @@ function! s:GetCurrentBufferName(...) abort
     return l:full_path
   endif
   "}}}
+endfunction
+
+function! diagnosis#ShowSelecting() abort
+"{{{ show all
+  let g:ECY_items_data = g:ECY_sign_lists
+  " must be called by a timer.
+  call timer_start(1, 'user_ui#UsingTimerStartingSelectingWindows')
+"}}}
 endfunction
 
 call s:Init()
