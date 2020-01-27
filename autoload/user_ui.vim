@@ -330,14 +330,14 @@ endfunction
 
 "}}}
 
-function! user_ui#Search(items_2_show) abort
+function! user_ui#SearchSymbols(items_2_show) abort
 "{{{ handle a symbol event.
 "a symbol's infos must contain a line to show
 
 " this will invoke leaderf plugin in python to handle g:ECY_items_data
   let g:ECY_items_data = a:items_2_show
   " must be called by a timer.
-  call timer_start(100, 'user_ui#UsingTimerStartingSelectingWindows')
+  call timer_start(1, 'user_ui#UsingTimerStartingSelectingWindows')
 "}}}
 endfunction
 
