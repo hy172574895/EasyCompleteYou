@@ -7,13 +7,10 @@ class Source_interface(object):
     def _return(self, _id):
         # 'ErroCode' 1 means source did not impletment that method
         return {'ID': _id, 'Results': 'ok', 'ErroCode': 1,
-                'Event':'erro_code', 'Description':'not implemented'}
+                'Event': 'erro_code', 'Description': 'not implemented'}
 
     def GetInfo(self):
         return {'Name': 'nothing', 'WhiteList': ['nothing']}
-
-    def RefreshTextDocument(self, version):
-        return self._return(version['VersionID'])
 
     def DoCompletion(self, version):
         return self._return(version['VersionID'])
@@ -21,28 +18,13 @@ class Source_interface(object):
     def CleanAllCache(self, version):
         return self._return(version['VersionID'])
 
-    def CleanCompletionCache(self, version):
-        return self._return(version['VersionID'])
-
     def Exit(self, version):
-        return self._return(version['VersionID'])
-
-    def DidConfigurate(self, version):
         return self._return(version['VersionID'])
 
     def OnBufferEnter(self, version):
         return self._return(version['VersionID'])
 
-    def OnInsertLeave(self, version):
-        return self._return(version['VersionID'])
-
-    def DidWorkspace(self, version):
-        return self._return(version['VersionID'])
-
-    def GetLint(self, version):
-        return self._return(version['VersionID'])
-
-    def Hover(self, version):
+    def Diagnosis(self, version):
         return self._return(version['VersionID'])
 
     def GetSymbol(self, version):
@@ -55,18 +37,6 @@ class Source_interface(object):
         return self._return(version['VersionID'])
 
     def GotoDefinition(self, version):
-        return self._return(version['VersionID'])
-
-    def GotoImplementation(self, version):
-        return self._return(version['VersionID'])
-
-    def FindReferences(self, version):
-        return self._return(version['VersionID'])
-
-    def DocumentSymbols(self, version):
-        return self._return(version['VersionID'])
-
-    def Rename(self, version):
         return self._return(version['VersionID'])
 
     def FindStart(self, text, reg):
@@ -119,7 +89,7 @@ class Source_interface(object):
             if pre_i % 2 != 0 and after_i % 2 != 0:
                 return True
         if pre_j != 0 and after_j != 0:
-            if pre_j % 2 != 0 and after_j % 2 !=0:
+            if pre_j % 2 != 0 and after_j % 2 != 0:
                 return True
         return False
         # }}}
