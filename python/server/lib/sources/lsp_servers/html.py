@@ -1,4 +1,7 @@
 import re
+import subprocess
+import shlex
+import json
 
 import utils.interface as scope_
 import utils.lsp.language_server_protocol as lsp
@@ -12,6 +15,7 @@ class Operate(scope_.Source_interface):
         self.is_server_start = 'not started'
         self._deamon_queue = None
         self._starting_server_cmd = None
+        self._diagnosis = HtmlHint()
 
     def GetInfo(self):
         return {'Name': self._name, 'WhiteList': ['html', 'xhtml'],
@@ -179,3 +183,48 @@ class Operate(scope_.Source_interface):
                 results_list.append(results_format)
         return_['Lists'] = results_list
         return return_
+
+    def Diagnosis(self, version):
+        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        workspace = version['WorkSpace']
+        cmd = ''
+        if workspace is not None:
+            cmd += '--config ' + workspace + '/.htmlhintrc'
+        cmd += version['HTMLHintCMD'] + " --format=json " + version['FilePath']
+        diagnosis_lists = self._diagnosis.GetDiagnosis(cmd)
+        return_['Lists'] = diagnosis_lists
+        return return_
+
+
+class HtmlHint:
+    def _get(self, cmd):
+        """start annalysis and put results to queue
+        """
+        # cmd = "htmlhint --format=json C:/Users/qwe/Desktop/socket/htdocs/compare.html"
+        cmd = shlex.split(cmd)
+        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        if process.wait(timeout=5) is None:
+            return None
+        else:
+            return process.stdout.read()
+
+    def GetDiagnosis(self, cmd):
+        results = self._get(cmd).split(b'\n')
+        results = results[0].decode("UTF-8")
+        results = json.loads(results)
+        results_list = []
+        for item in results:
+            file_path = item['file']
+            for msg in item['messages']:
+                position = {'line': msg['line'], 'range': {
+                    'start': {'line': msg['line'], 'colum': msg['col']},
+                    'end': {'line': msg['line'], 'colum': msg['col']}}}
+                temp = [{'name': '1', 'content': {'abbr': msg['message']}},
+                        {'name': '2', 'content': {'abbr': msg['type']}},
+                        {'name': '3', 'content': {'abbr': file_path}},
+                        {'name': '4', 'content': {'abbr': '[' + str(msg['line']) + ', ' + str(msg['col']) + ']'}}]
+                temp = {'items': temp,
+                        'type': 'diagnosis',
+                        'diagnosis': msg['rule']['description'],
+                        'position': position}
+                results_list.append(temp)
