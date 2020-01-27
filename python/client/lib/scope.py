@@ -51,10 +51,9 @@ class Event(object):
     def _pack(self, msg, event_name):
         msg = self._basic(msg)
         msg['Event'] = event_name
-        msg['Additional'] = self._additional(msg['SourceName'], event_name)
         return msg
 
-    def _additional(self, source_name, event_name):
+    def _get_snippets(self):
         if not self.has_ultisnippet_support:
             results = {'HasSnippetSupport': False}
         else:

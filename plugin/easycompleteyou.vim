@@ -2,7 +2,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:Finish(is_quit, msg)
+function! s:Finish(is_quit, msg) abort
   if  a:msg != ''
     echohl WarningMsg |
           \ echomsg a:msg |
