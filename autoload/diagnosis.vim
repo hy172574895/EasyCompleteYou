@@ -3,6 +3,10 @@ function s:Init() abort
   hi ECY_diagnosis_erro  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
   hi ECY_diagnosis_warn  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
   hi ECY_diagnosis_highlight  term=undercurl gui=undercurl guisp=DarkRed cterm=underline
+  let g:ECY_diagnosis_erro      = get(g:,'ECY_diagnosis_erro', 'ECY_diagnosis_erro')
+  let g:ECY_diagnosis_warn      = get(g:,'ECY_diagnosis_warn', 'ECY_diagnosis_warn')
+  let g:ECY_diagnosis_highlight = get(g:,'ECY_diagnosis_highlight','ECY_diagnosis_highlight')
+
   call sign_define("ECY_diagnosis_erro", {
     \ "text" : ">>",
     \ "texthl" : "ECY_diagnosis_erro"})
