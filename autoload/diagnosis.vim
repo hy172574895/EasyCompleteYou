@@ -7,16 +7,19 @@ function s:Init() abort
   let g:ECY_diagnosis_warn      = get(g:,'ECY_diagnosis_warn', 'ECY_diagnosis_warn')
   let g:ECY_diagnosis_highlight = get(g:,'ECY_diagnosis_highlight','ECY_diagnosis_highlight')
 
+  hi ECY_erro_sign_highlight  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
+  hi ECY_warn_sign_highlight  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
+  let g:ECY_erro_sign_highlight = get(g:,'ECY_erro_sign_highlight', 'ECY_erro_sign_highlight')
+  let g:ECY_warn_sign_highlight = get(g:,'ECY_warn_sign_highlight', 'ECY_warn_sign_highlight')
+
   call sign_define("ECY_diagnosis_erro", {
     \ "text" : ">>",
-    \ "texthl" : "ECY_diagnosis_erro"})
+    \ "texthl" : g:ECY_erro_sign_highlight})
   call sign_define("ECY_diagnosis_warn", {
     \ "text" : "!!",
-    \ "texthl" : "ECY_diagnosis_warn"})
-  " exe ":sign define ECY_diagnosis_erro text=>> texthl=ECY_diagnosis_erro"
-  " exe ":sign define ECY_diagnosis_warn text=!! texthl=ECY_diagnosis_warn"
-  let g:ECY_sign_lists = []
+    \ "texthl" : g:ECY_warn_sign_highlight})
 
+  let g:ECY_sign_lists = []
 "}}}
 endfunction
 
