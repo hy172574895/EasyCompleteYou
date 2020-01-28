@@ -10,6 +10,8 @@ function user_ui#Init() abort
         \get(g:,'ecy_fileter_search_items_keyword','')
   let g:ECY_use_floating_windows_to_be_popup_windows = 
         \get(g:,'ECY_use_floating_windows_to_be_popup_windows',v:true)
+  let g:ECY_preview_windows_size = 
+        \get(g:,'ECY_preview_windows_size',[[30, 50], [2, 14]])
   " TODO:
   let g:ECY_PreviewWindows_style = 
         \get(g:,'ECY_PreviewWindows_style','append')
@@ -18,7 +20,7 @@ function user_ui#Init() abort
     let g:has_floating_windows_support = 'nvim'
     " TODO:
     let g:has_floating_windows_support = 'has_no'
-  elseif has('textprop')
+  elseif has('textprop') && has('popupwin')
     let g:has_floating_windows_support = 'vim'
   else
     let g:has_floating_windows_support = 'has_no'
@@ -83,6 +85,30 @@ function! user_ui#ClosePreviewWindows() abort
     pclose
 "}}}
   endif
+"}}}
+endfunction
+
+function! user_ui#RollPreviewWindows(up_or_down) abort
+"{{{ a:up_or_down = -1 = up; a:up_or_down = 1 = down
+  if g:has_floating_windows_support == 'vim' && 
+        \g:ECY_use_floating_windows_to_be_popup_windows == v:true
+    if s:preview_windows_nr != -1
+      " there are 'scrollbar' we can use in vim to roll preview windows
+      " but it require 8.1+, we use popup_setoptions at here could work at
+      " 8.0+
+      try
+        let l:opts = popup_getoptions(s:preview_windows_nr)
+        call popup_setoptions(s:preview_windows_nr,
+              \{'firstline': l:opts['firstline'] + a:up_or_down})
+      catch 
+      endtry
+    endif
+  elseif g:has_floating_windows_support == 'neovim'
+    " TODO
+  elseif g:has_floating_windows_support == 'has_no'
+    " TODO
+  endif
+  return ''
 "}}}
 endfunction
 
@@ -643,7 +669,7 @@ function! user_ui#ShowMsg(msg, style) abort
 "}}}
 endfunction
 
-function s:PreviewWindows_vim(msg,using_filetype) abort
+function s:PreviewWindows_vim(msg, using_filetype) abort
 "{{{ return a floating_win_nr
 
 "{{{ this two keys will be contained in the formmat whether it's None or not.
@@ -655,14 +681,14 @@ function s:PreviewWindows_vim(msg,using_filetype) abort
 
   let l:toShow_list = []
   if l:item_menu != ''
-    let l:toShow_list = split(l:item_menu,"\n")
+    let l:toShow_list = split(l:item_menu, "\n")
     call add(l:toShow_list,'----------------')
   endif
   for item in l:item_info
-    call add(l:toShow_list,item)
+    call add(l:toShow_list, item)
   endfor
   if l:toShow_list == []
-    return
+    return -1
   endif
   if g:ECY_PreviewWindows_style == 'append'
     if g:ECY_use_floating_windows_to_be_popup_windows == v:true
@@ -676,15 +702,17 @@ function s:PreviewWindows_vim(msg,using_filetype) abort
     endif
 
     let l:opts = {
-        \ 'minwidth': 30,
-        \ 'maxwidth': 50,
+        \ 'minwidth': g:ECY_preview_windows_size[0][0],
+        \ 'maxwidth': g:ECY_preview_windows_size[0][1],
         \ 'pos': 'topleft',
         \ 'col': l:col,
         \ 'line': l:line,
-        \ 'minheight': 2,
-        \ 'maxheight': 14,
+        \ 'minheight': g:ECY_preview_windows_size[1][0],
+        \ 'maxheight': g:ECY_preview_windows_size[1][1],
         \ 'border': [],
         \ 'close': 'click',
+        \ 'scrollbar': 1,
+        \ 'firstline': 1,
         \ 'padding': [0,1,0,1],
         \ 'zindex': 2000}
   else

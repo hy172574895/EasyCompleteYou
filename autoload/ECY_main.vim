@@ -33,7 +33,7 @@ function! s:SetUpEvent() abort
 endfunction
 
 function! s:OnSelectingMenu() abort 
-  "{{{ won't be triggered when it has no floating windows support
+"{{{ 
   try
     call user_ui#ClosePreviewWindows()
     if g:ECY_use_floating_windows_to_be_popup_windows == v:true 
@@ -50,7 +50,7 @@ function! s:OnSelectingMenu() abort
     call user_ui#PreviewWindows(s:user_data[l:item_index],&filetype)
   catch
   endtry
-  "}}}
+"}}}
 endfunction
 
 function! s:OnBufferLeave() abort 
@@ -263,7 +263,7 @@ function! s:SetVariable() abort
         \= get(g:,'ECY_file_type_info',{})
 
   let g:ycm_autoclose_preview_window_after_completion
-        \= get(g:,'ycm_autoclose_preview_window_after_completion',1)
+        \= get(g:,'ycm_autoclose_preview_window_after_completion',v:true)
 
   let g:ECY_triggering_length
         \= get(g:,'ECY_triggering_length',1)
@@ -286,12 +286,16 @@ function! s:SetVariable() abort
   let g:ECY_disable_diagnosis
         \= get(g:,'ECY_disable_diagnosis', v:false)
 
+  let g:ECY_log_msg = []
+
   " we put this at here to accelarate the starting time
   try
     call UltiSnips#SnippetsInCurrentScope(1)
     let g:has_ultisnips_support = v:true
+    call s:Log('has UltiSnips')
   catch
     let g:has_ultisnips_support = v:false
+    call s:Log('has no UltiSnips')
   endtry
 
   let  s:isSelecting          = v:false
@@ -844,6 +848,11 @@ function! s:SetMapping() abort
     exe 'inoremap <expr>' . key . ' <SID>BackToLastSource( "\' . key . '" )'
   endfor
 
+  if g:has_floating_windows_support != 'has_no'
+    exe 'inoremap <expr>' . g:ECY_rolling_key_of_floating_windows[0] . ' user_ui#RollPreviewWindows(1)'
+    exe 'inoremap <expr>' . g:ECY_rolling_key_of_floating_windows[1] . ' user_ui#RollPreviewWindows(-1)'
+  endif
+
 "}}}
 endfunction
 
@@ -886,6 +895,12 @@ function! s:ShowErroAndFinish(msg) abort
         \ echohl None
   call s:restore_cpo()
   finish
+"}}}
+endfunction
+
+function! s:Log(msg) abort
+"{{{
+ call add(g:ECY_log_msg, a:msg)
 "}}}
 endfunction
 
