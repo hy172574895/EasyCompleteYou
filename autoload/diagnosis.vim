@@ -137,6 +137,16 @@ function! diagnosis#PlaceSign(msg) abort
 "}}}
 endfunction
 
+function! diagnosis#Toggle() abort
+"{{{
+  let g:ECY_disable_diagnosis = (!g:ECY_disable_diagnosis)
+  if g:ECY_disable_diagnosis 
+    call diagnosis#CleanAllSignHighlight()
+    call diagnosis#UnPlaceAllSign()
+  endif
+"}}}
+endfunction
+
 function! s:GetCurrentBufferName(...) abort
   "{{{
   let l:file = a:0 ? a:1 : @%

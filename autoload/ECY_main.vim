@@ -121,6 +121,9 @@ endfunction
 " ==============================================================================
 function! s:AskDiagnosis(event) abort 
 "{{{
+  if g:ECY_disable_diagnosis
+    return
+  endif
   if a:event == 'OnTextChangedInsertMode' || a:event == 'OnTextChangedNormalMode'
     call diagnosis#CleanAllSignHighlight()
     let s:buffer_has_changed = 1
