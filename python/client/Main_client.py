@@ -1,3 +1,6 @@
+# Author: Jimmy Huang (1902161621@qq.com)
+# License: WTFPL
+
 from socket import * # noqa
 import random
 import threading

@@ -1,3 +1,6 @@
+" Author: Jimmy Huang (1902161621@qq.com)
+" License: WTFPL
+
 function user_ui#Init() abort
   "{{{ var init
   let s:is_vim = !has('nvim')

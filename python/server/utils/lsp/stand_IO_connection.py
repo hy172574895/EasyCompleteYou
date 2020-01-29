@@ -1,3 +1,6 @@
+# Author: Jimmy Huang (1902161621@qq.com)
+# License: WTFPL
+
 import subprocess
 import logging
 import shlex

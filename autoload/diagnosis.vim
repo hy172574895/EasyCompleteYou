@@ -1,3 +1,22 @@
+" Author: Jimmy Huang (1902161621@qq.com)
+" License: WTFPL
+
+function s:SetUpEvent() abort
+  augroup EasyCompleteYou_diagnosis
+    autocmd CursorHold * call s:OnInsertChar()
+  augroup END
+endfunction
+
+function s:OnCursorHold() abort
+  if g:ECY_disable_diagnosis
+    return
+  endif
+  let l:current_line_nr = line('.')
+  for item in g:ECY_sign_lists
+    
+  endfor
+endfunction
+
 function s:Init() abort
 "{{{ var init
   hi ECY_diagnosis_erro  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
@@ -20,6 +39,7 @@ function s:Init() abort
     \ "texthl" : g:ECY_warn_sign_highlight})
 
   let g:ECY_sign_lists = []
+  call s:SetUpEvent()
 "}}}
 endfunction
 

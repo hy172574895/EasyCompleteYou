@@ -1,3 +1,6 @@
+" Author: Jimmy Huang (1902161621@qq.com)
+" License: WTFPL
+
 " This is basic vim plugin boilerplate
 let s:save_cpo = &cpo
 set cpo&vim

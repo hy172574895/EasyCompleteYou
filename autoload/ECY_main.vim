@@ -1,3 +1,7 @@
+" Author: Jimmy Huang (1902161621@qq.com)
+" License: WTFPL
+" Log:
+" 2020-01-30 03:14  Happy birthday to me.
 
 " must put these outside a function
 let  s:python_script_folder_path = expand( '<sfile>:p:h:h' ).'\python'

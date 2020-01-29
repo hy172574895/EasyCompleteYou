@@ -1,3 +1,6 @@
+# Author: Jimmy Huang (1902161621@qq.com)
+# License: WTFPL
+
 import lib.vim_or_neovim_support as vim_lib
 
 class Event(object):

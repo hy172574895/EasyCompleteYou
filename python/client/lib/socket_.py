@@ -1,3 +1,6 @@
+# Author: Jimmy Huang (1902161621@qq.com)
+# License: WTFPL
+
 from base64 import b64encode
 from socket import * # noqa
 import hmac

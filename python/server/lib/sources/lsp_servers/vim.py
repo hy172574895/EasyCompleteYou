@@ -1,3 +1,6 @@
+# Author: Jimmy Huang (1902161621@qq.com)
+# License: WTFPL
+
 import utils.interface as scope_
 import utils.lsp.language_server_protocol as lsp
 

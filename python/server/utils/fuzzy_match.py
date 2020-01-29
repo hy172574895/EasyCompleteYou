@@ -1,3 +1,6 @@
+# Author: Jimmy Huang (1902161621@qq.com)
+# License: WTFPL
+
 # -*- coding: utf-8 -*-
 # standard lib of python
 import re

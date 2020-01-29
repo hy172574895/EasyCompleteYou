@@ -1,3 +1,5 @@
+# Author: Jimmy Huang (1902161621@qq.com)
+# License: WTFPL
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-

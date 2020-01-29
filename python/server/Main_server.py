@@ -1,3 +1,6 @@
+# Author: Jimmy Huang (1902161621@qq.com)
+# License: WTFPL
+
 import argparse
 import sys
 parser = argparse.ArgumentParser(description='EasyCompleteYou, Easily complete you.')
