@@ -250,7 +250,7 @@ class HtmlHint:
         cmd = shlex.split(cmd)
         process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
         if process.wait(timeout=5) is None:
-            return -1
+            return None
         temp = process.stdout.read()
         process.terminate()
         return temp
@@ -258,10 +258,11 @@ class HtmlHint:
     def GetDiagnosis(self, cmd, buffers, file_path):
         global hint_content
         hint_content = buffers
-        results = self._get(cmd).split(b'\n')
-        if (results is None):
+        results = self._get(cmd)
+        if results is None:
             # time out or something wrong
             return None
+        results = results.split(b'\n')
         results = results[0].decode("UTF-8")
         results = json.loads(results)
         results_list = []
