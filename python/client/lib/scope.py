@@ -29,7 +29,7 @@ class Event(object):
         return self._pack(msg, 'DoCompletion')
 
     def Diagnosis(self):
-        return self._pack({}, 'OnBufferEnter')
+        return self._pack({}, 'Diagnosis')
 
     def InstallSource(self):
         msg = {}

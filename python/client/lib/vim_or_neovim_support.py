@@ -86,7 +86,10 @@ def GetCurrentBufferNumber():
 
 
 def GetCurrentBufferFilePath():
-    return GetBufferFilepath(GetCurrentBufferObject())
+    temp = GetBufferFilepath(GetCurrentBufferObject())
+    temp = temp.replace("\\\\",'/')
+    temp = temp.replace("\\",'/')
+    return temp
 
 
 def GetCurrentBufferObject():

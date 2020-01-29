@@ -114,8 +114,9 @@ function! s:OnTextChangedInsertMode() abort
   if !ECY_main#IsECYWorksAtCurrentBuffer()
     return
   endif
-  call s:DoCompletion()
+  " order matters
   call s:AskDiagnosis('OnTextChangedInsertMode')
+  call s:DoCompletion()
   "}}}
 endfunction
 " ==============================================================================
@@ -132,10 +133,9 @@ function! s:AskDiagnosis(event) abort
     call diagnosis#UnPlaceAllSignInBuffer(bufnr("$"))
     let s:buffer_has_changed = 0
   endif
-  if mode() == 'i' && g:ECY_update_diagnosis_mode == 1
-    return
+  if a:event == 'OnInsertModeLeave'
+    call s:Do("Diagnosis", v:true)
   endif
-  call s:Do("Diagnosis", v:true)
 "}}}
 endfunction
 
@@ -240,7 +240,7 @@ function! s:SetVariable() abort
   " this debug option will start another server with socket port 1234 and
   " HMAC_KEY 1234, and output logging to file where server dir is. 
   let g:ECY_debug
-        \= get(g:, 'ECY_debug',0)
+        \= get(g:, 'ECY_debug', 0)
 
   let g:ECY_select_items
         \= get(g:, 'ECY_select_items',['<Tab>','<S-TAB>'])
@@ -750,6 +750,8 @@ function! s:EventSort(id, data, event) abort
         call s:Integration_cb(l:data_dict)
       elseif l:Event == 'install_source'
         call user_ui#ShowMsg('[ECY] [' . l:data_dict['Name'] .'] '.l:data_dict['Description'], 2)
+      elseif l:Event == 'diagnosis'
+        call diagnosis#PlaceSign(l:data_dict)
       endif
     endfor
   " catch

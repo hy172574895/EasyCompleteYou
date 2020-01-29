@@ -24,7 +24,6 @@ class HtmlLSPEvent(scope_.Event):
         self._workspace = self.GetCurrentWorkSpace()
         msg = {}
         msg['StartingCMD'] = self._get_starting_cmd()
-        msg['HTMLHintCMD'] = self._get_HTMLHint_cmd()
         return self._pack(msg, 'OnBufferEnter')
 
     def DoCompletion(self):
@@ -38,4 +37,5 @@ class HtmlLSPEvent(scope_.Event):
         msg = self._basic(msg)
         msg['Event'] = event_name
         msg['Additional'] = self._get_snippets()
+        msg['HTMLHintCMD'] = self._get_HTMLHint_cmd()
         return msg

@@ -30,6 +30,7 @@ import lib.on_buffer as buffer_things
 import lib.completion as completion
 import lib.completor_manager as sources_manager
 import lib.integration as integration
+import lib.diagnosis as diagnosis
 
 if g_args.log_dir is None:
     output_log_dir = p.dirname( p.abspath( __file__ ) )
@@ -210,6 +211,7 @@ class EventHandler(object):
             self.source_manager = sources_manager.Operate()
             self.on_buffer = buffer_things.Operate()
             self.integration = integration.Operate()
+            self.diagnosis = diagnosis.Operate()
         except Exception as e:
             g_logger.opt(exception=True).debug("exception:")
             raise
@@ -242,6 +244,8 @@ class EventHandler(object):
             temp = self.completion.DoCompletion(object_, version_dict)
         elif event_ == 'OnBufferEnter':
             temp = self.on_buffer.OnBufferEnter(object_, version_dict)
+        elif event_ == 'Diagnosis':
+            temp = self.diagnosis.Diagnosis(object_, version_dict)
         elif event_ == 'integration':
             temp = self.integration.HandleIntegration(object_, version_dict)
         elif event_ == 'InstallSource':
