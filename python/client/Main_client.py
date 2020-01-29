@@ -24,6 +24,7 @@ class _do(object):
         #     using_source = 'nothing'
         return using_source
 
+
 class ECY_Client(_do):
     """interface
     """
@@ -90,7 +91,7 @@ class ECY_Client(_do):
 
     def _add(self, event):
         version_id = self.GetVersionID_change()
-        threading.Thread(target=self._go(event, version_id)).start()
+        self._go(event, version_id)
 
     def _get(self, event):
         # do
@@ -105,22 +106,14 @@ class ECY_Client(_do):
 
     def _go(self, event, version_id):
         try:
-            self._lock.acquire()
+            # self._lock.acquire()
             todo = self._get(event)
-            if self.GetVersionID_NotChange() != version_id:
-                # we filter some usless requests at here
-                return None
             todo['VersionID'] = version_id
             if self.isdebug:
                 self._debug_server.AddTodo(todo)
             self.socket_connection.AddTodo(todo)
         except Exception as e:
             raise e
-        finally:
-            self._lock.release()
 
     def Exe(self, do):
-        try:
-            self._add(do)
-        except Exception as e:
-            raise
+        self._add(do)

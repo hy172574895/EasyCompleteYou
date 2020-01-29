@@ -394,6 +394,7 @@ function! s:CheckResultsAtWindows(position, modes)
 endfunction
 
 function! user_ui#LeaderF_cb(line, event, nr, ...)
+"{{{
   let l:data  = g:ECY_items_data[a:nr]
   if a:event == 'acceptSelection' || a:event == 'previewResult'
     if exists("l:data['position']")
@@ -407,6 +408,7 @@ function! user_ui#LeaderF_cb(line, event, nr, ...)
       call s:CheckResultsAtWindows(l:data['position'],l:modes)
     endif
   endif
+"}}}
 endfunction
 
 function! user_ui#CheckGoto(items,using_filetype) abort
