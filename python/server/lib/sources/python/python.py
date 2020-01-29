@@ -162,6 +162,7 @@ class Operate(scope_.Source_interface):
                     params = self._analyze_params(temp)
                     snippet = self._build_func_snippet(item.name, params)
                     results_format['snippet'] = snippet
+                    results_format['kind'] += '~'
             except Exception:
                 pass
             results_list.append(results_format)
