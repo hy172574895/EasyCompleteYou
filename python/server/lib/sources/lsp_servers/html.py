@@ -1,7 +1,16 @@
+# for basic
 import re
+
+# for htmlhint
 import subprocess
+import queue
+from socket import *
 import shlex
 import json
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
+global hint_content
+hint_content = 'ok'
 
 import utils.interface as scope_
 import utils.lsp.language_server_protocol as lsp
@@ -15,7 +24,10 @@ class Operate(scope_.Source_interface):
         self.is_server_start = 'not started'
         self._deamon_queue = None
         self._starting_server_cmd = None
+        self._diagnosis_queue = queue.Queue()
         self._diagnosis = HtmlHint()
+        self._is_http_server_started = None
+        threading.Thread(target=self._diagnosis_notification).start()
 
     def GetInfo(self):
         return {'Name': self._name, 'WhiteList': ['html', 'xhtml'],
@@ -110,7 +122,7 @@ class Operate(scope_.Source_interface):
         return None
 
     def _return_label(self, all_text_list):
-        items_list = list(set(re.findall(r'[\w\-]+', all_text_list )))
+        items_list = list(set(re.findall(r'[\w\-]+', all_text_list)))
         results_list = []
         for item in items_list:
             # the results_format must at least contain the following keys.
@@ -123,6 +135,7 @@ class Operate(scope_.Source_interface):
         return results_list
 
     def DoCompletion(self, version):
+# {{{
         if not self._check(version):
             return None
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
@@ -154,7 +167,8 @@ class Operate(scope_.Source_interface):
                     results_format = {'abbr': '', 'word': '', 'kind': '',
                                       'menu': '', 'info': '', 'user_data': ''}
                     results_format['word'] = trigger
-                    results_format['abbr'] = trigger + ' ~'
+                    # results_format['abbr'] = trigger + ' ~'
+                    results_format['abbr'] = trigger
                     results_format['kind'] = '[Snippet]'
                     results_format['menu'] = snippet['description']
                     results_list.append(results_format)
@@ -173,7 +187,7 @@ class Operate(scope_.Source_interface):
                     results_format['info'] = temp
                 try:
                     if item['insertTextFormat'] == 2:
-                        results_format['abbr'] += ' ~'
+                        # results_format['abbr'] += ' ~'
                         results_format['kind'] = '[Snippet]'
                         if 'newText' in item['textEdit']:
                             temp = item['textEdit']['newText']
@@ -183,48 +197,100 @@ class Operate(scope_.Source_interface):
                 results_list.append(results_format)
         return_['Lists'] = results_list
         return return_
+# }}}
 
     def Diagnosis(self, version):
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
-        workspace = version['WorkSpace']
-        cmd = ''
-        if workspace is not None:
-            cmd += '--config ' + workspace + '/.htmlhintrc'
-        cmd += version['HTMLHintCMD'] + " --format=json " + version['FilePath']
-        diagnosis_lists = self._diagnosis.GetDiagnosis(cmd)
-        return_['Lists'] = diagnosis_lists
-        return return_
+        self._diagnosis_queue.put(version)
+        return None
+
+    def _diagnosis_notification(self):
+        address = ('localhost', self._diagnosis.GetUnusedLocalhostPort())
+        server = HTTPServer(address, Handler)
+        threading.Thread(target=server.serve_forever).start()
+        while 1:
+            version = self._diagnosis_queue.get()
+            return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+            return_['Event'] = 'diagnosis'
+            return_['FilePath'] = version['FilePath']
+            workspace = version['WorkSpace']
+            # if workspace is not None:
+            #     cmd += '--config ' + workspace + '/.htmlhintrc'
+            diagnosis_lists = self._diagnosis.GetDiagnosis(
+                    version['HTMLHintCMD'],
+                    version['AllTextList'],version['FilePath'])
+            return_['Lists'] = diagnosis_lists
+            if diagnosis_lists is None:
+                # time out or something wrong
+                # and we do nothing
+                # continue
+                return None
+            self._deamon_queue.put(return_)
 
 
 class HtmlHint:
+    def __init__(self):
+        self._port = -1
+
+    def GetUnusedLocalhostPort(self):
+        if self._port == -1:
+            sock = socket() # noqa
+            # This tells the OS to give us any free port in the
+            # range [1024 - 65535]
+            sock.bind(('', 0))
+            port = sock.getsockname()[1]
+            self._port = port
+            sock.close()
+        return self._port
+
     def _get(self, cmd):
         """start annalysis and put results to queue
         """
-        # cmd = "htmlhint --format=json C:/Users/qwe/Desktop/socket/htdocs/compare.html"
+        cmd += " --format=json http://localhost:"
+        cmd += str(self.GetUnusedLocalhostPort())
         cmd = shlex.split(cmd)
         process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
         if process.wait(timeout=5) is None:
-            return None
-        else:
-            return process.stdout.read()
+            return -1
+        temp = process.stdout.read()
+        process.terminate()
+        return temp
 
-    def GetDiagnosis(self, cmd):
+    def GetDiagnosis(self, cmd, buffers, file_path):
+        global hint_content
+        hint_content = buffers
         results = self._get(cmd).split(b'\n')
+        if (results is None):
+            # time out or something wrong
+            return None
         results = results[0].decode("UTF-8")
         results = json.loads(results)
         results_list = []
         for item in results:
-            file_path = item['file']
             for msg in item['messages']:
+                msg['col'] += 1
+                pos_string = '[' + str(msg['line']) + ', ' + str(msg['col']) + ']'
                 position = {'line': msg['line'], 'range': {
                     'start': {'line': msg['line'], 'colum': msg['col']},
                     'end': {'line': msg['line'], 'colum': msg['col']}}}
                 temp = [{'name': '1', 'content': {'abbr': msg['message']}},
                         {'name': '2', 'content': {'abbr': msg['type']}},
                         {'name': '3', 'content': {'abbr': file_path}},
-                        {'name': '4', 'content': {'abbr': '[' + str(msg['line']) + ', ' + str(msg['col']) + ']'}}]
+                        {'name': '4', 'content': {'abbr': pos_string}}]
                 temp = {'items': temp,
                         'type': 'diagnosis',
                         'diagnosis': msg['rule']['description'],
                         'position': position}
                 results_list.append(temp)
+        return results_list
+        
+
+class Handler(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type','text/html')
+        self.end_headers()
+        self.wfile.write(hint_content.encode())
+
+    def log_request(self, code='-', size='-'):
+        pass
