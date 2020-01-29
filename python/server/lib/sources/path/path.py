@@ -63,6 +63,7 @@ class Operate(scope_.Source_interface):
                 os.chdir(path)
                 file_list = os.listdir(os.curdir)
                 addtional_data['Path'] = path
+                addtional_data['UsingWorkSpace'] = os.getcwd()
             except Exception as e:
                 is_id = True
                 file_list = list(set(re.findall(r'\w+', line_text)))
@@ -94,7 +95,7 @@ class Operate(scope_.Source_interface):
 
                 if addtional_data['UsingWorkSpace'] is not None: 
                     results_format['menu'] = results_format['kind']
-                    full_path = path_temp + item
+                    full_path = addtional_data['UsingWorkSpace'] + item
                     if results_format['kind'] == '[Dir]':
                         full_path += '/'
                     results_format['info'] = full_path.replace("\\\\",'/')
