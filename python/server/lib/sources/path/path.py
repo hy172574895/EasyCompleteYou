@@ -56,7 +56,7 @@ class Operate(scope_.Source_interface):
             os.chdir(path_temp)
             file_list = os.listdir(os.curdir)
             addtional_data['Path'] = path_temp
-            addtional_data['UsingWorkSpace'] = workspace
+            addtional_data['UsingWorkSpace'] = workspace + '/'
         except Exception as e:
             try:
                 path_temp = path
