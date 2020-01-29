@@ -90,8 +90,8 @@ Example(not default):
   default: 1
 
 When to update diagnosis.
-1 means update when text has changed but not in Insert mode.
-2 means update when text has changed in all mode.
+1 means updating when text has changed but not in Insert mode.
+2 means updating when text has changed in all mode.
 Example(not default): 
   let g:ECY_update_diagnosis_mode = 2
 
