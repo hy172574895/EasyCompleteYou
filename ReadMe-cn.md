@@ -17,9 +17,9 @@
 ---
 ---
 # 介绍
-1. 兼容 [YCM](https://github.com/ycm-core/YouCompleteMe), 可以作为YCM的补充。
+1. 自动兼容 [YCM](https://github.com/ycm-core/YouCompleteMe), 可以作为YCM的补充。
 2. 流畅的补全.
-3. 使用python3 编写.
+3. 使用 Python3 编写.
 4. 类似YCM的模糊匹配.
 5. 内置 [LSP](https://microsoft.github.io/language-server-protocol).
 6. 开箱即用.

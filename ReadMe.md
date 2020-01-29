@@ -16,9 +16,9 @@
 ---
 ---
 # Brief Introduction
-1. Collaborate with [YCM](https://github.com/ycm-core/YouCompleteMe), can be a extension for YCM.
+1. Automatically compatible with [YCM](https://github.com/ycm-core/YouCompleteMe), can be a extension for YCM.
 2. Fluent completion.
-3. Write in Python3.
+3. Wrote with Python3.
 4. Fuzzy-find support like YCM.
 5. Buildin [LSP](https://microsoft.github.io/language-server-protocol).
 6. Out of the box.
