@@ -1,22 +1,6 @@
 " Author: Jimmy Huang (1902161621@qq.com)
 " License: WTFPL
 
-function s:SetUpEvent() abort
-  augroup EasyCompleteYou_diagnosis
-    autocmd CursorHold * call s:OnInsertChar()
-  augroup END
-endfunction
-
-function s:OnCursorHold() abort
-  if g:ECY_disable_diagnosis
-    return
-  endif
-  let l:current_line_nr = line('.')
-  for item in g:ECY_sign_lists
-    
-  endfor
-endfunction
-
 function s:Init() abort
 "{{{ var init
   hi ECY_diagnosis_erro  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
@@ -38,8 +22,133 @@ function s:Init() abort
     \ "text" : "!!",
     \ "texthl" : g:ECY_warn_sign_highlight})
 
-  let g:ECY_sign_lists = []
+  let g:ECY_sign_lists    = []
+  let s:current_diagnosis = {}
+
   call s:SetUpEvent()
+
+  let g:ECY_show_diagnosis = get(g:,'ECY_show_diagnosis', 'H')
+  exe 'nmap ' . g:ECY_show_diagnosis .
+        \ ' :call diagnosis#ShowCurrentLineDiagnosis(v:false)<CR>'
+"}}}
+endfunction
+
+function s:SetUpEvent() abort
+  augroup EasyCompleteYou_Diagnosis
+    autocmd CursorHold * call s:OnCursorHold()
+  augroup END
+endfunction
+
+function s:OnCursorHold() abort
+  call diagnosis#ShowCurrentLineDiagnosis(v:true)
+endfunction
+
+function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
+"{{{ show diagnosis msg in normal mode.
+  if g:ECY_disable_diagnosis || mode() != 'n'
+    call user_ui#ShowMsg("[ECY] Diagnosis had been turn off.", 2)
+    return ''
+  endif
+  let l:current_line_nr   = line('.')
+  let l:current_buffer_nr = bufnr("$")
+  let l:index_list        = []
+  for item in g:ECY_sign_lists
+    if item['buffer_nr'] != l:current_buffer_nr || 
+          \item['position']['line'] != l:current_line_nr
+      continue
+    endif
+    call add(l:index_list, item)
+  endfor
+  if len(l:index_list) != 0
+    let s:current_diagnosis['line']      = l:current_line_nr
+    let s:current_diagnosis['buffer_nr'] = l:current_buffer_nr
+    call diagnosis#ShowDiagnosis(l:index_list)
+  else
+    if !a:is_triggered_by_event 
+      call user_ui#ShowMsg("[ECY] Diagnosis has nothing to show.", 2)
+    endif
+  endif
+  return ''
+"}}}
+endfunction
+
+function! diagnosis#ShowNextDiagnosis() abort
+"{{{ show diagnosis msg in normal mode at current buffer. 
+  let l:current_buffer_nr = bufnr("$")
+
+  let l:i = 0
+  if s:current_diagnosis == {}
+    " init
+    for item in g:ECY_sign_lists
+      if l:current_buffer_nr == item['buffer_nr']
+        let l:line = item['position']['line']
+        let l:colum = item['position']['range']['start']['colum']
+        let s:current_diagnosis['buffer_nr'] = l:current_buffer_nr
+        let s:current_diagnosis['line'] = l:line
+        call diagnosis#MoveTo(l:line, l:colum, l:i)
+        call diagnosis#ShowCurrentLineDiagnosis(v:true)
+        break
+      endif
+      let l:i += 1
+    endfor
+    return ''
+  endif
+
+  let l:i = 0
+  for item in g:ECY_sign_lists
+    if item['position']['line'] == s:current_diagnosis['line']
+      let l:index = (l:i + 1) % len(g:ECY_sign_lists)
+      let l:line = g:ECY_sign_lists[l:index]['position']['line']
+      if  l:line != s:current_diagnosis['line'] 
+            \&& l:current_buffer_nr == s:current_diagnosis['buffer_nr']
+        let l:colum = g:ECY_sign_lists[l:index]['position']['range']['start']['colum']
+        call diagnosis#MoveTo(l:line, l:colum, l:index)
+        call diagnosis#ShowCurrentLineDiagnosis(v:true)
+        let s:current_diagnosis['line'] = l:line
+        return ''
+      endif
+    endif
+    let l:i += 1
+  endfor
+  call user_ui#ShowMsg("[ECY] Diagnosis has no next one.", 2)
+  return ''
+"}}}
+endfunction
+
+function! diagnosis#MoveTo(line, colum, index) abort
+"{{{ on current buffer
+  let l:lens = string(len(g:ECY_sign_lists))
+  call user_ui#ShowMsg("[ECY] Diagnosis goto next (". a:index . '/' . l:lens . ')' , 2)
+"}}}
+endfunction
+
+function! diagnosis#ShowDiagnosis(index_list) abort
+"{{{ 
+  if g:has_floating_windows_support == 'vim'
+    let l:text = []
+    for item in a:index_list
+      if len(l:text) != 0
+        call add(l:text, '----------------------------')
+      endif
+      call add(l:text, item['kind'])
+      call add(l:text, item['diagnosis'])
+    endfor
+    if g:ECY_PreviewWindows_style == 'append'
+      " show a popup windows aside current current cursor.
+      let l:opts = {
+          \ 'minwidth': g:ECY_preview_windows_size[0][0],
+          \ 'maxwidth': g:ECY_preview_windows_size[0][1],
+          \ 'minheight': g:ECY_preview_windows_size[1][0],
+          \ 'maxheight': g:ECY_preview_windows_size[1][1],
+          \ 'border': [],
+          \ 'close': 'click',
+          \ 'scrollbar': 1,
+          \ 'firstline': 1,
+          \ 'padding': [0,1,0,1],
+          \ 'zindex': 2000}
+      call popup_atcursor(l:text, l:opts)
+    endif
+  endif
 "}}}
 endfunction
 
