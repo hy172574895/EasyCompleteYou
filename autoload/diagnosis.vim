@@ -16,8 +16,7 @@ function s:Init() abort
   let g:ECY_warn_sign_highlight = get(g:,'ECY_warn_sign_highlight', 'ECY_warn_sign_highlight')
 
   if g:has_floating_windows_support == 'vim'
-    hi ECY_diagnosis_text  guifg=#eee8d5 ctermfg=white	ctermbg=Blue
-    let g:ECY_diagnosis_text = get(g:,'ECY_diagnosis_text', 'ECY_diagnosis_text')
+    let g:ECY_diagnosis_text = get(g:,'ECY_diagnosis_text', 'Title')
     call prop_type_add('ECY_diagnosis_text', {'highlight': g:ECY_diagnosis_text})
   endif
 
@@ -56,7 +55,7 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
     return ''
   endif
   let l:current_line_nr   = line('.')
-  let l:current_buffer_nr = bufnr("$")
+  let l:current_buffer_nr = bufnr()
   let l:index_list        = []
   for item in g:ECY_sign_lists
     if item['buffer_nr'] != l:current_buffer_nr || 
@@ -80,7 +79,7 @@ endfunction
 
 function! diagnosis#ShowNextDiagnosis() abort
 "{{{ show diagnosis msg in normal mode at current buffer. 
-  let l:current_buffer_nr = bufnr("$")
+  let l:current_buffer_nr = bufnr()
 
   let l:i = 0
   if s:current_diagnosis == {}
@@ -219,7 +218,7 @@ function! diagnosis#UnPlaceAllSignInBuffer(buffer_nr) abort
   let i = 0
   for item in g:ECY_sign_lists
     if item['buffer_nr'] == a:buffer_nr
-      call sign_unplace('', {'buffer' : item['buffer_name'], 'id' : item['id']})
+      call sign_unplace('', {'buffer' : item['buffer_name'], 'id': item['id']})
       unlet g:ECY_sign_lists[i]
       call diagnosis#UnPlaceAllSignInBuffer(a:buffer_nr)
       return
@@ -235,6 +234,7 @@ function! diagnosis#UnPlaceAllSign() abort
   for item in g:ECY_sign_lists
     call sign_unplace('', {'buffer' : item['buffer_name'], 'id' : item['id']})
   endfor
+  let g:ECY_sign_lists = []
 "}}}
 endfunction
 
@@ -242,7 +242,7 @@ function! s:PlaceSign(position, diagnosis, items, style) abort
 "{{{ place a sign in current buffer.
   " a:position = {'line': 10, 'range': {'start': { 'line': 5, 'colum': 23 },'end' : { 'line': 6, 'colum': 0 } }}
   " a:diagnosis = {'item':{'1':'asdf', '2':'sdf'}}
-  let l:buffer_nr = bufnr("$")
+  let l:buffer_nr = bufnr()
   if a:style == 1
     let l:style = 'ECY_diagnosis_erro'
   else
@@ -267,7 +267,7 @@ function! diagnosis#PlaceSign(msg) abort
 "{{{Place a Sign and highlight it.
   " order matters
   call diagnosis#CleanAllSignHighlight()
-  call diagnosis#UnPlaceAllSignInBuffer(bufnr("$"))
+  call diagnosis#UnPlaceAllSignInBuffer(bufnr())
   let l:items = a:msg['Lists']
   if len(l:items) > 100
     call user_ui#ShowMsg("[ECY] Diagnosis will not be highlighted: the erros/warnnings are too much.", 2)

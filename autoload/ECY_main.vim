@@ -134,7 +134,7 @@ function! s:AskDiagnosis(event) abort
     let s:buffer_has_changed = 1
   endif
   if a:event == 'OnInsertModeLeave' && s:buffer_has_changed == 1
-    call diagnosis#UnPlaceAllSignInBuffer(bufnr("$"))
+    call diagnosis#UnPlaceAllSignInBuffer(bufnr())
     let s:buffer_has_changed = 0
   endif
   if a:event == 'OnInsertModeLeave'
@@ -563,7 +563,7 @@ function! ECY_main#GetCurrentUsingSourceName() abort
 "}}}
 endfunction
 
-function! ECY_main#ChooseSource(file_type,next_or_pre) abort
+function! ECY_main#ChooseSource(file_type, next_or_pre) abort
 "{{{ this will call by 'user_ui.vim'
   let l:filetype = &filetype
   if !exists("g:ECY_file_type_info[".string(l:filetype)."]")
@@ -597,7 +597,7 @@ function! ECY_main#AfterUserChooseASource() abort
 " lists
   " order matters
   call diagnosis#CleanAllSignHighlight()
-  call diagnosis#UnPlaceAllSignInBuffer(bufnr("$"))
+  call diagnosis#UnPlaceAllSignInBuffer(bufnr())
   if ECY_main#HasYCM()
     " according the user's settings to optionally complete.
     let l:filetype = &filetype
@@ -971,7 +971,7 @@ endfunction
 function! ECY_main#GetBufferWorkSpace(...) abort
 "{{{
   if a:000 == 0
-    let l:bufnr = bufnr('%')
+    let l:bufnr = bufnr()
   else
     let l:bufnr = a:1
   endif
