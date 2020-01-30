@@ -15,6 +15,12 @@ function s:Init() abort
   let g:ECY_erro_sign_highlight = get(g:,'ECY_erro_sign_highlight', 'ECY_erro_sign_highlight')
   let g:ECY_warn_sign_highlight = get(g:,'ECY_warn_sign_highlight', 'ECY_warn_sign_highlight')
 
+  if g:has_floating_windows_support == 'vim'
+    hi ECY_diagnosis_text  guifg=#eee8d5 ctermfg=white	ctermbg=Blue
+    let g:ECY_diagnosis_text = get(g:,'ECY_diagnosis_text', 'ECY_diagnosis_text')
+    call prop_type_add('ECY_diagnosis_text', {'highlight': g:ECY_diagnosis_text})
+  endif
+
   call sign_define("ECY_diagnosis_erro", {
     \ "text" : ">>",
     \ "texthl" : g:ECY_erro_sign_highlight})
@@ -130,11 +136,13 @@ function! diagnosis#ShowDiagnosis(index_list) abort
       if len(l:text) != 0
         call add(l:text, '----------------------------')
       endif
-      call add(l:text, item['kind'])
-      call add(l:text, item['diagnosis'])
+      let l:line = string(item['position']['line'])
+      let l:colum = string(item['position']['range']['start']['colum'])
+      call add(l:text, item['kind'] . ' [' .l:line . ', ' . l:colum . ']',)
+      call add(l:text, '(' . item['diagnosis'] . ')')
     endfor
     if g:ECY_PreviewWindows_style == 'append'
-      " show a popup windows aside current current cursor.
+      " show a popup windows aside current cursor.
       let l:opts = {
           \ 'minwidth': g:ECY_preview_windows_size[0][0],
           \ 'maxwidth': g:ECY_preview_windows_size[0][1],
@@ -146,7 +154,10 @@ function! diagnosis#ShowDiagnosis(index_list) abort
           \ 'firstline': 1,
           \ 'padding': [0,1,0,1],
           \ 'zindex': 2000}
-      call popup_atcursor(l:text, l:opts)
+      let l:nr = popup_atcursor(l:text, l:opts)
+      call setbufvar(winbufnr(l:nr), '&filetype', &filetype)
+      let l:exe = "call prop_add(1, 1, {'length': 100,'type': 'ECY_diagnosis_text'})"
+      call win_execute(l:nr, l:exe)
     endif
   endif
 "}}}
