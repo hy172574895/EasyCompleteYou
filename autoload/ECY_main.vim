@@ -552,6 +552,10 @@ endfunction
 function! ECY_main#GetCurrentUsingSourceName() abort
 "{{{
   let l:filetype = &filetype
+  if l:filetype == ''
+    let &filetype  = 'nothing'
+    let l:filetype = 'nothing'
+  endif
   if !exists("g:ECY_file_type_info[".string(l:filetype)."]")
     return ''
   endif
