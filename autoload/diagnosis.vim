@@ -225,16 +225,15 @@ endfunction
 function! diagnosis#UnPlaceAllSignInBuffer(buffer_nr) abort
 "{{{ remove all ECY's sign in current buffer.
   let i = 0
-  for item in g:ECY_sign_lists
-    if item['buffer_nr'] == a:buffer_nr
-      call sign_unplace('', {'buffer' : item['buffer_name'], 'id': item['id']})
+  while i < len(g:ECY_sign_lists)
+    let l:temp = g:ECY_sign_lists[i]
+    if l:temp['buffer_nr'] == a:buffer_nr
+      call sign_unplace('', {'buffer' : l:temp['buffer_name'], 'id': l:temp['id']})
       unlet g:ECY_sign_lists[i]
-      call diagnosis#UnPlaceAllSignInBuffer(a:buffer_nr)
-      return
+      continue
     endif
     let i += 1
-  endfor
-  return
+  endw
 "}}}
 endfunction
 
@@ -282,7 +281,7 @@ function! diagnosis#PlaceSign(msg) abort
   call diagnosis#CleanAllSignHighlight()
   call diagnosis#UnPlaceAllSignInBuffer(bufnr())
   let l:items = a:msg['Lists']
-  if len(l:items) > 100
+  if len(l:items) > 500
     call user_ui#ShowMsg("[ECY] Diagnosis will not be highlighted: the erros/warnnings are too much.", 2)
     return
   endif
