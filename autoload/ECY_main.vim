@@ -137,7 +137,7 @@ function! s:AskDiagnosis(event) abort
     let s:buffer_has_changed = 1
   endif
   if a:event == 'OnInsertModeLeave' && s:buffer_has_changed == 1
-    call diagnosis#UnPlaceAllSignInBuffer(bufnr())
+    call diagnosis#UnPlaceAllSignInBufferName(ECY_main#GetCurrentBufferPath())
     let s:buffer_has_changed = 0
   endif
   let l:temp = (a:event == 'OnTextChangedInsertMode' && 
@@ -603,7 +603,7 @@ function! ECY_main#AfterUserChooseASource() abort
 " lists
   " order matters
   call diagnosis#CleanAllSignHighlight()
-  call diagnosis#UnPlaceAllSignInBuffer(bufnr())
+  call diagnosis#UnPlaceAllSignInBufferName(ECY_main#GetCurrentBufferPath())
   if ECY_main#HasYCM()
     " according the user's settings to optionally complete.
     let l:filetype = &filetype

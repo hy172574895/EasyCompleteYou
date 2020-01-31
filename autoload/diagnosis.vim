@@ -1,6 +1,6 @@
 " Author: Jimmy Huang (1902161621@qq.com)
 " License: WTFPL
-
+ 
 function s:Init() abort
 "{{{ var init
   hi ECY_diagnosis_erro  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
@@ -58,10 +58,10 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
     return ''
   endif
   let l:current_line_nr   = line('.')
-  let l:current_buffer_nr = bufnr()
+  let l:current_buffer_path = ECY_main#GetCurrentBufferPath()
   let l:index_list        = []
   for item in g:ECY_sign_lists
-    if item['buffer_nr'] != l:current_buffer_nr || 
+    if item['buffer_name'] != l:current_buffer_path || 
           \item['position']['line'] != l:current_line_nr
       continue
     endif
@@ -69,7 +69,7 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
   endfor
   if len(l:index_list) != 0
     let s:current_diagnosis['line']      = l:current_line_nr
-    let s:current_diagnosis['buffer_nr'] = l:current_buffer_nr
+    let s:current_diagnosis['buffer_name'] = l:current_buffer_path
     call s:ShowDiagnosis(l:index_list)
   else
     if !a:is_triggered_by_event 
@@ -82,16 +82,16 @@ endfunction
 
 function! diagnosis#ShowNextDiagnosis() abort
 "{{{ show diagnosis msg in normal mode at current buffer. 
-  let l:current_buffer_nr = bufnr()
+  let l:current_buffer_path = ECY_main#GetCurrentBufferPath()
 
   let l:i = 0
   if s:current_diagnosis == {}
     " init
     for item in g:ECY_sign_lists
-      if l:current_buffer_nr == item['buffer_nr']
+      if l:current_buffer_path == item['buffer_name']
         let l:line = item['position']['line']
         let l:colum = item['position']['range']['start']['colum']
-        let s:current_diagnosis['buffer_nr'] = l:current_buffer_nr
+        let s:current_diagnosis['buffer_name'] = l:current_buffer_path
         let s:current_diagnosis['line'] = l:line
         call diagnosis#MoveTo(l:line, l:colum, l:i)
         call diagnosis#ShowCurrentLineDiagnosis(v:true)
@@ -108,7 +108,7 @@ function! diagnosis#ShowNextDiagnosis() abort
       let l:index = (l:i + 1) % len(g:ECY_sign_lists)
       let l:line = g:ECY_sign_lists[l:index]['position']['line']
       if  l:line != s:current_diagnosis['line'] 
-            \&& l:current_buffer_nr == s:current_diagnosis['buffer_nr']
+            \&& l:current_buffer_path == s:current_diagnosis['buffer_name']
         let l:colum = g:ECY_sign_lists[l:index]['position']['range']['start']['colum']
         call diagnosis#MoveTo(l:line, l:colum, l:index)
         call diagnosis#ShowCurrentLineDiagnosis(v:true)
@@ -234,12 +234,12 @@ function! diagnosis#CleanAllSignHighlight() abort
 "}}}
 endfunction
 
-function! diagnosis#UnPlaceAllSignInBuffer(buffer_nr) abort
+function! diagnosis#UnPlaceAllSignInBufferName(buffer_name) abort
 "{{{ remove all ECY's sign in current buffer.
   let i = 0
   while i < len(g:ECY_sign_lists)
     let l:temp = g:ECY_sign_lists[i]
-    if l:temp['buffer_nr'] == a:buffer_nr
+    if l:temp['buffer_name'] == a:buffer_name
       call sign_unplace('', {'buffer' : l:temp['buffer_name'], 'id': l:temp['id']})
       unlet g:ECY_sign_lists[i]
       continue
@@ -262,7 +262,6 @@ function! s:PlaceSign(position, diagnosis, items, style, path) abort
 "{{{ place a sign in current buffer.
   " a:position = {'line': 10, 'range': {'start': { 'line': 5, 'colum': 23 },'end' : { 'line': 6, 'colum': 0 } }}
   " a:diagnosis = {'item':{'1':'asdf', '2':'sdf'}}
-  let l:buffer_nr = bufnr()
   if a:style == 1
     let l:style = 'ECY_diagnosis_erro'
   else
@@ -274,7 +273,6 @@ function! s:PlaceSign(position, diagnosis, items, style, path) abort
   endif
   let l:temp = {'position': a:position, 
         \'id': l:sign_id,
-        \'buffer_nr': l:buffer_nr,
         \'items': a:items,
         \'buffer_name': a:path,
         \'diagnosis': a:diagnosis,
@@ -292,7 +290,7 @@ function! diagnosis#PlaceSign(msg) abort
   " order matters
   call s:CloseDiagnosisPopupWindows()
   call diagnosis#CleanAllSignHighlight()
-  call diagnosis#UnPlaceAllSignInBuffer(bufnr())
+  call diagnosis#UnPlaceAllSignInBufferName(ECY_main#GetCurrentBufferPath())
   let s:current_diagnosis = {}
   let l:items = a:msg['Lists']
   if len(l:items) > 500
