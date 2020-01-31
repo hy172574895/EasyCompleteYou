@@ -68,6 +68,7 @@ function! s:OnTextChangedNormalMode() abort
   if !ECY_main#IsECYWorksAtCurrentBuffer()
     return
   endif
+  call ECY_main#ChangeDocumentVersionID()
   call s:AskDiagnosis('OnTextChangedNormalMode')
   "}}}
 endfunction
@@ -118,11 +119,13 @@ function! s:OnTextChangedInsertMode() abort
   if !ECY_main#IsECYWorksAtCurrentBuffer()
     return
   endif
+  call ECY_main#ChangeDocumentVersionID()
   " order matters
   call s:AskDiagnosis('OnTextChangedInsertMode')
   call s:DoCompletion()
   "}}}
 endfunction
+
 " ==============================================================================
 function! s:AskDiagnosis(event) abort 
 "{{{
@@ -137,7 +140,9 @@ function! s:AskDiagnosis(event) abort
     call diagnosis#UnPlaceAllSignInBuffer(bufnr())
     let s:buffer_has_changed = 0
   endif
-  if a:event == 'OnInsertModeLeave'
+  let l:temp = (a:event == 'OnTextChangedInsertMode' && 
+        \g:ECY_update_diagnosis_mode == 2)
+  if a:event == 'OnInsertModeLeave' || l:temp || a:event == 'OnTextChangedNormalMode'
     call s:Do("Diagnosis", v:true)
   endif
 "}}}
@@ -176,6 +181,7 @@ function! s:DoCompletion() abort
     let &indentexpr = s:indentexpr
     call user_ui#CloseCompletionPopup()
   endif
+  call ECY_main#ChangeVersionID()
   call s:Do("DoCompletion", v:true)
 "}}}
 endfunction
@@ -728,8 +734,29 @@ endfunction
 "}}}
 
 function! ECY_main#GetVersionID() abort
+"{{{ mainly for completion
+  let l:temp = "ECY_Client_.GetCompletionVersionID_NotChanging()"
+  return s:PythonEval(l:temp)
+"}}}
+endfunction
+
+function! ECY_main#ChangeVersionID() abort
+"{{{ mainly for completion
+  let l:temp = "ECY_Client_.GetCompletionVersionID_Changing()"
+  return s:PythonEval(l:temp)
+"}}}
+endfunction
+
+function! ECY_main#GetDocumentVersionID() abort
+"{{{ change while buffer had changes
+  let l:temp = "ECY_Client_.GetDocumentVersionID_NotChanging()"
+  return s:PythonEval(l:temp)
+"}}}
+endfunction
+
+function! ECY_main#ChangeDocumentVersionID() abort
 "{{{
-  let l:temp = "ECY_Client_.GetVersionID_NotChange()"
+  let l:temp = "ECY_Client_.GetDocumentVersionID_Changing()"
   return s:PythonEval(l:temp)
 "}}}
 endfunction

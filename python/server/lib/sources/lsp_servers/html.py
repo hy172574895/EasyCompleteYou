@@ -215,6 +215,7 @@ class Operate(scope_.Source_interface):
             return_ = {'ID': version['VersionID'], 'Server_name': self._name}
             return_['Event'] = 'diagnosis'
             return_['FilePath'] = version['FilePath']
+            return_['DocumentID'] = version['DocumentVersionID']
             workspace = version['WorkSpace']
             # if workspace is not None:
             #     cmd += '--config ' + workspace + '/.htmlhintrc'

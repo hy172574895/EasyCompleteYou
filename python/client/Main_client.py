@@ -35,7 +35,8 @@ class ECY_Client(_do):
     def __init__(self):
         _do.__init__(self)
         self._lock = threading.Lock()
-        self._id = 0 
+        self._completion_id = 0 
+        self._document_id = 0 
         self._HMAC_KEY = -1
         self._port = -1
         self.isdebug = False
@@ -60,16 +61,27 @@ class ECY_Client(_do):
         return 'ok'
 # {{{
 
-    def GetVersionID_change(self):
+    def GetCompletionVersionID_Changing(self):
         """ return a oder ID. this func will add version id automatically
         """
-        self._id += 1
-        return self._id
+        self._completion_id += 1
+        return self._completion_id
 
-    def GetVersionID_NotChange(self):
+    def GetCompletionVersionID_NotChanging(self):
         """ return a oder ID. this func just get the ID but won't change ID
         """
-        return self._id
+        return self._completion_id
+
+    def GetDocumentVersionID_Changing(self):
+        """ return a oder ID. this func will add version id automatically
+        """
+        self._document_id += 1
+        return self._document_id
+
+    def GetDocumentVersionID_NotChanging(self):
+        """ return a oder ID. this func just get the ID but won't change ID
+        """
+        return self._document_id
 
     def GetUnusedLocalhostPort(self):
         if self._port == -1:
@@ -93,8 +105,9 @@ class ECY_Client(_do):
 # }}}
 
     def _add(self, event):
-        version_id = self.GetVersionID_change()
-        self._go(event, version_id)
+        version_id = self.GetCompletionVersionID_NotChanging()
+        document_version_id = self.GetDocumentVersionID_NotChanging()
+        self._go(event, version_id, document_version_id)
 
     def _get(self, event):
         # do
@@ -107,11 +120,12 @@ class ECY_Client(_do):
         # return a dict
         return method()
 
-    def _go(self, event, version_id):
+    def _go(self, event, version_id, document_id):
         try:
             # self._lock.acquire()
             todo = self._get(event)
             todo['VersionID'] = version_id
+            todo['DocumentVersionID'] = document_id
             if self.isdebug:
                 self._debug_server.AddTodo(todo)
             self.socket_connection.AddTodo(todo)
