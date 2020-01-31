@@ -108,9 +108,10 @@ function! s:OnBufferEnter() abort
   let  s:completeopt_temp     = &completeopt
   let  s:completeopt_fuc_temp = &completefunc
   let  s:buffer_has_changed   = 0
+  call diagnosis#CleanAllSignHighlight()
   call s:SetUpCompleteopt()
+  " OnBufferEnter will trigger Diagnosis
   call s:Do("OnBufferEnter", v:true)
-  call s:AskDiagnosis('OnBufferEnter')
   "}}}
 endfunction
 
@@ -120,7 +121,6 @@ function! s:OnTextChangedInsertMode() abort
     return
   endif
   call ECY_main#ChangeDocumentVersionID()
-  " order matters
   call s:AskDiagnosis('OnTextChangedInsertMode')
   call s:DoCompletion()
   "}}}
@@ -140,9 +140,7 @@ function! s:AskDiagnosis(event) abort
     call diagnosis#UnPlaceAllSignInBufferName(ECY_main#GetCurrentBufferPath())
     let s:buffer_has_changed = 0
   endif
-  let l:temp = (a:event == 'OnTextChangedInsertMode' && 
-        \g:ECY_update_diagnosis_mode == 2)
-  if a:event == 'OnInsertModeLeave' || l:temp || a:event == 'OnTextChangedNormalMode'
+  if a:event == 'OnInsertModeLeave' || a:event == 'OnTextChangedNormalMode'
     call s:Do("Diagnosis", v:true)
   endif
 "}}}
@@ -997,8 +995,17 @@ endfunction
 
 function! ECY_main#GetCurrentBufferPath() abort
 "{{{
-  let l:temp = "ECY_Client_.GetCurrentBufferPath()"
-  return s:PythonEval(l:temp)
+  " let l:temp = "ECY_Client_.GetCurrentBufferPath()"
+  " return s:PythonEval(l:temp)
+  let l:file = @%
+  if l:file =~# '^\a\a\+:' || a:0 > 1
+    return call('Current_buffer_path', [l:file] + a:000[1:-1])
+  elseif l:file =~# '^/\|^\a:\|^$'
+    return l:file
+  else
+    let l:full_path = fnamemodify(l:file, ':p' . (l:file =~# '[\/]$' ? '' : ':s?[\/]$??'))
+    return l:full_path
+  endif
 "}}}
 endfunction
 

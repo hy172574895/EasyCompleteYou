@@ -86,10 +86,11 @@ def GetCurrentBufferNumber():
 
 
 def GetCurrentBufferFilePath():
-    temp = GetBufferFilepath(GetCurrentBufferObject())
-    temp = temp.replace("\\\\",'/')
-    temp = temp.replace("\\",'/')
-    return temp
+    try:
+        return CallEval('ECY_main#GetCurrentBufferPath()')
+    except Exception as e:
+        # have bug in popup windows
+        return GetBufferFilepath(GetCurrentBufferObject())
 
 
 def GetCurrentBufferObject():

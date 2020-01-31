@@ -8,13 +8,19 @@ class Event(object):
     """
     def __init__(self, source_name):
         self.source_name = source_name
-        self._isReturn_match_point = False
+        self._is_return_match_point = False
         if vim_lib.GetVariableValue("g:ECY_use_floating_windows_to_be_popup_windows"):
-            self._isReturn_match_point = True
+            self._is_return_match_point = True
 
         self._trigger_len = vim_lib.GetVariableValue("g:ECY_triggering_length")
         self.has_ultisnippet_support = vim_lib.GetVariableValue("g:has_ultisnips_support")
         self._workspace = None
+
+        temp = vim_lib.GetVariableValue("g:ECY_update_diagnosis_mode")
+        self._is_return_diagnosis = False
+        if self._is_return_diagnosis == 2:
+            # return it after completion
+            self._is_return_diagnosis = True
 
     def GetCurrentWorkSpace(self):
         temp = vim_lib.CallEval("rooter#GetCurrentBufferWorkSpace()")
@@ -28,7 +34,8 @@ class Event(object):
     def DoCompletion(self):
         msg = {}
         msg['TriggerLength'] = self._trigger_len
-        msg['ReturnMatchPoint'] = self._isReturn_match_point
+        msg['ReturnMatchPoint'] = self._is_return_match_point
+        msg['ReturnDiagnosis'] = self._is_return_diagnosis
         return self._pack(msg, 'DoCompletion')
 
     def Diagnosis(self):

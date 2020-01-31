@@ -32,8 +32,9 @@ class HtmlLSPEvent(scope_.Event):
     def DoCompletion(self):
         msg = {}
         msg['TriggerLength'] = self._trigger_len
-        msg['ReturnMatchPoint'] = self._isReturn_match_point
+        msg['ReturnMatchPoint'] = self._is_return_match_point
         msg['StartingCMD'] = self._get_starting_cmd()
+        msg['ReturnDiagnosis'] = self._is_return_diagnosis
         return self._pack(msg, 'DoCompletion')
 
     def _pack(self, msg, event_name):

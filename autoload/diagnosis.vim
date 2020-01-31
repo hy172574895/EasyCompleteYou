@@ -288,7 +288,6 @@ function! diagnosis#PlaceSign(msg) abort
     return
   endif
   " order matters
-  call s:CloseDiagnosisPopupWindows()
   call diagnosis#CleanAllSignHighlight()
   call diagnosis#UnPlaceAllSignInBufferName(ECY_main#GetCurrentBufferPath())
   let s:current_diagnosis = {}

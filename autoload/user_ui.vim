@@ -649,7 +649,7 @@ function! user_ui#GetLoadedFile() abort
   "return the loaded file with path
   let l:list_of_buf = []
   for l:buff in getbufinfo()
-    let l:path = tr(l:buff['name'], '\', '/')
+    let l:path = l:buff['name']
     let l:buf_info = {'bufnr': l:buff['bufnr'],'buf_path': l:path}
     call add(l:list_of_buf,l:buf_info)
   endfor

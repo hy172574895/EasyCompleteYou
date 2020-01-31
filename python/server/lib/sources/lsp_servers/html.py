@@ -121,6 +121,7 @@ class Operate(scope_.Source_interface):
             uri_ = self._lsp.PathToUri(version['FilePath'])
             line_text = version['AllTextList']
             self._did_open_or_change(uri_, line_text)
+            self.Diagnosis(version)
         # every event must return something. 'None' means send nothing to client
         return None
 
@@ -141,6 +142,9 @@ class Operate(scope_.Source_interface):
 # {{{
         if not self._check(version):
             return None
+        if version['ReturnDiagnosis']:
+            self.Diagnosis(version)
+
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         uri_ = self._lsp.PathToUri(version['FilePath'])
         line_text = version['AllTextList']
@@ -220,7 +224,7 @@ class Operate(scope_.Source_interface):
             #     cmd += '--config ' + workspace + '/.htmlhintrc'
             diagnosis_lists = self._diagnosis.GetDiagnosis(
                     version['HTMLHintCMD'],
-                    version['AllTextList'],version['FilePath'])
+                    version['AllTextList'], version['FilePath'])
             return_['Lists'] = diagnosis_lists
             if diagnosis_lists is None:
                 # time out or something wrong
