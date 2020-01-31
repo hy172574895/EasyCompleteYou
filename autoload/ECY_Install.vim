@@ -1,3 +1,5 @@
+" Author: Jimmy Huang (1902161621@qq.com)
+" License: WTFPL
 
 " python, label and path are buildin.
 let g:ECY_available_sources_lists = ['HTML_LSP', 'Snippets', 'YCM', 'Pygment']
