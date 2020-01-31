@@ -234,7 +234,7 @@ function! user_ui#Completion(items_info, fliter_words) abort
     let j += 1
   endw
 
-  let s:popup_windows_nr = popup_create(l:to_show,l:opts)
+  let s:popup_windows_nr = popup_create(l:to_show, l:opts)
   let g:ECY_current_popup_windows_info = {'windows_nr': s:popup_windows_nr,
         \'selecting_item':0,'items_info':a:items_info,
         \'opts': popup_getoptions(s:popup_windows_nr)}
@@ -435,18 +435,18 @@ function! g:ChooseSource_cb(id, key) abort
   let l:filetype = &filetype
   if a:key == 'j' || a:key == 'k'
     if a:key == 'k'
-      let l:temp = (s:using_source['current']-1)%len(s:using_source['list'])
+      let l:temp = (s:using_source['current'] - 1) % len(s:using_source['list'])
       call ECY_main#ChooseSource(l:filetype,'pre')
     else
-      let l:temp = (s:using_source['current']+1)%len(s:using_source['list'])
-      call ECY_main#ChooseSource(l:filetype,'next')
+      let l:temp = (s:using_source['current'] + 1) % len(s:using_source['list'])
+      call ECY_main#ChooseSource(l:filetype, 'next')
     endif
     let s:using_source['current'] = l:temp
 
     " have to clear it then reset the text for new.
     " maybe this a bug of vim.
-    call popup_settext(a:id,'')
-    call popup_settext(a:id,s:BuildLoopingList(s:using_source))
+    call popup_settext(a:id, '')
+    call popup_settext(a:id, s:BuildLoopingList(s:using_source))
     return 1
   elseif a:key == "\<ESC>"
     " a callback
