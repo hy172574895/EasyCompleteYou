@@ -70,7 +70,7 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
   if len(l:index_list) != 0
     let s:current_diagnosis['line']      = l:current_line_nr
     let s:current_diagnosis['buffer_nr'] = l:current_buffer_nr
-    call diagnosis#ShowDiagnosis(l:index_list)
+    call s:ShowDiagnosis(l:index_list)
   else
     if !a:is_triggered_by_event 
       call user_ui#ShowMsg("[ECY] Diagnosis has nothing to show.", 2)
@@ -134,8 +134,20 @@ function! g:Diagnosis_vim_cb(id, key) abort
   let s:current_diagnosis_nr = -1
 endfunction
 
-function! diagnosis#ShowDiagnosis(index_list) abort
+function! s:CloseDiagnosisPopupWindows() abort
+"{{{
+  if s:current_diagnosis_nr != -1
+    if g:has_floating_windows_support == 'vim'
+      call popup_close(s:current_diagnosis_nr)
+      let s:current_diagnosis_nr = -1
+    endif
+  endif
+"}}}
+endfunction
+
+function! s:ShowDiagnosis(index_list) abort
 "{{{ 
+  call s:CloseDiagnosisPopupWindows()
   if g:has_floating_windows_support == 'vim'
     let l:text = []
     for item in a:index_list
@@ -277,8 +289,10 @@ function! diagnosis#PlaceSign(msg) abort
     return
   endif
   " order matters
+  call s:CloseDiagnosisPopupWindows()
   call diagnosis#CleanAllSignHighlight()
   call diagnosis#UnPlaceAllSignInBuffer(bufnr())
+  let s:current_diagnosis = {}
   let l:items = a:msg['Lists']
   if len(l:items) > 500
     call user_ui#ShowMsg("[ECY] Diagnosis will not be highlighted: the erros/warnnings are too much.", 2)
