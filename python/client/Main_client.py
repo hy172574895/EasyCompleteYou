@@ -94,6 +94,9 @@ class ECY_Client(_do):
             sock.close()
         return self._port
 
+    def GetCurrentBufferPath(self):
+        return vim_lib.GetCurrentBufferFilePath()
+
     def CreateHMACKey(self):
         """new a new key if it's not exist.
         """

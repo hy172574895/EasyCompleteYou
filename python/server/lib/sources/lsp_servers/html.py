@@ -214,7 +214,6 @@ class Operate(scope_.Source_interface):
             version = self._diagnosis_queue.get()
             return_ = {'ID': version['VersionID'], 'Server_name': self._name}
             return_['Event'] = 'diagnosis'
-            return_['FilePath'] = version['FilePath']
             return_['DocumentID'] = version['DocumentVersionID']
             workspace = version['WorkSpace']
             # if workspace is not None:
@@ -285,6 +284,7 @@ class HtmlHint:
                         {'name': '4', 'content': {'abbr': pos_string}}]
                 temp = {'items': temp,
                         'type': 'diagnosis',
+                        'file_path': file_path,
                         'diagnosis': msg['rule']['description'],
                         'position': position}
                 results_list.append(temp)

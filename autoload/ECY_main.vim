@@ -995,6 +995,13 @@ function! ECY_main#Execute(event) abort
 "}}}
 endfunction
 
+function! ECY_main#GetCurrentBufferPath() abort
+"{{{
+  let l:temp = "ECY_Client_.GetCurrentBufferPath()"
+  return s:PythonEval(l:temp)
+"}}}
+endfunction
+
 function! ECY_main#GetBufferWorkSpace(...) abort
 "{{{
   if a:000 == 0

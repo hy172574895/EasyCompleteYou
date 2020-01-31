@@ -246,7 +246,7 @@ function! diagnosis#UnPlaceAllSign() abort
 "}}}
 endfunction
 
-function! s:PlaceSign(position, diagnosis, items, style) abort
+function! s:PlaceSign(position, diagnosis, items, style, path) abort
 "{{{ place a sign in current buffer.
   " a:position = {'line': 10, 'range': {'start': { 'line': 5, 'colum': 23 },'end' : { 'line': 6, 'colum': 0 } }}
   " a:diagnosis = {'item':{'1':'asdf', '2':'sdf'}}
@@ -256,15 +256,14 @@ function! s:PlaceSign(position, diagnosis, items, style) abort
   else
     let l:style = 'ECY_diagnosis_warn'
   endif
-  let l:buffer_name = s:GetCurrentBufferName()
-  let l:sign_id = sign_place(0,'',l:style, l:buffer_name, {'lnum' : a:position['line']})
+  let l:sign_id = sign_place(0,'',l:style, a:path, {'lnum' : a:position['line']})
   call s:HighlightRange(a:position['range'], 'ECY_diagnosis_highlight')
 
   let l:temp = {'position': a:position, 
         \'id': l:sign_id,
         \'buffer_nr': l:buffer_nr,
         \'items': a:items,
-        \'buffer_name': l:buffer_name,
+        \'buffer_name': a:path,
         \'diagnosis': a:diagnosis,
         \'kind': l:style}
   call add(g:ECY_sign_lists, l:temp)
@@ -291,7 +290,10 @@ function! diagnosis#PlaceSign(msg) abort
     " {'name':'2', 'content': {'abbr': 'yyy'}}
     "  ],
     " 'position':{...}, 'diagnosis': 'strings'}
-    call s:PlaceSign(item['position'], item['diagnosis'], item['items'], 1)
+    call s:PlaceSign(item['position'], 
+          \item['diagnosis'],
+          \item['items'], 1,
+          \item['file_path'])
   endfor
 "}}}
 endfunction
@@ -304,20 +306,6 @@ function! diagnosis#Toggle() abort
     call diagnosis#UnPlaceAllSign()
   endif
 "}}}
-endfunction
-
-function! s:GetCurrentBufferName(...) abort
-  "{{{
-  let l:file = a:0 ? a:1 : @%
-  if l:file =~# '^\a\a\+:' || a:0 > 1
-    return call('Current_buffer_path', [l:file] + a:000[1:-1])
-  elseif l:file =~# '^/\|^\a:\|^$'
-    return l:file
-  else
-    let l:full_path = fnamemodify(l:file, ':p' . (l:file =~# '[\/]$' ? '' : ':s?[\/]$??'))
-    return l:full_path
-  endif
-  "}}}
 endfunction
 
 function! diagnosis#ShowSelecting() abort
