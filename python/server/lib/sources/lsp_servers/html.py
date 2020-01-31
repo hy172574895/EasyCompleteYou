@@ -234,6 +234,8 @@ class Operate(scope_.Source_interface):
 class HtmlHint:
     def __init__(self):
         self._port = -1
+        self._cmd = " --format=json http://localhost:" + \
+                str(self.GetUnusedLocalhostPort())
 
     def GetUnusedLocalhostPort(self):
         if self._port == -1:
@@ -249,13 +251,13 @@ class HtmlHint:
     def _get(self, cmd):
         """start annalysis and put results to queue
         """
-        cmd += " --format=json http://localhost:"
-        cmd += str(self.GetUnusedLocalhostPort())
-        cmd = shlex.split(cmd)
-        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-        if process.wait(timeout=5) is None:
-            return None
-        temp = process.stdout.read()
+        cmd += self._cmd
+        try:
+            cmd = shlex.split(cmd)
+            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+            temp = process.stdout.read()
+        except Exception as e:
+            temp = None
         process.terminate()
         return temp
 
@@ -273,7 +275,7 @@ class HtmlHint:
         for item in results:
             for msg in item['messages']:
                 msg['col'] += 1
-                pos_string = '[' + str(msg['line']) + ', ' + str(msg['col']) + ']'
+                pos_string = '[' + str(msg['line']) + ', ' + str(msg['col'])+']'
                 position = {'line': msg['line'], 'range': {
                     'start': {'line': msg['line'], 'colum': msg['col']},
                     'end': {'line': msg['line'], 'colum': msg['col']}}}
