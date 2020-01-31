@@ -27,8 +27,9 @@ function s:Init() abort
     \ "text" : "!!",
     \ "texthl" : g:ECY_warn_sign_highlight})
 
-  let g:ECY_sign_lists    = []
-  let s:current_diagnosis = {}
+  let g:ECY_sign_lists       = []
+  let s:current_diagnosis    = {}
+  let s:current_diagnosis_nr = -1
 
   call s:SetUpEvent()
 
@@ -45,7 +46,9 @@ function s:SetUpEvent() abort
 endfunction
 
 function s:OnCursorHold() abort
-  call diagnosis#ShowCurrentLineDiagnosis(v:true)
+  if s:current_diagnosis_nr == -1
+    call diagnosis#ShowCurrentLineDiagnosis(v:true)
+  endif
 endfunction
 
 function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
@@ -127,6 +130,10 @@ function! diagnosis#MoveTo(line, colum, index) abort
 "}}}
 endfunction
 
+function! g:Diagnosis_vim_cb(id, key) abort
+  let s:current_diagnosis_nr = -1
+endfunction
+
 function! diagnosis#ShowDiagnosis(index_list) abort
 "{{{ 
   if g:has_floating_windows_support == 'vim'
@@ -149,6 +156,7 @@ function! diagnosis#ShowDiagnosis(index_list) abort
           \ 'maxheight': g:ECY_preview_windows_size[1][1],
           \ 'border': [],
           \ 'close': 'click',
+          \ 'callback': 'g:Diagnosis_vim_cb',
           \ 'scrollbar': 1,
           \ 'firstline': 1,
           \ 'padding': [0,1,0,1],
@@ -157,6 +165,7 @@ function! diagnosis#ShowDiagnosis(index_list) abort
       call setbufvar(winbufnr(l:nr), '&filetype', &filetype)
       let l:exe = "call prop_add(1, 1, {'length': 100,'type': 'ECY_diagnosis_text'})"
       call win_execute(l:nr, l:exe)
+      let s:current_diagnosis_nr = l:nr
     endif
   endif
 "}}}
@@ -265,6 +274,10 @@ endfunction
 
 function! diagnosis#PlaceSign(msg) abort
 "{{{Place a Sign and highlight it.
+  if exists("a:msg['DocumentID']") && 
+        \ECY_main#GetDocumentVersionID() > a:msg['DocumentID']
+    return
+  endif
   " order matters
   call diagnosis#CleanAllSignHighlight()
   call diagnosis#UnPlaceAllSignInBuffer(bufnr())
