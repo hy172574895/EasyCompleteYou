@@ -269,8 +269,9 @@ function! s:PlaceSign(position, diagnosis, items, style, path) abort
     let l:style = 'ECY_diagnosis_warn'
   endif
   let l:sign_id = sign_place(0,'',l:style, a:path, {'lnum' : a:position['line']})
-  call s:HighlightRange(a:position['range'], 'ECY_diagnosis_highlight')
-
+  if ECY_main#GetCurrentBufferPath() == a:path
+    call s:HighlightRange(a:position['range'], 'ECY_diagnosis_highlight')
+  endif
   let l:temp = {'position': a:position, 
         \'id': l:sign_id,
         \'buffer_nr': l:buffer_nr,
