@@ -282,14 +282,17 @@ class HtmlHint:
                 position = {'line': msg['line'], 'range': {
                     'start': {'line': msg['line'], 'colum': msg['col']},
                     'end': {'line': msg['line'], 'colum': msg['col']}}}
-                temp = [{'name': '1', 'content': {'abbr': msg['message']}},
+                # can work too:
+                # diagnosis = msg['rule']['description']
+                diagnosis = msg['message']
+                temp = [{'name': '1', 'content': {'abbr': diagnosis}},
                         {'name': '2', 'content': {'abbr': msg['type']}},
                         {'name': '3', 'content': {'abbr': file_path}},
                         {'name': '4', 'content': {'abbr': pos_string}}]
                 temp = {'items': temp,
                         'type': 'diagnosis',
                         'file_path': file_path,
-                        'diagnosis': msg['rule']['description'],
+                        'diagnosis': diagnosis,
                         'position': position}
                 results_list.append(temp)
         return results_list
