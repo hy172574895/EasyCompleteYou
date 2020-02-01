@@ -5,6 +5,8 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+let g:ECY_version = {'version':1, 'tags':'1.0'}
+
 function! s:Finish(is_quit, msg) abort
   if  a:msg != ''
     echohl WarningMsg |
