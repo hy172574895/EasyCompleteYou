@@ -53,7 +53,9 @@ endfunction
 function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
 "{{{ show diagnosis msg in normal mode.
   if g:ECY_disable_diagnosis || mode() != 'n'
-    call user_ui#ShowMsg("[ECY] Diagnosis had been turn off.", 2)
+    if !a:is_triggered_by_event
+      call user_ui#ShowMsg("[ECY] Diagnosis had been turn off.", 2)
+    endif
     return ''
   endif
   let l:current_line_nr   = line('.')
@@ -282,8 +284,9 @@ endfunction
 
 function! diagnosis#PlaceSign(msg) abort
 "{{{Place a Sign and highlight it.
-  if exists("a:msg['DocumentID']") && 
-        \ECY_main#GetDocumentVersionID() > a:msg['DocumentID']
+  if (exists("a:msg['DocumentID']") 
+        \ && ECY_main#GetDocumentVersionID() > a:msg['DocumentID'] )
+        \ || g:ECY_disable_diagnosis
     return
   endif
   " order matters
