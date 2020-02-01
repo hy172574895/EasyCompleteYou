@@ -1,5 +1,7 @@
-" can only have one preview windows
+" Author: Jimmy Huang (1902161621@qq.com)
+" License: WTFPL
 
+" can only have one preview windows
 function! completion_preview_windows#Init() abort
 "{{{ 
   let s:preview_windows_nr = get(s:,'preview_windows_nr',-1)

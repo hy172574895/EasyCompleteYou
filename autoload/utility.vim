@@ -1,3 +1,5 @@
+" Author: Jimmy Huang (1902161621@qq.com)
+" License: WTFPL
 
 function! utility#MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
 "{{{ move cursor to windows
