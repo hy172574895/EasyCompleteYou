@@ -16,6 +16,8 @@ from leaderf.manager import *
 # ECYDiagnosisExplorer
 #*****************************************************
 global g_items_data
+global g_callback_name
+
 class ECYDiagnosisExplorer(Explorer):
     def __init__(self):
         pass
@@ -23,6 +25,7 @@ class ECYDiagnosisExplorer(Explorer):
     def getContent(self, *args, **kwargs):
         # return a list
         g_items_data = lfEval("g:ECY_items_data")
+        g_callback_name = lfEval("g:ECY_selecting_cb_name")
         # max length
         items_len = {}
         for item in g_items_data:
@@ -60,7 +63,7 @@ class ECYDiagnosisExplorer(Explorer):
 
     def getStlCategory(self):
         # return a strings
-        return "ECY_Diagnosis"
+        return "ECY_Selecting"
 
     def getStlCurDir(self):
         # return a strings
@@ -79,6 +82,25 @@ class ECYDiagnosisManager(Manager):
         super(ECYDiagnosisManager, self).__init__()
         self._match_ids = []
 
+    def _callback_to_vim(self, event_name, line_content, modes):
+        index = self._get_index(line)
+        cmd = "call user_ui#LeaderF_cb({0},{1},{2},{3},{4},{5})".\
+                format(line_content, event_name, index, modes, g_callback_name)
+        lfCmd(cmd)
+
+    def _get_index(self, line):
+        """return strings
+        """
+        i = len(line) - 1
+        temp = ""
+        while i > 0:
+            if line[i] is not " ":
+                temp = line[i] + temp
+            else:
+                return temp
+            i -= 1
+        return '-1'
+
     def _getExplClass(self):
         return ECYDiagnosisExplorer
 
@@ -90,18 +112,7 @@ class ECYDiagnosisManager(Manager):
             return
         line = args[0]
         mode = kwargs.get("mode", '')
-        lfCmd("call user_ui#LeaderF_cb('"+ str(line) + "','acceptSelection',"+ self._get_nr(line) +",'"+ mode +"')")
-
-    def _get_nr(self, line):
-        i = len(line) - 1
-        temp = ""
-        while i > 0:
-            if line[i] is not " ":
-                temp = line[i] + temp
-            else:
-                return temp
-            i -= 1
-        return '-1'
+        self._callback_to_vim('acceptSelection', str(line), mode)
 
     def _getDigest(self, line, mode):
         """
@@ -138,6 +149,7 @@ class ECYDiagnosisManager(Manager):
         help.append('" ---------------------------------------------------------')
         return help
 
+    #TODO: highlight for line.
     # def _afterEnter(self):
     #     super(ECYDiagnosisManager, self)._afterEnter()
     #     id = int(lfEval('''matchadd('Lf_hl_marksTitle', '^mark line .*$')'''))
@@ -152,7 +164,7 @@ class ECYDiagnosisManager(Manager):
         for i in self._match_ids:
             lfCmd("silent! call matchdelete(%d)" % i)
         self._match_ids = []
-        lfCmd("call user_ui#LeaderF_cb('"+ "nothing" + "','beforeExit',"+ "-1" +")")
+        self._callback_to_vim('beforeExit', '-1', 'nothing')
 
     def _previewResult(self, preview):
         if not self._needPreview(preview):
@@ -165,7 +177,7 @@ class ECYDiagnosisManager(Manager):
         vim.options['eventignore'] = 'BufLeave,WinEnter,BufEnter'
         try:
             vim.current.tabpage, vim.current.window = orig_pos[:2]
-            lfCmd("call user_ui#LeaderF_cb('"+ str(line) + "','previewResult',"+ self._get_nr(line) +")")
+            self._callback_to_vim('previewResult', str(line), 'nothing')
         finally:
             vim.current.tabpage, vim.current.window, vim.current.buffer = cur_pos
             vim.options['eventignore'] = saved_eventignore

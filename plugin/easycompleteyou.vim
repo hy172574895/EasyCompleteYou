@@ -48,6 +48,19 @@ function! s:CheckRequires() abort
     call s:Finish(v:true,"EasyCompletion unavailable: has no python3 support. " .
           \ "python3 only, python2 is abandomed.")
   endif
+
+  let g:is_vim = !has('nvim')
+  if !g:is_vim && exists('*nvim_win_set_config')
+    let g:has_floating_windows_support = 'nvim'
+    " TODO:
+    let g:has_floating_windows_support = 'has_no'
+  elseif has('textprop') && has('popupwin')
+    let g:has_floating_windows_support = 'vim'
+  else
+    let g:has_floating_windows_support = 'has_no'
+    let g:ECY_use_floating_windows_to_be_popup_windows = v:false
+  endif
+
   let g:loaded_easycomplete = v:true
 "}}}
 endfunction
@@ -56,7 +69,9 @@ endfunction
 let g:ECY_starttime = reltimefloat(reltime())
 
 call s:CheckRequires()
-call user_ui#Init()
+call diagnosis#Init()
+call completion_preview_windows#Init()
+call color_completion#Init()
 call ECY_main#Start()
 
 let g:ECY_endtime = reltimefloat(reltime())

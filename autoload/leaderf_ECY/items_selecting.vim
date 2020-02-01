@@ -42,6 +42,17 @@ function! leaderf_ECY#items_selecting#Maps()
 "}}}
 endfunction
 
-function! leaderf_ECY#items_selecting#Start()
-    call leaderf#LfPy("ECY_leaderf_selecting.startExplorer('".g:Lf_WindowPosition."')")
+function! s:LeaderfTimer_cb(timer) abort
+  call leaderf#LfPy("ECY_leaderf_selecting.startExplorer('".g:Lf_WindowPosition."')")
+endfunction
+
+function! leaderf_ECY#items_selecting#Start(content, callback_name) abort
+"{{{
+  " this will invoke leaderf plugin in python to handle g:ECY_items_data
+  " must be called by a timer.
+  let g:ECY_items_data = a:content
+  let g:ECY_selecting_cb_name = a:callback_name
+  " can not have some of loop-like code in event callback
+  call timer_start(1, function('s:LeaderfTimer_cb'))
+"}}}
 endfunction

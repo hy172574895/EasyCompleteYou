@@ -87,7 +87,7 @@ def GetCurrentBufferNumber():
 
 def GetCurrentBufferFilePath():
     try:
-        return CallEval('ECY_main#GetCurrentBufferPath()')
+        return CallEval('utility#GetCurrentBufferPath()')
     except Exception as e:
         # have bug in popup windows
         return GetBufferFilepath(GetCurrentBufferObject())

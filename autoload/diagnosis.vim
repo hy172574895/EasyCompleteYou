@@ -1,7 +1,7 @@
 " Author: Jimmy Huang (1902161621@qq.com)
 " License: WTFPL
  
-function s:Init() abort
+function diagnosis#Init() abort
 "{{{ var init
   hi ECY_diagnosis_erro  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
   hi ECY_diagnosis_warn  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
@@ -54,12 +54,12 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
 "{{{ show diagnosis msg in normal mode.
   if g:ECY_disable_diagnosis || mode() != 'n'
     if !a:is_triggered_by_event
-      call user_ui#ShowMsg("[ECY] Diagnosis had been turn off.", 2)
+      call utility#ShowMsg("[ECY] Diagnosis had been turn off.", 2)
     endif
     return ''
   endif
   let l:current_line_nr   = line('.')
-  let l:current_buffer_path = ECY_main#GetCurrentBufferPath()
+  let l:current_buffer_path = utility#GetCurrentBufferPath()
   let l:index_list        = []
   for item in g:ECY_sign_lists
     if item['buffer_name'] != l:current_buffer_path || 
@@ -74,7 +74,7 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
     call s:ShowDiagnosis(l:index_list)
   else
     if !a:is_triggered_by_event 
-      call user_ui#ShowMsg("[ECY] Diagnosis has nothing to show.", 2)
+      call utility#ShowMsg("[ECY] Diagnosis has nothing to show.", 2)
     endif
   endif
   return ''
@@ -83,7 +83,7 @@ endfunction
 
 function! diagnosis#ShowNextDiagnosis() abort
 "{{{ show diagnosis msg in normal mode at current buffer. 
-  let l:current_buffer_path = ECY_main#GetCurrentBufferPath()
+  let l:current_buffer_path = utility#GetCurrentBufferPath()
 
   let l:i = 0
   if s:current_diagnosis == {}
@@ -94,7 +94,7 @@ function! diagnosis#ShowNextDiagnosis() abort
         let l:colum = item['position']['range']['start']['colum']
         let s:current_diagnosis['buffer_name'] = l:current_buffer_path
         let s:current_diagnosis['line'] = l:line
-        call diagnosis#MoveTo(l:line, l:colum, l:i)
+        call utility#MoveToBuffer(l:line, l:colum, l:current_buffer_path, 'current buffer')
         call diagnosis#ShowCurrentLineDiagnosis(v:true)
         break
       endif
@@ -111,7 +111,7 @@ function! diagnosis#ShowNextDiagnosis() abort
       if  l:line != s:current_diagnosis['line'] 
             \&& l:current_buffer_path == s:current_diagnosis['buffer_name']
         let l:colum = g:ECY_sign_lists[l:index]['position']['range']['start']['colum']
-        call diagnosis#MoveTo(l:line, l:colum, l:index)
+        call utility#MoveToBuffer(l:line, l:colum, l:current_buffer_path, 'current buffer')
         call diagnosis#ShowCurrentLineDiagnosis(v:true)
         let s:current_diagnosis['line'] = l:line
         return ''
@@ -119,15 +119,8 @@ function! diagnosis#ShowNextDiagnosis() abort
     endif
     let l:i += 1
   endfor
-  call user_ui#ShowMsg("[ECY] Diagnosis has no next one.", 2)
+  call utility#ShowMsg("[ECY] Diagnosis has no next one.", 2)
   return ''
-"}}}
-endfunction
-
-function! diagnosis#MoveTo(line, colum, index) abort
-"{{{ on current buffer
-  let l:lens = string(len(g:ECY_sign_lists))
-  call user_ui#ShowMsg("[ECY] Diagnosis goto next (". a:index . '/' . l:lens . ')' , 2)
 "}}}
 endfunction
 
@@ -269,7 +262,7 @@ function! s:PlaceSign(position, diagnosis, items, style, path) abort
     let l:style = 'ECY_diagnosis_warn'
   endif
   let l:sign_id = sign_place(0,'',l:style, a:path, {'lnum' : a:position['line']})
-  if ECY_main#GetCurrentBufferPath() == a:path
+  if utility#GetCurrentBufferPath() == a:path
     call s:HighlightRange(a:position['range'], 'ECY_diagnosis_highlight')
   endif
   let l:temp = {'position': a:position, 
@@ -291,11 +284,11 @@ function! diagnosis#PlaceSign(msg) abort
   endif
   " order matters
   call diagnosis#CleanAllSignHighlight()
-  call diagnosis#UnPlaceAllSignInBufferName(ECY_main#GetCurrentBufferPath())
+  call diagnosis#UnPlaceAllSignInBufferName(utility#GetCurrentBufferPath())
   let s:current_diagnosis = {}
   let l:items = a:msg['Lists']
   if len(l:items) > 500
-    call user_ui#ShowMsg("[ECY] Diagnosis will not be highlighted: the erros/warnnings are too much.", 2)
+    call utility#ShowMsg("[ECY] Diagnosis will not be highlighted: the erros/warnnings are too much.", 2)
     return
   endif
   for item in l:items
@@ -319,13 +312,21 @@ function! diagnosis#Toggle() abort
     call diagnosis#CleanAllSignHighlight()
     call diagnosis#UnPlaceAllSign()
   endif
+  if g:ECY_disable_diagnosis
+    let l:status = 'Alive'
+  else
+    let l:status = 'Disabled'
+  endif
+  call utility#ShowMsg('[ECY] Diagnosis status: ' . l:status, 2)
 "}}}
 endfunction
 
 function! diagnosis#ShowSelecting() abort
 "{{{ show all
-  call user_ui#UsingTimerStartingSelectingWindows(g:ECY_sign_lists)
+  call leaderf_ECY#items_selecting#Start(g:ECY_sign_lists, 'diagnosis#Selecting_cb')
 "}}}
 endfunction
 
-call s:Init()
+function! diagnosis#Selecting_cb(line, event, index, nodes) abort
+  echo a:line
+endfunction
