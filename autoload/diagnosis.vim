@@ -34,7 +34,7 @@ function s:Init() abort
   call s:SetUpEvent()
 
   let g:ECY_show_diagnosis_in_normal_mode = get(g:,'ECY_show_diagnosis_in_normal_mode', 'H')
-  exe 'nmap ' . g:ECY_show_diagnosis . ' :call diagnosis#ShowCurrentLineDiagnosis(v:false)<CR>'
+  exe 'nmap ' . g:ECY_show_diagnosis_in_normal_mode . ' :call diagnosis#ShowCurrentLineDiagnosis(v:false)<CR>'
 "}}}
 endfunction
 
@@ -321,9 +321,7 @@ endfunction
 
 function! diagnosis#ShowSelecting() abort
 "{{{ show all
-  let g:ECY_items_data = g:ECY_sign_lists
-  " must be called by a timer.
-  call timer_start(1, 'user_ui#UsingTimerStartingSelectingWindows')
+  call user_ui#UsingTimerStartingSelectingWindows(g:ECY_sign_lists)
 "}}}
 endfunction
 

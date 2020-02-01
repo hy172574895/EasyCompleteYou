@@ -362,16 +362,22 @@ endfunction
 function! user_ui#SearchSymbols(items_2_show) abort
 "{{{ handle a symbol event.
 "a symbol's infos must contain a line to show
-
-" this will invoke leaderf plugin in python to handle g:ECY_items_data
-  let g:ECY_items_data = a:items_2_show
-  " must be called by a timer.
-  call timer_start(1, 'user_ui#UsingTimerStartingSelectingWindows')
+  call user_ui#UsingTimerStartingSelectingWindows(a:items_2_show)
 "}}}
 endfunction
 
-function! user_ui#UsingTimerStartingSelectingWindows(timer)
+function! s:LeaderfTimer_cb(timer)
   call leaderf_ECY#items_selecting#Start()
+endfunction
+
+function! user_ui#UsingTimerStartingSelectingWindows(content)
+"{{{
+  " this will invoke leaderf plugin in python to handle g:ECY_items_data
+  " must be called by a timer.
+  let g:ECY_items_data = a:content
+  " can not have some of loop-like code in event callback
+  call timer_start(1, function('s:LeaderfTimer_cb'))
+"}}}
 endfunction
 
 function! user_ui#MoveTo(line, colum, path, modes)
