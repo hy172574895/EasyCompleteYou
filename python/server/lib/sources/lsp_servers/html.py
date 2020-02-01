@@ -259,9 +259,9 @@ class HtmlHint:
             cmd = shlex.split(cmd)
             process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
             temp = process.stdout.read()
+            process.terminate()
         except Exception as e:
             temp = None
-        process.terminate()
         return temp
 
     def GetDiagnosis(self, cmd, buffers, file_path):
