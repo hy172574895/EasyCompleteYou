@@ -7,20 +7,12 @@ class Event(object):
     """
     """
     def __init__(self, source_name):
-        self.source_name = source_name
-        self._is_return_match_point = False
-        if vim_lib.GetVariableValue("g:ECY_use_floating_windows_to_be_popup_windows"):
-            self._is_return_match_point = True
-
-        self._trigger_len = vim_lib.GetVariableValue("g:ECY_triggering_length")
+        self._workspace              = None
+        self.source_name             = source_name
+        self._is_return_match_point  = vim_lib.GetVariableValue("g:ECY_use_floating_windows_to_be_popup_windows")
+        self._trigger_len            = vim_lib.GetVariableValue("g:ECY_triggering_length")
         self.has_ultisnippet_support = vim_lib.GetVariableValue("g:has_ultisnips_support")
-        self._workspace = None
-
-        temp = vim_lib.GetVariableValue("g:ECY_update_diagnosis_mode")
-        self._is_return_diagnosis = False
-        if self._is_return_diagnosis == 2:
-            # return it after completion
-            self._is_return_diagnosis = True
+        self._is_return_diagnosis    = vim_lib.GetVariableValue("g:ECY_update_diagnosis_mode")
 
     def GetCurrentWorkSpace(self):
         temp = vim_lib.CallEval("rooter#GetCurrentBufferWorkSpace()")

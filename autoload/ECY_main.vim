@@ -290,6 +290,11 @@ function! s:SetVariable() abort
   " 2 means ask diagnosis when there are changes including user in insert mode
   let g:ECY_update_diagnosis_mode
         \= get(g:,'ECY_update_diagnosis_mode',1)
+  if g:ECY_update_diagnosis_mode == 2
+    let g:ECY_update_diagnosis_mode = v:true
+  else
+    let g:ECY_update_diagnosis_mode = v:false
+  endif
 
   let g:ECY_rolling_key_of_floating_windows
         \= get(g:,'ECY_rolling_key_of_floating_windows',['<C-h>', '<C-l>'])

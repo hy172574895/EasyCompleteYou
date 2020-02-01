@@ -33,9 +33,8 @@ function s:Init() abort
 
   call s:SetUpEvent()
 
-  let g:ECY_show_diagnosis = get(g:,'ECY_show_diagnosis', 'H')
-  exe 'nmap ' . g:ECY_show_diagnosis .
-        \ ' :call diagnosis#ShowCurrentLineDiagnosis(v:false)<CR>'
+  let g:ECY_show_diagnosis_in_normal_mode = get(g:,'ECY_show_diagnosis_in_normal_mode', 'H')
+  exe 'nmap ' . g:ECY_show_diagnosis . ' :call diagnosis#ShowCurrentLineDiagnosis(v:false)<CR>'
 "}}}
 endfunction
 
