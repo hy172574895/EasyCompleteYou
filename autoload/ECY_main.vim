@@ -841,7 +841,7 @@ function! s:SetMapping() abort
   call s:MappingSelection()
 
   exe 'nmap ' . g:ECY_show_switching_source_popup .
-        \ ' :call user_ui#ChooseSource()<CR>'
+        \ ' :call choose_sources#Start()<CR>'
 
   if g:has_ultisnips_support
   " UltiSnips' API must be called in <C-R>
