@@ -186,7 +186,7 @@ class Operate(scope_.Source_interface):
             item = [{'name': '1', 'content': {'abbr': item.name, 'highlight': 'ECY_blue'}},
                     {'name': '2', 'content': {'abbr': item.type, 'highlight': 'ECY_green'}},
                     {'name': '3', 'content': {'abbr': str(position.start_pos),  'highlight':'ECY_yellow'}}]
-            position = {'line': start_line, 'colum': start_column, 'path': version['FilePath'].replace('\\', '/')}
+            position = {'line': start_line, 'colum': start_column, 'path': version['FilePath']}
             temp = {'items': item,
                     'type': 'symbol',
                     'position': position}
