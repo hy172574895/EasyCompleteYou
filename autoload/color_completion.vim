@@ -88,7 +88,7 @@ function! s:ShowPrompt_vim(items_info, fliter_words) abort
     let j = 0
     let l:point = l:to_show_matched_point[i]
     while j < len(l:to_show[i])
-      if s:IsInList(j, l:point)
+      if utility#IsInList(j, l:point)
         let l:hightlight = 'item_normal_matched'
       else
         let l:hightlight = 'item_normal'
@@ -141,7 +141,7 @@ function! s:SelectItems_vim(next_or_pre,start_colum) abort
     let l:point = l:info['match_point']
     let i = 0
     while i < g:ECY_current_popup_windows_info['floating_windows_width']
-      if s:IsInList(i, l:point)
+      if utility#IsInList(i, l:point)
         let l:hightlight = 'item_selected_matched'
       else
         let l:hightlight = 'item_selected'
@@ -167,7 +167,7 @@ function! s:SelectItems_vim(next_or_pre,start_colum) abort
     let l:point = l:info['match_point']
     let i = 0
     while i < g:ECY_current_popup_windows_info['floating_windows_width']
-      if s:IsInList(i, l:point)
+      if utility#IsInList(i, l:point)
         let l:hightlight = 'item_normal_matched'
       else
         let l:hightlight = 'item_normal'
@@ -190,19 +190,6 @@ function! s:SelectItems_vim(next_or_pre,start_colum) abort
   " selected item, because we filter the key of <Tab> that is selecting
   " mapping, then the s:isSelecting in ECY_main.vim can not be reset.
   call complete(a:start_colum+1,[l:to_complete])
-"}}}
-endfunction
-
-function! s:IsInList(item,list) abort
-"{{{
-  let i = 0
-  while i < len(a:list)
-    if a:item == a:list[i]
-      return v:true
-    endif
-    let i += 1
-  endw
-  return v:false
 "}}}
 endfunction
 

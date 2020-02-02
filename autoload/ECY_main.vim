@@ -2,6 +2,7 @@
 " License: WTFPL
 " Log:
 " 2020-01-30 03:14  Happy birthday to me.
+" 2020-02-02 22:25  Happy 2020-0202.
 
 " must put these outside a function
 let  s:python_script_folder_path = expand( '<sfile>:p:h:h' ).'\python'
@@ -111,7 +112,7 @@ function! s:OnBufferEnter() abort
   call diagnosis#CleanAllSignHighlight()
   call s:SetUpCompleteopt()
   " OnBufferEnter will trigger Diagnosis
-  call s:Do("OnBufferEnter", v:true)
+  call ECY_main#Do("OnBufferEnter", v:true)
   "}}}
 endfunction
 
@@ -141,7 +142,7 @@ function! s:AskDiagnosis(event) abort
     let s:buffer_has_changed = 0
   endif
   if a:event == 'OnInsertModeLeave' || a:event == 'OnTextChangedNormalMode'
-    call s:Do("Diagnosis", v:true)
+    call ECY_main#Do("Diagnosis", v:true)
   endif
 "}}}
 endfunction
@@ -180,7 +181,7 @@ function! s:DoCompletion() abort
     call color_completion#ClosePrompt()
   endif
   call ECY_main#ChangeVersionID()
-  call s:Do("DoCompletion", v:true)
+  call ECY_main#Do("DoCompletion", v:true)
 "}}}
 endfunction
 
@@ -351,12 +352,12 @@ endfunction
 function! s:SetUpPython() abort
 "{{{
   if !s:is_using_stdio
-    call s:Do("import os", v:false)
+    call ECY_main#Do("import os", v:false)
     let l:temp =  s:python_script_folder_path."/client"
     let l:temp = "sys.path.append('" . l:temp . "')"
-    call s:Do(l:temp, v:false)
-    call s:Do("import Main_client", v:false)
-    call s:Do("ECY_Client_ = Main_client.ECY_Client()", v:false)
+    call ECY_main#Do(l:temp, v:false)
+    call ECY_main#Do("import Main_client", v:false)
+    call ECY_main#Do("ECY_Client_ = Main_client.ECY_Client()", v:false)
 
     call s:SetUpLeaderf()
   else
@@ -374,7 +375,7 @@ function! s:SetUpLeaderf() abort
     " Leaderf Plugin
     return
   endif
-  call s:Do("from leaderf_plugin.selecting import *", v:false)
+  call ECY_main#Do("from leaderf_plugin.selecting import *", v:false)
 
   " In order to be listed by :LeaderfSelf
   call g:LfRegisterSelf("ECY_selecting", "Plugin for EasyCompleteYou")
@@ -431,7 +432,7 @@ function! s:YCMCompatible(is_YCM) abort
             \ ' pumvisible() ? "\<C-n>" : "\' . key .'"'
     endfor
     " tell ECY's server to save the setting
-    call s:Do("OnBufferEnter", v:true)
+    call ECY_main#Do("OnBufferEnter", v:true)
   else
     call s:SetUpCompleteopt()
     call s:MappingSelection()
@@ -484,7 +485,7 @@ endfunction
 
 function! s:GetCurrentBufferAvailableSources() abort
 "{{{ will do something in callback.
-  call s:Do("GetAvailableSources", v:true)
+  call ECY_main#Do("GetAvailableSources", v:true)
 "}}}
 endfunction
 
@@ -935,12 +936,12 @@ function! ECY_main#Install(name) abort
     return
   endif
   let g:ecy_source_name_2_install = l:install_return['name']
-  call s:Do("InstallSource", v:true)
+  call ECY_main#Do("InstallSource", v:true)
   call utility#ShowMsg('[ECY] installing "'.l:install_return['name'].'".', 2)
 "}}}
 endfunction
 
-function! s:Do(cmd, is_event) abort
+function! ECY_main#Do(cmd, is_event) abort
 "{{{ask the server to do something with python3
 if a:is_event
   if s:is_using_stdio
@@ -962,7 +963,7 @@ endfunction
 function! ECY_main#Execute(event) abort
 "{{{
   let g:ECY_do_something_event = a:event
-  call s:Do("Integration", v:true)
+  call ECY_main#Do("Integration", v:true)
 "}}}
 endfunction
 
