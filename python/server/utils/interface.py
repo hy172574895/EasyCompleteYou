@@ -33,13 +33,7 @@ class Source_interface(object):
     def GetSymbol(self, version):
         return self._return(version['VersionID'])
 
-    def GotoDeclaration(self, version):
-        return self._return(version['VersionID'])
-
-    def GoToDeclarationOrDefinition(self, version):
-        return self._return(version['VersionID'])
-
-    def GotoDefinition(self, version):
+    def Goto(self, version):
         return self._return(version['VersionID'])
 
     def FindStart(self, text, reg):

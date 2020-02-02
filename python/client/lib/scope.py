@@ -42,6 +42,11 @@ class Event(object):
         self._workspace = self.GetCurrentWorkSpace()
         return self._pack({}, 'OnBufferEnter')
 
+    def Goto(self):
+        msg = {}
+        msg['SourcePath'] = vim_lib.GetVariableValue('g:ecy_source_name_2_install')
+        return self._pack(msg, 'Goto')
+
     def Integration(self):
         msg = {}
         msg['Integration_event'] = vim_lib.GetVariableValue('g:ECY_do_something_event')

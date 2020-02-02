@@ -5,7 +5,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let g:ECY_version = {'version': 3, 'tags': '1.0'}
+let g:ECY_version = {'version': 4, 'tags': '1.0'}
 
 function! s:Finish(is_quit, msg) abort
   if  a:msg != ''
@@ -74,6 +74,7 @@ call s:CheckRequires()
 call diagnosis#Init()
 call completion_preview_windows#Init()
 call color_completion#Init()
+call goto#Init()
 call ECY_main#Start()
 
 let g:ECY_endtime = reltimefloat(reltime())
