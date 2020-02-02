@@ -2,6 +2,7 @@
 " License: WTFPL
 
 function! symbols#Selecting_cb(line, event, index, nodes) abort
+"{{{
   let l:data  = g:ECY_items_data[a:index]
   if a:event == 'acceptSelection' || a:event == 'previewResult'
     let l:temp = l:data['position']
@@ -10,6 +11,7 @@ function! symbols#Selecting_cb(line, event, index, nodes) abort
           \l:temp['path'], 
           \'current buffer')
   endif
+"}}}
 endfunction
 
 function! symbols#ReturingResults_cb(items_2_show) abort
