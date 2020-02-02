@@ -285,6 +285,12 @@ class HtmlHint:
                 # can work too:
                 # diagnosis = msg['rule']['description']
                 diagnosis = msg['message']
+                if msg['type'] == 'erro':
+                    kind = 1
+                else:
+                    # warn
+                    kind = 2
+                kind 
                 temp = [{'name': '1', 'content': {'abbr': diagnosis}},
                         {'name': '2', 'content': {'abbr': msg['type']}},
                         {'name': '3', 'content': {'abbr': file_path}},
@@ -292,6 +298,7 @@ class HtmlHint:
                 temp = {'items': temp,
                         'type': 'diagnosis',
                         'file_path': file_path,
+                        'kind': kind,
                         'diagnosis': diagnosis,
                         'position': position}
                 results_list.append(temp)

@@ -302,7 +302,7 @@ function! diagnosis#PlaceSign(msg) abort
     " 'position':{...}, 'diagnosis': 'strings'}
     call s:PlaceSign(item['position'], 
           \item['diagnosis'],
-          \item['items'], 1,
+          \item['items'], item['kind'],
           \item['file_path'])
   endfor
 "}}}
@@ -331,5 +331,15 @@ function! diagnosis#ShowSelecting() abort
 endfunction
 
 function! diagnosis#Selecting_cb(line, event, index, nodes) abort
-  echo a:line
+"{{{
+  let l:data  = g:ECY_sign_lists[a:index]
+  if a:event == 'acceptSelection' || a:event == 'previewResult'
+    let l:position = l:data['position']['range']['start']
+    let l:path = l:data['buffer_name']
+    call utility#MoveToBuffer(l:position['line'], 
+          \l:position['colum'], 
+          \l:path, 
+          \'current buffer_name')
+  endif
+"}}}
 endfunction
