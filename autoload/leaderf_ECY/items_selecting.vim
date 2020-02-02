@@ -1,3 +1,5 @@
+" Author: Jimmy Huang (1902161621@qq.com)
+" License: WTFPL
 
 if !exists('g:leaderf_loaded')
   let g:ECY_load_leaderf_plugin = v:false
@@ -47,12 +49,19 @@ function! s:LeaderfTimer_cb(timer) abort
 endfunction
 
 function! leaderf_ECY#items_selecting#Start(content, callback_name) abort
-"{{{
+"{{{ call by viml
   " this will invoke leaderf plugin in python to handle g:ECY_items_data
   " must be called by a timer.
   let g:ECY_items_data = a:content
   let g:ECY_selecting_cb_name = a:callback_name
   " can not have some of loop-like code in event callback
   call timer_start(1, function('s:LeaderfTimer_cb'))
+"}}}
+endfunction
+
+function! leaderf_ECY#items_selecting#LeaderF_cb(line, event, index, nodes, callback_name) abort
+"{{{ call by python of leaderf
+  let l:Fuc = function(a:callback_name)
+  call l:Fuc(a:line, a:event, a:index, a:nodes)
 "}}}
 endfunction

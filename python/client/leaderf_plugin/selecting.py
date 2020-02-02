@@ -15,8 +15,6 @@ from leaderf.manager import *
 #*****************************************************
 # ECYDiagnosisExplorer
 #*****************************************************
-global g_items_data
-global g_callback_name
 
 class ECYDiagnosisExplorer(Explorer):
     def __init__(self):
@@ -24,6 +22,8 @@ class ECYDiagnosisExplorer(Explorer):
 
     def getContent(self, *args, **kwargs):
         # return a list
+        global g_items_data
+        global g_callback_name
         g_items_data = lfEval("g:ECY_items_data")
         g_callback_name = lfEval("g:ECY_selecting_cb_name")
         # max length
@@ -83,9 +83,18 @@ class ECYDiagnosisManager(Manager):
         self._match_ids = []
 
     def _callback_to_vim(self, event_name, line_content, modes):
-        index = self._get_index(line)
-        cmd = "call user_ui#LeaderF_cb({0},{1},{2},{3},{4},{5})".\
+        global g_callback_name
+        if line_content is not None:
+            index = self._get_index(line_content)
+        else:
+            index = '-1'
+
+        if modes is None or modes == '':
+            modes = 'nothing'
+
+        cmd = "call leaderf_ECY#items_selecting#LeaderF_cb('{0}','{1}','{2}','{3}','{4}')".\
                 format(line_content, event_name, index, modes, g_callback_name)
+        # lfCmd('echo "' + cmd + '"')
         lfCmd(cmd)
 
     def _get_index(self, line):
@@ -164,7 +173,7 @@ class ECYDiagnosisManager(Manager):
         for i in self._match_ids:
             lfCmd("silent! call matchdelete(%d)" % i)
         self._match_ids = []
-        self._callback_to_vim('beforeExit', '-1', 'nothing')
+        self._callback_to_vim('beforeExit', None, None)
 
     def _previewResult(self, preview):
         if not self._needPreview(preview):
@@ -177,7 +186,7 @@ class ECYDiagnosisManager(Manager):
         vim.options['eventignore'] = 'BufLeave,WinEnter,BufEnter'
         try:
             vim.current.tabpage, vim.current.window = orig_pos[:2]
-            self._callback_to_vim('previewResult', str(line), 'nothing')
+            self._callback_to_vim('previewResult', str(line), None)
         finally:
             vim.current.tabpage, vim.current.window, vim.current.buffer = cur_pos
             vim.options['eventignore'] = saved_eventignore
