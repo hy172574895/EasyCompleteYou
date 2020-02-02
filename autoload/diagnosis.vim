@@ -76,7 +76,7 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
     call s:ShowDiagnosis(l:index_list)
   else
     if !a:is_triggered_by_event 
-      call utility#ShowMsg("[ECY] Diagnosis has nothing to show.", 2)
+      call utility#ShowMsg("[ECY] Diagnosis has nothing to show in current buffer.", 2)
     endif
   endif
   return ''
@@ -209,13 +209,14 @@ function! s:HighlightRange(range, highlights) abort
 "{{{ return a list of `matchaddpos` e.g. [match_point1, match_point2]
 "a:range = {'start': { 'line': 5, 'colum': 23 },'end' : { 'line': 6, 'colum': 0 } }
 "
+"colum is 0-based, but highlight's colum is 1-based, so we add 1.
 "ensure cursor in buffer you want to highlight before you call this function.
 
   " map like a loop
   call map(s:CalculatePosition(a:range['start']['line'],
-          \a:range['start']['colum'],
+          \a:range['start']['colum'] + 1,
           \a:range['end']['line'],
-          \a:range['end']['colum']),
+          \a:range['end']['colum'] + 1),
         \'matchaddpos(a:highlights, v:val)')
 "}}}
 endfunction

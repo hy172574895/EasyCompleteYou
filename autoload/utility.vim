@@ -2,7 +2,7 @@
 " License: WTFPL
 
 function! utility#MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
-"{{{ move cursor to windows
+"{{{ move cursor to windows, in normal mode
 " a:colum is 0-based
 " a:line is 1-based
   if a:windows_to_show == 'h'

@@ -283,7 +283,7 @@ function! s:SetVariable() abort
   " 1 means ask diagnosis when there are changes not including user in insert mode
   " 2 means ask diagnosis when there are changes including user in insert mode
   let g:ECY_update_diagnosis_mode
-        \= get(g:,'ECY_update_diagnosis_mode',1)
+        \= get(g:,'ECY_update_diagnosis_mode',2)
   if g:ECY_update_diagnosis_mode == 2
     let g:ECY_update_diagnosis_mode = v:true
   else

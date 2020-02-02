@@ -277,7 +277,7 @@ class HtmlHint:
         results_list = []
         for item in results:
             for msg in item['messages']:
-                msg['col'] += 1
+                # msg['col'] is 0-based
                 pos_string = '[' + str(msg['line']) + ', ' + str(msg['col'])+']'
                 position = {'line': msg['line'], 'range': {
                     'start': {'line': msg['line'], 'colum': msg['col']},

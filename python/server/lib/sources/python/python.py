@@ -181,6 +181,7 @@ class Operate(scope_.Source_interface):
         lists = []
         for item in definitions:
             position = item._name.tree_name.get_definition()
+            # start_column is 0-based
             (start_line, start_column) = position.start_pos
             item = [{'name': '1', 'content': {'abbr': item.name, 'highlight': 'ECY_blue'}},
                     {'name': '2', 'content': {'abbr': item.type, 'highlight': 'ECY_green'}},
