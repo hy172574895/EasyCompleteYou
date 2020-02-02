@@ -34,7 +34,9 @@ function diagnosis#Init() abort
   call s:SetUpEvent()
 
   let g:ECY_show_diagnosis_in_normal_mode = get(g:,'ECY_show_diagnosis_in_normal_mode', 'H')
+  let g:ECY_show_next_diagnosis_in_normal_mode = get(g:,'ECY_show_next_diagnosis_in_normal_mode', '[j')
   exe 'nmap ' . g:ECY_show_diagnosis_in_normal_mode . ' :call diagnosis#ShowCurrentLineDiagnosis(v:false)<CR>'
+  exe 'nmap ' . g:ECY_show_next_diagnosis_in_normal_mode . ' :call diagnosis#ShowNextDiagnosis()<CR>'
 "}}}
 endfunction
 
