@@ -48,6 +48,9 @@ endfunction
 
 function! goto#Go_cb(items) abort
 "{{{
+  if a:items['ID'] < ECY_main#GetVersionID()
+    return
+  endif
   let s:goto_lists = a:items['Results']
   if len(s:goto_lists) > 1
     call leaderf_ECY#items_selecting#Start(s:goto_lists, 'goto#Selecting_cb')
@@ -91,8 +94,7 @@ function! goto#Go(...) abort
     endw
   endif
   call utility#ShowMsg("[ECY] Going to ....", 2)
+  call ECY_main#ChangeVersionID()
   call ECY_main#Do('Goto', v:true)
 "}}}
 endfunction
-
-

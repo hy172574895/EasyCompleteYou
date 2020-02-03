@@ -218,7 +218,7 @@ class Operate(scope_.Source_interface):
 
     def _goto_reference(self, version, results):
         usages = self._GetJediScript(version).usages()
-        return self._build_goto(usages, results, 'goto_declaration')
+        return self._build_goto(usages, results, 'goto_reference')
     
     def _build_goto(self, goto_sources, results, kind):
         for item in goto_sources:
