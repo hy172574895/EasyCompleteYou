@@ -855,7 +855,7 @@ function! s:SetMapping() abort
 
   for key in g:ECY_choose_special_source_key
     exe 'inoremap <expr>' . key['invoke_key'] . 
-          \' <SID>UsingSpecicalSource( "'.key['source_name'].'","\' . key['invoke_key'] . '",' . key['is_replace'] . ' )'
+          \' <SID>UsingSpecicalSource( "'.key['source_name'].'","\' . key['invoke_key'] . '",' . string(key['is_replace']) . ' )'
   endfor
 
   for key in s:back_to_source_key
