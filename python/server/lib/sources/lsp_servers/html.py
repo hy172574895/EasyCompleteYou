@@ -285,7 +285,7 @@ class HtmlHint:
                 # can work too:
                 # diagnosis = msg['rule']['description']
                 diagnosis = msg['message']
-                if msg['type'] == 'erro':
+                if msg['type'] == 'error':
                     kind = 1
                 else:
                     # warn
