@@ -183,40 +183,59 @@ class Operate(scope_.Source_interface):
             position = item._name.tree_name.get_definition()
             # start_column is 0-based
             (start_line, start_column) = position.start_pos
-            item = [{'name': '1', 'content': {'abbr': item.name, 'highlight': 'ECY_blue'}},
+            items = [{'name': '1', 'content': {'abbr': item.name, 'highlight': 'ECY_blue'}},
                     {'name': '2', 'content': {'abbr': item.type, 'highlight': 'ECY_green'}},
                     {'name': '3', 'content': {'abbr': str(position.start_pos),  'highlight':'ECY_yellow'}}]
             position = {'line': start_line, 'colum': start_column, 'path': version['FilePath']}
-            temp = {'items': item,
+            temp = {'items': items,
                     'type': 'symbol',
                     'position': position}
             lists.append(temp)
         return_['Results'] = lists
         return return_
 
-    def GotoDefinition(self, version):
+    def Goto(self, version):
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
-        definitions = self._GetJediScript(version).goto_definitions()
-        definitions = self._GetJediScript(version)
-        return_['Results'] = self._build_goto_response(definitions)
+        result_lists = []
+        for item in version['GotoLists']:
+            if item == 'definition':
+                result_lists = self._goto_definition(version, result_lists)
+            if item == 'declaration':
+                result_lists = self._goto_declaration(version, result_lists)
+        return_['Results'] = result_lists
         return return_
 
-    def GotoDeclaration(self, version):
+    def _goto_definition(self, version, results):
+        # can return mutiple definitions
+        definitions = self._GetJediScript(version).goto_definitions()
+        for item in definitions:
+            if item.in_builtin_module():
+                path = " "
+                file_size = " "
+                pos = 'Buildin'
+                position = {}
+            else:
+                path = str(item.module_path)
+                file_size = str(int(os.path.getsize(path)/1000)) + 'KB'
+                pos = '[' + str(item.line) + ', ' + str(item.column) + ']'
+                position = {'line': item.line, 'colum': item.column, 'path': path}
+
+            items = [{'name': '1', 'content': {'abbr': item.description}},
+                    {'name': '2', 'content': {'abbr': 'definition'}},
+                    {'name': '3', 'content': {'abbr': pos}},
+                    {'name': '4', 'content': {'abbr': path}},
+                    {'name': '5', 'content': {'abbr': file_size}}]
+
+            temp = {'items': items,
+                    'type': 'goto_definitions',
+                    'position': position}
+            results.append(temp)
+        return results
+
+    def _goto_declaration(self, version, results):
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         usages = self._GetJediScript(version).usages()
-        return_['Results'] = self._build_goto_response(usages)
-        return return_
-
-    def GoToDeclarationOrDefinition(self, version):
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
-        temp = self._GetJediScript(version)
-        definitions = temp.goto_definitions()
-        declarations = temp.goto_assignments()
-        return_['Results'] = self._build_goto_response(definitions)
-        for item in \
-                self._build_goto_response(declarations, types='declaration'):
-            return_['Results'].append(item)
-        return return_
+        return results
 
     def _build_goto_response(self, goto_info_list, types='definition'):
         goto = []
