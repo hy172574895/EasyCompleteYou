@@ -87,7 +87,7 @@ Some useful default mappings of Ultisnips. Check doc of ultisnips for more.
 `LeaderF` is a separate plugin, so you have to install it separately.
 We are strongly suggest you to install `LeaderF` to get better experience.
 ---
-What `LeaderF` can do for ECY? To help ECY to locate a position. So if you have no 
+What `LeaderF` can do for ECY? To help ECY to locate a position and provide selecting to users. So if you have no 
 `LeaderF` you can not use some functions of ECY such as `Goto-definition`.
 
 Some useful command of `LeaderF` are follow.  
@@ -113,4 +113,11 @@ A: There are so many tools like `LeaderF` such as `fzf-vim` `ctrlP`, that's true
 which is one of ECY's principles, that `LeaderF` hightly fit with ECY.  
 **Importance**: ECY will not support any plugin that functions resemble with `LeaderF` and `ultisnips` unless there are critical demands.  
   
-Q:   
+### Q: I only need a engine for python, why ECY install all engine's code in my computer?
+A: For out of the box, better.  You should no worry about ECY code in you computer, because it is python script(totally open source) and its size is not big and even small.
+
+### Q: Whe not use Ale to do diagnosis?
+A: Ale use job(channel) feature to send data to linter, but ECY use python3 instead.
+And every completion that ECY do will send data of current buffer to Server, on
+the same time, ECY can return diagnosis; that will be send only once. Using Ale
+will do it twice, sending to linter and ECY's Server.
