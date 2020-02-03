@@ -5,13 +5,14 @@ function! utility#MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
 "{{{ move cursor to windows, in normal mode
 " a:colum is 0-based
 " a:line is 1-based
+" the a:windows_to_show hightly fit leaderf
   if a:windows_to_show == 'h'
     exe 'new ' . a:buffer_name
     " horizontally new a windows at current tag
   elseif a:windows_to_show == 'v'
     " vertically new a windows at current tag
     exe 'vnew ' . a:buffer_name
-  elseif a:windows_to_show == 'tn'
+  elseif a:windows_to_show == 't'
     " new a windows and new a tab
     exe 'tabedit '
     exe "hide edit " .  a:buffer_name

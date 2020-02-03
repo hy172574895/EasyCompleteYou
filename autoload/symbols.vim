@@ -4,12 +4,21 @@
 function! symbols#Selecting_cb(line, event, index, nodes) abort
 "{{{
   let l:data  = g:ECY_items_data[a:index]
+  let g:abc = a:nodes
   if a:event == 'acceptSelection' || a:event == 'previewResult'
     let l:temp = l:data['position']
+
+    " we do this maybe it's a bug of leaderf
+    " there no same problem in goto.vim
+    let l:node = 'nothing'
+    if a:nodes == 't'
+      let l:node = 't'
+    endif
+
     call utility#MoveToBuffer(l:temp['line'], 
           \l:temp['colum'], 
           \l:temp['path'], 
-          \'current buffer')
+          \l:node)
   endif
 "}}}
 endfunction

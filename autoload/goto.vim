@@ -24,7 +24,7 @@ function! goto#Selecting_cb(line, event, index, nodes) abort
     call s:MoveToBuffer(l:item['line'], 
           \l:item['colum'], 
           \l:item['path'], 
-          \'current buffer')
+          \a:nodes)
   else
       call utility#ShowMsg(
             \"[ECY] Current goto have no position. So we can't jump.", 2)
@@ -34,7 +34,7 @@ endfunction
 
 function! s:MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
 "{{{
-  call utility#MoveToBuffer(a:line, a:colum, a:buffer_name, a:windows_to_show)
+  call utility#MoveToBuffer(a:line, a:colum, a:buffer_name, 'nothing')
   call utility#ShowMsg("[ECY] You had gone to : " . utility#FormatPosition(a:line, a:colum) , 2)
 "}}}
 endfunction
