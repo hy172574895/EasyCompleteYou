@@ -51,8 +51,8 @@ class Operate(object):
                 isIndent = version['ReturnMatchPoint']
             else:
                 isIndent = False
-            return_ = self.fuzzy_match.FilterItems(filter_words, 
-                    all_list,isreturn_match_point=isIndent,
+            return_ = self.fuzzy_match.FilterItems(filter_words,
+                    all_list, isreturn_match_point=isIndent,
                     isindent=isIndent)
 
         addtional_data = None

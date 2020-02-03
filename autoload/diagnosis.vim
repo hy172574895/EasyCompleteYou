@@ -10,8 +10,8 @@ function diagnosis#Init() abort
   let g:ECY_diagnosis_warn      = get(g:,'ECY_diagnosis_warn', 'ECY_diagnosis_warn')
   let g:ECY_diagnosis_highlight = get(g:,'ECY_diagnosis_highlight','ECY_diagnosis_highlight')
 
-  hi ECY_erro_sign_highlight  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
-  hi ECY_warn_sign_highlight  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
+  hi ECY_erro_sign_highlight  guifg=red	    ctermfg=red	
+  hi ECY_warn_sign_highlight  guifg=yellow	ctermfg=yellow
   let g:ECY_erro_sign_highlight = get(g:,'ECY_erro_sign_highlight', 'ECY_erro_sign_highlight')
   let g:ECY_warn_sign_highlight = get(g:,'ECY_warn_sign_highlight', 'ECY_warn_sign_highlight')
 
