@@ -43,19 +43,12 @@ function! utility#GetLoadedFile() abort
 "}}}
 endfunction
 
-function! utility#GetCurrentBufferPath() abort
+function! utility#GetCurrentBufferPath(...) abort
 "{{{
-  " let l:temp = "ECY_Client_.GetCurrentBufferPath()"
-  " return s:PythonEval(l:temp)
-  let l:file = @%
-  if l:file =~# '^\a\a\+:' || a:0 > 1
-    return call('Current_buffer_path', [l:file] + a:000[1:-1])
-  elseif l:file =~# '^/\|^\a:\|^$'
-    return l:file
-  else
-    let l:full_path = fnamemodify(l:file, ':p' . (l:file =~# '[\/]$' ? '' : ':s?[\/]$??'))
-    return l:full_path
-  endif
+  " let l:full_path = fnamemodify(@%, ':p')
+  let l:full_path = expand('%:p')
+  return l:full_path
+
 "}}}
 endfunction
 
@@ -123,7 +116,7 @@ function! utility#IsInList(item, list) abort
 endfunction
 
 function! utility#FormatPosition(line, colum) abort
-"{{{ return "[34, 35]"
+"{{{ return such as "[34, 35]"
   let l:temp = '[' . string(a:line). ', ' . string(a:colum) . ']'
   return l:temp
 "}}}
