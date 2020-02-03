@@ -208,7 +208,14 @@ class Operate(scope_.Source_interface):
     def _goto_definition(self, version, results):
         # can return mutiple definitions
         definitions = self._GetJediScript(version).goto_definitions()
-        for item in definitions:
+        return self._build_goto(definitions, results, 'goto_definitions')
+
+    def _goto_declaration(self, version, results):
+        usages = self._GetJediScript(version).usages()
+        return self._build_goto(usages, results, 'goto_declaration')
+    
+    def _build_goto(self, goto_sources, results, kind):
+        for item in goto_sources:
             if item.in_builtin_module():
                 path = " "
                 file_size = " "
@@ -221,38 +228,13 @@ class Operate(scope_.Source_interface):
                 position = {'line': item.line, 'colum': item.column, 'path': path}
 
             items = [{'name': '1', 'content': {'abbr': item.description}},
-                    {'name': '2', 'content': {'abbr': 'definition'}},
+                    {'name': '2', 'content': {'abbr': kind}},
                     {'name': '3', 'content': {'abbr': pos}},
                     {'name': '4', 'content': {'abbr': path}},
                     {'name': '5', 'content': {'abbr': file_size}}]
 
             temp = {'items': items,
-                    'type': 'goto_definitions',
+                    'type': kind,
                     'position': position}
             results.append(temp)
         return results
-
-    def _goto_declaration(self, version, results):
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
-        usages = self._GetJediScript(version).usages()
-        return results
-
-    def _build_goto_response(self, goto_info_list, types='definition'):
-        goto = []
-        for item in goto_info_list:
-            # path is None when it is build in module
-            temp = {'path': str(item.module_path)}
-
-            temp['is_in_builtin_module'] = 'no'
-            temp['types'] = types
-            if item.in_builtin_module():
-                temp['is_in_builtin_module'] = 'yes'
-            else:
-                temp['description'] = item.description
-                temp['start_colum'] = item.column + 1
-                temp['start_line'] = item.line
-                temp['end_line'] = temp['start_line']
-                temp['end_colum'] = temp['start_colum'] + len(temp['description'])
-                temp['size'] = os.path.getsize(str(item.module_path)) # Bytes
-            goto.append(temp)
-        return goto

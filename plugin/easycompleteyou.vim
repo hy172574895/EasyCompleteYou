@@ -5,7 +5,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let g:ECY_version = {'version': 4, 'tags': '1.0'}
+let g:ECY_version = {'version': 5, 'tags': '1.0'}
 
 function! s:Finish(is_quit, msg) abort
   if  a:msg != ''
