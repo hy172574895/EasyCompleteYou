@@ -29,11 +29,12 @@ import os.path as p
 
 # local lib
 from utils.ECY_logger import ECY_logger as ecy_logger
-import lib.on_buffer as buffer_things
-import lib.completion as completion
-import lib.completor_manager as sources_manager
-import lib.integration as integration
-import lib.diagnosis as diagnosis
+import lib.on_buffer                    as buffer_things
+import lib.completion                   as completion
+import lib.completor_manager            as sources_manager
+import lib.integration                  as integration
+import lib.diagnosis                    as diagnosis
+import lib.goto                         as goto
 
 if g_args.log_dir is None:
     output_log_dir = p.dirname( p.abspath( __file__ ) )
@@ -215,6 +216,7 @@ class EventHandler(object):
             self.on_buffer = buffer_things.Operate()
             self.integration = integration.Operate()
             self.diagnosis = diagnosis.Operate()
+            self.goto = goto.Operate()
         except Exception as e:
             g_logger.opt(exception=True).debug("exception:")
             raise
@@ -249,6 +251,8 @@ class EventHandler(object):
             temp = self.on_buffer.OnBufferEnter(object_, version_dict)
         elif event_ == 'Diagnosis':
             temp = self.diagnosis.Diagnosis(object_, version_dict)
+        elif event_ == 'Goto':
+            temp = self.goto.Goto(object_, version_dict)
         elif event_ == 'integration':
             temp = self.integration.HandleIntegration(object_, version_dict)
         elif event_ == 'InstallSource':

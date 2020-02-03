@@ -44,7 +44,7 @@ class Event(object):
 
     def Goto(self):
         msg = {}
-        msg['SourcePath'] = vim_lib.GetVariableValue('g:ecy_source_name_2_install')
+        msg['GotoLists'] = vim_lib.GetVariableValue('g:ECY_goto_info')
         return self._pack(msg, 'Goto')
 
     def Integration(self):

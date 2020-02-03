@@ -5,12 +5,18 @@ import re
 
 
 class Source_interface(object):
-    # rewrite the method
-    # ErroCode==1 is means This completor doesn't support that future.
-    def _return(self, _id):
-        # 'ErroCode' 1 means source did not impletment that method
-        return {'ID': _id, 'Results': 'ok', 'ErroCode': 1,
-                'Event': 'erro_code', 'Description': 'not implemented'}
+
+    def _return(self, _id, is_slience=True, content='not implemented'):
+        if is_slience:
+            # 'ErroCode' 1 means source did not impletment that method
+            # and don't show description to user
+            erro_code = 1
+        else:
+            # show description to user
+            erro_code = 2
+
+        return {'ID': _id, 'Results': 'ok', 'ErroCode': erro_code,
+                'Event': 'erro_code', 'Description': content}
 
     def GetInfo(self):
         return {'Name': 'nothing', 'WhiteList': ['nothing']}
@@ -31,10 +37,14 @@ class Source_interface(object):
         return self._return(version['VersionID'])
 
     def GetSymbol(self, version):
-        return self._return(version['VersionID'])
+        return self._return(version['VersionID'],
+                is_slience=False,
+                content='Current Source Have No GetSymbol Ability.')
 
     def Goto(self, version):
-        return self._return(version['VersionID'])
+        return self._return(version['VersionID'], 
+                is_slience=False,
+                content='Current Source Have No Goto Ability.')
 
     def FindStart(self, text, reg):
         # {{{
