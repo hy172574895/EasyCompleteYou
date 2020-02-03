@@ -34,7 +34,13 @@ endfunction
 
 function! s:MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
 "{{{
-  call utility#MoveToBuffer(a:line, a:colum, a:buffer_name, 'nothing')
+  " we do this maybe it's a bug of leaderf
+  " there no same problem in goto.vim
+  let l:windows_to_show = 'nothing'
+  if a:windows_to_show == 't'
+    let l:windows_to_show = 't'
+  endif
+  call utility#MoveToBuffer(a:line, a:colum, a:buffer_name,l:windows_to_show)
   call utility#ShowMsg("[ECY] You had gone to : " . utility#FormatPosition(a:line, a:colum) , 2)
 "}}}
 endfunction
