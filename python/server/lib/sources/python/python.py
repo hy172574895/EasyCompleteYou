@@ -202,6 +202,8 @@ class Operate(scope_.Source_interface):
                 result_lists = self._goto_definition(version, result_lists)
             if item == 'declaration':
                 result_lists = self._goto_declaration(version, result_lists)
+            if item == 'references':
+                result_lists = self._goto_reference(version, result_lists)
         return_['Results'] = result_lists
         return return_
 
@@ -211,6 +213,10 @@ class Operate(scope_.Source_interface):
         return self._build_goto(definitions, results, 'goto_definitions')
 
     def _goto_declaration(self, version, results):
+        assisment = self._GetJediScript(version).goto_assignments()
+        return self._build_goto(assisment, results, 'goto_declaration')
+
+    def _goto_reference(self, version, results):
         usages = self._GetJediScript(version).usages()
         return self._build_goto(usages, results, 'goto_declaration')
     
