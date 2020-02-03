@@ -121,3 +121,10 @@ function! utility#IsInList(item, list) abort
   return v:false
 "}}}
 endfunction
+
+function! utility#FormatPosition(line, colum) abort
+"{{{ return "[34, 35]"
+  let l:temp = '[' . string(a:line). ', ' . string(a:colum) . ']'
+  return l:temp
+"}}}
+endfunction
