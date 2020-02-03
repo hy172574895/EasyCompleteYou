@@ -91,10 +91,10 @@ class ECYDiagnosisManager(Manager):
 
         if modes is None or modes == '':
             modes = 'nothing'
-
+        if line_content is not None:
+            line_content = line_content.replace("'", "\"")
         cmd = "call leaderf_ECY#items_selecting#LeaderF_cb('{0}','{1}','{2}','{3}','{4}')".\
                 format(line_content, event_name, index, modes, g_callback_name)
-        # lfCmd('echo "' + cmd + '"')
         lfCmd(cmd)
 
     def _get_index(self, line):
