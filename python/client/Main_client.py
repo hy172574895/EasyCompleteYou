@@ -1,16 +1,28 @@
 # Author: Jimmy Huang (1902161621@qq.com)
 # License: WTFPL
 
-from socket import * # noqa
 import random
 import threading
 import json
+import logging
+import sys
+import os
+from socket import * # noqa
 
 # local lib
-import lib.vim_or_neovim_support as vim_lib
-import lib.socket_ as socket_
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(BASE_DIR)
+from lib import vim_or_neovim_support as vim_lib
+from lib import socket_
 from lib.event import *
 
+fileHandler = logging.FileHandler("D:/gvim/vimfiles/myplug/ECY_new/python/client/ECY_client.log", mode="w", encoding="UTF-8")
+formatter = logging.Formatter('%(asctime)s %(filename)s:%(lineno)d %(message)s')
+fileHandler.setFormatter(formatter)
+global g_logger
+g_logger = logging.getLogger('ECY_client')
+g_logger.addHandler(fileHandler)
+g_logger.setLevel(logging.DEBUG)
 
 class _do(object):
     def __init__(self):
