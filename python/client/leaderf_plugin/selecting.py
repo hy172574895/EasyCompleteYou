@@ -103,7 +103,7 @@ class ECYDiagnosisManager(Manager):
         i = len(line) - 1
         temp = ""
         while i > 0:
-            if line[i] is not " ":
+            if line[i] != " ":
                 temp = line[i] + temp
             else:
                 return temp
