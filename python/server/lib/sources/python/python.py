@@ -1,9 +1,12 @@
 # Author: Jimmy Huang (1902161621@qq.com)
 # License: WTFPL
 
-import jedi
 import os
 import re
+try:
+    import jedi
+except Exception as e:
+    raise e
 
 import utils.interface as scope_
 

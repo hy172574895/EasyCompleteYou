@@ -111,6 +111,7 @@ function! s:OnBufferEnter() abort
   let  s:buffer_has_changed   = 0
   call diagnosis#CleanAllSignHighlight()
   call s:SetUpCompleteopt()
+  call s:SetUpLeaderf()
   " OnBufferEnter will trigger Diagnosis
   call ECY_main#Do("OnBufferEnter", v:true)
   "}}}
@@ -513,7 +514,6 @@ endfunction
 function! ECY_main#IsECYWorksAtCurrentBuffer() abort 
 "{{{
 "return v:false means not working.
-  call s:SetUpLeaderf()
   if utility#IsCurrentBufferBigFile()
     return v:false
   endif
