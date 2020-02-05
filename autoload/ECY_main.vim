@@ -364,6 +364,9 @@ function! s:SetUpPython() abort
     " TODO
     " don't need to use python as client.
   endif
+  " check https://github.com/davidhalter/jedi-vim/issues/870 for more of this
+  " line
+  call ECY_main#Do("sys.executable=os.path.join(sys.prefix, 'python.exe')", v:false)
 "}}}
 endfunction
 
@@ -738,6 +741,7 @@ function! s:EventSort(id, data, event) abort
   "{{{ classify events.
   " a:data is a list that every item was divided into a decodable json
   " try
+    let g:abc = a:data
     for item in a:data
       if item == ''
         " an additional part when splitting line with '\n'
@@ -878,8 +882,9 @@ function! s:StartCommunication() abort
     let s:HMAC_KEY = s:PythonEval("ECY_Client_.CreateHMACKey()")
     let s:port     = s:PythonEval("ECY_Client_.GetUnusedLocalhostPort()")
     " enable 'input with socket', yet to enable 'output with socket'
-    let l:start_cmd = 
-          \l:start_cmd.' --input_with_socket --hmac '.s:HMAC_KEY.' --port '.s:port
+    " let l:start_cmd = 
+    "       \l:start_cmd.' --input_with_socket --hmac '.s:HMAC_KEY.' --port '.s:port
+    let l:start_cmd = l:start_cmd . ' --hmac ' . s:HMAC_KEY . ' --port ' . s:port 
   endif
   if g:ECY_debug
     let l:start_cmd .= ' --debug_log'
