@@ -359,7 +359,6 @@ function! s:SetUpPython() abort
     call ECY_main#Do("import Main_client", v:false)
     call ECY_main#Do("ECY_Client_ = Main_client.ECY_Client()", v:false)
 
-    call s:SetUpLeaderf()
   else
     " TODO
     " don't need to use python as client.
@@ -372,6 +371,10 @@ endfunction
 
 function! s:SetUpLeaderf() abort
 "{{{
+  if exists('s:is_init_leaderf_support')
+    return
+  endif
+  let s:is_init_leaderf_support = v:true
   " Importance: so, at plugin manageer such as vunble or plug-vim
   " the leaderf must be put upon ECY.
   if !exists('g:leaderf_loaded')
@@ -510,7 +513,7 @@ endfunction
 function! ECY_main#IsECYWorksAtCurrentBuffer() abort 
 "{{{
 "return v:false means not working.
-
+  call s:SetUpLeaderf()
   if utility#IsCurrentBufferBigFile()
     return v:false
   endif
