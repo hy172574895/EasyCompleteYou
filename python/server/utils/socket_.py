@@ -1,74 +1,92 @@
 # Author: Jimmy Huang (1902161621@qq.com)
 # License: WTFPL
 
-from base64 import b64encode
-from socket import * # noqa
 import hmac
+import hashlib
+import threading
 import queue
 import json
-import threading
+from socket import *
+from base64 import b64decode
+import logging
 
+global g_logger
+g_logger = logging.getLogger('ECY')
 
-class Socket_(object):
-    def __init__(self, PORT, HMAC_KEY_str):
-        HOST = '127.0.0.1'  # or 'localhost'
-        self.ADDR = (HOST, PORT)
-        self._id = 0
-        self._HMAC_KEY = HMAC_KEY_str
-        self.thread = threading.Thread(target=self.Loop)
-        self.thread.daemon = True
-        self._isconnected = False
-        self.callback_queue = queue.Queue()
+class Server(object):
+    def __init__(self, port, hmac_str, is_use_socket_to_get_msg=True):
+        self._results_queue = queue.Queue()
+        if not is_use_socket_to_get_msg:
+            pass
+            # TODO
+            # self.thread = threading.Thread(target=self.StdioLoop)
+            # self.stdio_data_handler = StdioDataHander()
+        else:
+            self.HOST = gethostname()
+            # for security reason, we have to make sure the client is the right one.
+            self.BUFSIZ = 1024 * 100
+
+            self.ADDR = (self.HOST, int(port))
+            self.tcpSerSock = socket(AF_INET, SOCK_STREAM)
+            self.tcpSerSock.bind(self.ADDR)
+            self.tcpSerSock.listen(5)
+
+            self.thread = threading.Thread(target=self.SocketLoop)
+            # with HMAC for socket
+            self._HMAC_KEY = bytes(str(hmac_str), encoding='utf-8') 
+            self.thread.daemon = True
+
+    def GetResults(self):
         self.thread.start()
+        return self._results_queue
 
-    def AddTodo(self, todo):
-        self.callback_queue.put(todo)
+    def SocketLoop(self):
+        g_logger.debug("using socket to input") 
+        while True:
+            tcpCliSock, addr = self.tcpSerSock.accept()
+            data_bytes = b''
+            g_logger.debug("server connect successfully.") 
+            # tcpCliSock.settimeout(5)
+            try:
+                while True:
+                    data_bytes += tcpCliSock.recv(self.BUFSIZ)
+                    if not data_bytes:
+                        return
+                    g_logger.debug("receive msg from client.") 
+                    part_bytes = data_bytes.split(b'\n')
+                    # we make sure every recived json can be loaded with no erro.
+                    # a simple C/S
+                    # if the last one in the variable part_bytes is empty
+                    # so it's incomplete
+                    the_last_one = len(part_bytes)-1
+                    data_bytes = part_bytes[the_last_one]
+                    i = 0
+                    while i < the_last_one:
+                        data_dict = json.loads(part_bytes[i])
+                        i += 1
+                        self.HandData(data_dict)
+            except Exception as e:
+                g_logger.exception("something wrong")
+                # time out or something wrong.
+                # maybe that data is too big. we donot accept that big data beacause
+                # this server just like a callback event
+            finally:
+                tcpCliSock.close()
+        self.tcpSerSock.close()
 
-    def _connect_socket(self):
-        try:
-            if self._isconnected:
-                return
-            self.tcpCliSock = socket(AF_INET, SOCK_STREAM) # noqa
-            self.tcpCliSock.connect(self.ADDR)
-            self._isconnected = True
-            self._HMAC_KEY = bytes(str(self._HMAC_KEY), encoding='utf-8')
-            print("connect successfully")
-        except: # noqa
-            print("failed to connect")
-            raise
-            self._isconnected = False
-
-    def ConnectSocket(self):
-        threading.Thread(target=self._connect_socket).start()
-
-    def BuildMsg(self, msg_dict):
-        """build a msg and send it to server
-        """
-        if not self._isconnected:
-            # todo abandom
-            return
-        self._id += 1
-        # convert to unicode, then calculate the HMAC
-        msg_str = str(msg_dict)
-        msg_length = len(msg_str)
-        msg_bytes = bytes(msg_str, encoding='utf-8')
-        HMAC_abstract1 = hmac.new(self._HMAC_KEY, msg_bytes).digest()
-        HMAC_abstract1 = b64encode(HMAC_abstract1)
-        HMAC_abstract1 = HMAC_abstract1.decode('utf-8')
-        send_data = {'Method': 'receive_all_msg', 'Key': HMAC_abstract1,
-                     'ID': self._id, 'Msg_length': msg_length, 'Msg': msg_dict}
-        send_data = bytes(json.dumps(send_data), encoding='utf-8')
-        # there are no '\n' in json's string, so we use that to split the text.
-        self.tcpCliSock.sendall(send_data+b'\n')
-
-    def Loop(self):
-        try:
-            while 1:
-                todo = self.callback_queue.get()
-                self.BuildMsg(todo)
-        except:# noqa
-            print("something wrong with Socket_.")
-        finally:
-            if self._isconnected:
-                self._isconnected = False
-                self.tcpCliSock.close()
+    def HandData(self, data_dict):
+        if data_dict['Method'] == 'receive_all_msg':
+            # requires id, msg, and key
+            _msg_byte = bytes(str(data_dict['Msg']), encoding='utf-8')
+            HMAC_abstract2 = bytes(data_dict['Key'], encoding='utf-8')
+            HMAC_abstract2 = b64decode(HMAC_abstract2)
+            # we are using MD5, it's safe enough for us, because the key is 
+            # too complicated.
+            # And for compatibility, we must specify 'digestmod'
+            HMAC_abstract1 = hmac.new(self._HMAC_KEY, _msg_byte, digestmod=hashlib.md5).digest()
+            if hmac.compare_digest(HMAC_abstract1, HMAC_abstract2):
+                data_dict = {'Msg': data_dict['Msg']}
+                self._results_queue.put(data_dict)
+            else:
+                # TODO: handle an unkonw msg
+                pass
