@@ -49,27 +49,27 @@ Check [here](https://vi.stackexchange.com/questions/613/how-do-i-install-a-plugi
 
 # Usage  
 
-After successfully installed ECY, there are 3 buildin completion source that
+After successfully installed ECY, there are 3 buildin completion engine that
 is `label`, `path` and `python`. 
 
-Firstly ECY will detect the filetype of your buffer that you are using. Knowing the filetype, then ECY asks the server what sources are available on this filetype.  
+Firstly ECY will detect the filetype of your buffer that you are using. Knowing the filetype, then ECY asks the server what engines are available on this filetype.  
 
-So if you want a specific source works on a buffer, you can change the filetype by the vim that `:set &filetype=java` on the buffer you want to change.
+So if you want a specific engine works on a buffer, you can change the filetype by the vim that `:set &filetype=java` on the buffer you want to change.
 
-You can also check available sources of ECY by pressing `<Tab>` in normal mode.
-It will show a floating windows containing all the sources you can use in current buffera. Change `<Tab>`  by `g:ECY_show_switching_source_popup`.
+You can also check available engine of ECY by pressing `<Tab>` in normal mode.
+It will show a floating windows containing all the engine you can use in current buffera. Change `<Tab>`  by `g:ECY_show_switching_source_popup`.
 
 ## How to change the default value to you want?
-All of them are variables of vimL, so you can put a line such as     
+All of them are variables of vimL, so you can put a code such as     
 `let g:ECY_expand_snippets_key = '<F7>'` into your [vimrc](https://stackoverflow.com/questions/10921441/where-is-my-vimrc-file).  
 
 ## Enable more.
 
-there only three buildin sources which is `label`,`python` and `path` after you installed ECY. If you want ECY work on `HTML`, you can activate a source by: `:call ECY_Installer('HTML_LSP')` in vim.  
-**Importance**: There are might dependence while you install a source of ECY
+there only three buildin engine which is `label`,`python` and `path` after you installed ECY. If you want ECY work on `HTML`, you can activate that engine by: `:call ECY_Installer('HTML_LSP')` in vim.  
+**Importance**: There are might dependence while you installing a engine of ECY
 So check out the following lists carefully and install the dependence before you install it.
 
-Here the full lists of sources that ECY supports. 
+Here the full lists of engine that ECY supports. 
 
 ## Cooperate with [Ultisnips](https://github.com/SirVer/ultisnips)
 `Ultisnips` is a separate plugin, so you have to install it separately.
