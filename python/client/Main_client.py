@@ -22,7 +22,7 @@ fileHandler.setFormatter(formatter)
 global g_logger
 g_logger = logging.getLogger('ECY_client')
 g_logger.addHandler(fileHandler)
-g_logger.setLevel(logging.DEBUG)
+# g_logger.setLevel(logging.DEBUG)
 
 class _do(object):
     def __init__(self):
