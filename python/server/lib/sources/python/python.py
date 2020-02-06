@@ -3,19 +3,22 @@
 
 import os
 import re
-try:
-    import jedi
-except Exception as e:
-    raise e
+import sys
+import jedi
 
 import utils.interface as scope_
 
 
 class Operate(scope_.Source_interface):
     def __init__(self):
+        # check https://github.com/davidhalter/jedi-vim/issues/870
+        # revert to 0.9 of jedi can fix this
+        # sys.executable = os.path.join(sys.prefix, 'python.exe')
+
         # FIXME:when completing the last line of a method or a class will
         # show only a few of items, mabye, because the cache's system position
         # don't match with jedi
+        # revert to 0.9 of jedi can also fix this
         self._name = 'python_jedi'
 
     def GetInfo(self):
@@ -178,9 +181,14 @@ class Operate(scope_.Source_interface):
 
     def GetSymbol(self, version):
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
-        definitions = jedi.api.names(source=version['AllTextList'],
-                                     all_scopes=True, definitions=True,
-                                     references=False, path=version['FilePath'])
+        try:
+            # in embed python, some of this can not find module path.
+            # So we try
+            definitions = jedi.api.names(source=version['AllTextList'],
+                                         all_scopes=True, definitions=True,
+                                         references=False, path=version['FilePath'])
+        except Exception as e:
+            definitions = []
         lists = []
         for item in definitions:
             position = item._name.tree_name.get_definition()
@@ -201,12 +209,18 @@ class Operate(scope_.Source_interface):
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         result_lists = []
         for item in version['GotoLists']:
-            if item == 'definition':
-                result_lists = self._goto_definition(version, result_lists)
-            if item == 'declaration':
-                result_lists = self._goto_declaration(version, result_lists)
-            if item == 'references':
-                result_lists = self._goto_reference(version, result_lists)
+            try:
+                # in embed python, some of this can not find module path.
+                # So we try
+                if item == 'definition':
+                    result_lists = self._goto_definition(version, result_lists)
+                if item == 'declaration':
+                    result_lists = self._goto_declaration(version, result_lists)
+                if item == 'references':
+                    result_lists = self._goto_reference(version, result_lists)
+            except Exception as e:
+                # will return []
+                pass
         return_['Results'] = result_lists
         return return_
 

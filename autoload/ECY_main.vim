@@ -244,7 +244,7 @@ function! s:SetVariable() abort
   " this debug option will start another server with socket port 1234 and
   " HMAC_KEY 1234, and output logging to file where server dir is. 
   let g:ECY_debug
-        \= get(g:, 'ECY_debug', 0)
+        \= get(g:, 'ECY_debug', 1)
 
   let g:ECY_select_items
         \= get(g:, 'ECY_select_items',['<Tab>','<S-TAB>'])
@@ -364,9 +364,6 @@ function! s:SetUpPython() abort
     " TODO
     " don't need to use python as client.
   endif
-  " check https://github.com/davidhalter/jedi-vim/issues/870 for more of this
-  " line
-  call ECY_main#Do("sys.executable=os.path.join(sys.prefix, 'python.exe')", v:false)
 "}}}
 endfunction
 
@@ -375,27 +372,32 @@ function! s:SetUpLeaderf() abort
   if exists('s:is_init_leaderf_support')
     return
   endif
-  let s:is_init_leaderf_support = v:true
-  " Importance: so, at plugin manageer such as vunble or plug-vim
-  " the leaderf must be put upon ECY.
-  if !exists('g:leaderf_loaded')
-    " Leaderf Plugin
+  try
+    " Importance: so, at plugin manageer such as vunble or plug-vim
+    " the leaderf must be put upon ECY.
+    if !exists('g:leaderf_loaded')
+      " Leaderf Plugin
+      return
+    endif
+    call ECY_main#Do("from leaderf_plugin.selecting import *", v:false)
+
+    " In order to be listed by :LeaderfSelf
+    call g:LfRegisterSelf("ECY_selecting", "Plugin for EasyCompleteYou")
+
+    " In order to make this plugin in Leaderf available 
+    let l:extension = {
+                \   "name": "ECY_selecting",
+                \   "help": "check out Doc of ECY",
+                \   "registerFunc": "symbols#register",
+                \   "arguments": [
+                \   ]
+                \ }
+    call g:LfRegisterPythonExtension(l:extension.name, l:extension)
+    
+  catch 
     return
-  endif
-  call ECY_main#Do("from leaderf_plugin.selecting import *", v:false)
-
-  " In order to be listed by :LeaderfSelf
-  call g:LfRegisterSelf("ECY_selecting", "Plugin for EasyCompleteYou")
-
-  " In order to make this plugin in Leaderf available 
-  let l:extension = {
-              \   "name": "ECY_selecting",
-              \   "help": "check out Doc of ECY",
-              \   "registerFunc": "symbols#register",
-              \   "arguments": [
-              \   ]
-              \ }
-  call g:LfRegisterPythonExtension(l:extension.name, l:extension)
+  endtry
+  let s:is_init_leaderf_support = v:true
 "}}}
 endfunction
 
