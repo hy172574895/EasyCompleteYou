@@ -4,7 +4,11 @@
 import os
 import re
 import sys
-import jedi
+try:
+    import jedi
+    has_jedi = True
+except Exception as e:
+    has_jedi = False
 
 import utils.interface as scope_
 
@@ -34,6 +38,11 @@ class Operate(scope_.Source_interface):
                            line_nr,
                            current_colum,
                            path)
+
+    def _check(self, version):
+        if not has_jedi:
+            return False
+        return True
 
     def _analyze_params(self, line, show_default_value=False):
         # {{{
@@ -137,8 +146,10 @@ class Operate(scope_.Source_interface):
 
     def DoCompletion(self, version):
         # {{{
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        if not self._check():
+            return None
 
+        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         current_colum = version['StartPosition']['Colum']
         current_line = version['CurrentLineText']
         if self.IsInsideQuotation(current_line, current_colum)\
@@ -180,6 +191,8 @@ class Operate(scope_.Source_interface):
         # }}}
 
     def GetSymbol(self, version):
+        if not self._check():
+            return None
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         try:
             # in embed python, some of this can not find module path.
@@ -205,7 +218,16 @@ class Operate(scope_.Source_interface):
         return_['Results'] = lists
         return return_
 
+    def OnBufferEnter(self, version):
+        if self._check():
+            return None
+        return {'ID': version['VersionID'], 'Results': 'ok', 'ErroCode': 3,
+                'Event': 'erro_code',
+                'Description': 'You are missing jedi. So this engine can not work.'}
+
     def Goto(self, version):
+        if not self._check():
+            return None
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         result_lists = []
         for item in version['GotoLists']:

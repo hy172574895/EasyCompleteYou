@@ -9,5 +9,6 @@ class Operate(object):
         
     def Goto(self, obj_,  version):
         results = obj_.Goto(version)
-        results['Event'] = 'goto'
+        if results is not None:
+            results['Event'] = 'goto'
         return results

@@ -111,7 +111,6 @@ function! s:OnBufferEnter() abort
   let  s:buffer_has_changed   = 0
   call diagnosis#CleanAllSignHighlight()
   call s:SetUpCompleteopt()
-  call s:SetUpLeaderf()
   " OnBufferEnter will trigger Diagnosis
   call ECY_main#Do("OnBufferEnter", v:true)
   "}}}
@@ -244,7 +243,7 @@ function! s:SetVariable() abort
   " this debug option will start another server with socket port 1234 and
   " HMAC_KEY 1234, and output logging to file where server dir is. 
   let g:ECY_debug
-        \= get(g:, 'ECY_debug', 1)
+        \= get(g:, 'ECY_debug', 0)
 
   let g:ECY_select_items
         \= get(g:, 'ECY_select_items',['<Tab>','<S-TAB>'])
@@ -516,6 +515,9 @@ endfunction
 function! ECY_main#IsECYWorksAtCurrentBuffer() abort 
 "{{{
 "return v:false means not working.
+
+  call s:SetUpLeaderf()
+
   if utility#IsCurrentBufferBigFile()
     return v:false
   endif
