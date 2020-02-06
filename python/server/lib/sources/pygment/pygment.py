@@ -30,14 +30,14 @@ class Operate(scope_.Source_interface):
         return True
 
     def OnBufferEnter(self, version):
-        if self._check():
+        if self._check(version):
             return None
         return {'ID': version['VersionID'], 'Results': 'ok', 'ErroCode': 3,
                 'Event': 'erro_code',
                 'Description': 'You are missing pygments. So this engine can not work.'}
 
     def DoCompletion(self, version):
-        if not self._check():
+        if not self._check(version):
             return None
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         line_text = version['AllTextList']
