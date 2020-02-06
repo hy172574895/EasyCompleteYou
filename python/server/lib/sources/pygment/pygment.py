@@ -3,12 +3,16 @@
 
 # standard lib
 import re
-from  pygments import highlight
-from  pygments import lex
-from  pygments import lexers
-from  pygments import token
 
 # local lib
+try:
+    from  pygments import highlight
+    from  pygments import lex
+    from  pygments import lexers
+    from  pygments import token
+    has_pygment = True
+except Exception as e:
+    has_pygment = False
 import utils.interface as scope_
 # from util import vim_or_neovim_support as vim_lib
 
@@ -20,7 +24,21 @@ class Operate(scope_.Source_interface):
         return {'Name': self._name, 'WhiteList': ['all'],
                 'Regex': r'[\w]', 'TriggerKey': []}
 
+    def _check(self, version):
+        if not has_pygment:
+            return False
+        return True
+
+    def OnBufferEnter(self, version):
+        if self._check():
+            return None
+        return {'ID': version['VersionID'], 'Results': 'ok', 'ErroCode': 3,
+                'Event': 'erro_code',
+                'Description': 'You are missing pygments. So this engine can not work.'}
+
     def DoCompletion(self, version):
+        if not self._check():
+            return None
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         line_text = version['AllTextList']
         path = version['FilePath']
