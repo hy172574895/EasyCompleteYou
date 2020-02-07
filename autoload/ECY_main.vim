@@ -243,7 +243,7 @@ function! s:SetVariable() abort
   " this debug option will start another server with socket port 1234 and
   " HMAC_KEY 1234, and output logging to file where server dir is. 
   let g:ECY_debug
-        \= get(g:, 'ECY_debug', 0)
+        \= get(g:, 'ECY_debug', v:false)
 
   let g:ECY_select_items
         \= get(g:, 'ECY_select_items',['<Tab>','<S-TAB>'])
@@ -748,7 +748,6 @@ function! s:EventSort(id, data, event) abort
   "{{{ classify events.
   " a:data is a list that every item was divided into a decodable json
   " try
-    let g:abc = a:data
     for item in a:data
       if item == ''
         " an additional part when splitting line with '\n'
@@ -937,21 +936,21 @@ function! ECY_main#Install(name) abort
   try
     let l:install_return = function(l:name)()
   catch
-    call utility#ShowMsg('[ECY] have no "'.a:name.'" supported.', 2)
+    call utility#ShowMsg('[ECY] have no "'.a:name.'" supported.', 3)
     return 
   endtry
   if l:install_return['status'] == 0
     " refleshing all the running completor to make new completor work at every
     " where.
-    call utility#ShowMsg('[ECY] checked the requires of "'.l:install_return['name'].'" successfully.', 2)
+    call utility#ShowMsg('[ECY] checked the requires of "'.l:install_return['name'].'" successfully.', 3)
   else
     "failed while check.
-    call utility#ShowMsg(l:install_return['description'], 2)
+    call utility#ShowMsg(l:install_return['description'], 3)
     return
   endif
   let g:ecy_source_name_2_install = l:install_return['name']
   call ECY_main#Do("InstallSource", v:true)
-  call utility#ShowMsg('[ECY] installing "'.l:install_return['name'].'".', 2)
+  call utility#ShowMsg('[ECY] installing "'.l:install_return['name'].'".', 3)
 "}}}
 endfunction
 

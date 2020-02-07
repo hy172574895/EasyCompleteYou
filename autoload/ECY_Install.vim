@@ -7,8 +7,8 @@ let g:ECY_available_sources_lists = ['HTML_LSP', 'Snippets', 'YCM', 'Pygment']
 function! ECY_Install#HTML_LSP()
 "{{{
   " options: 1. cmd for starting Server
-  let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
-  if !executable(l:temp)
+  " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
+  if !executable('html-languageserver')
     if !executable('npm')
       return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
     endif
@@ -37,7 +37,7 @@ endfunction
 
 function! ECY_Install#YCM()
 "{{{
-  if !ECY_main#HasYCM()
+  if !utility#HasYCM()
     return {'status':'-1','description':"ECY failed to install it. You missing YCM. Please install that plugin, firstly. "}
   endif
   return {'status':'0','description':"ok",'name':'lib.sources.youcompleteme.ycm'}
