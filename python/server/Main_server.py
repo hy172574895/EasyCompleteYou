@@ -40,15 +40,15 @@ if g_args.log_dir is None:
 else:
     output_log_dir = g_args.log_dir
 
-fileHandler = logging.FileHandler(output_log_dir, mode="w", encoding="UTF-8")
-formatter = logging.Formatter('%(asctime)s %(filename)s:%(lineno)d %(message)s')
-fileHandler.setFormatter(formatter)
-
-global g_logger
-g_logger = logging.getLogger('ECY')
-g_logger.addHandler(fileHandler)
-g_logger.setLevel(logging.DEBUG)
 if g_args.debug_log:
+    print(g_args.debug_log)
+    fileHandler = logging.FileHandler(output_log_dir, mode="w", encoding="UTF-8")
+    formatter = logging.Formatter('%(asctime)s %(filename)s:%(lineno)d %(message)s')
+    fileHandler.setFormatter(formatter)
+global g_logger
+g_logger = logging.getLogger('ECY_server`')
+if g_args.debug_log:
+    g_logger.addHandler(fileHandler)
     g_logger.setLevel(logging.DEBUG)
 
 

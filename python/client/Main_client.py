@@ -16,13 +16,16 @@ from lib import vim_or_neovim_support as vim_lib
 from lib import socket_
 from lib.event import *
 
-fileHandler = logging.FileHandler("D:/gvim/vimfiles/myplug/ECY_new/python/client/ECY_client.log", mode="w", encoding="UTF-8")
-formatter = logging.Formatter('%(asctime)s %(filename)s:%(lineno)d %(message)s')
-fileHandler.setFormatter(formatter)
+g_is_debug = False  
+if g_is_debug:
+    fileHandler = logging.FileHandler(BASE_DIR + "/ECY_client.log", mode="w", encoding="UTF-8")
+    formatter = logging.Formatter('%(asctime)s %(filename)s:%(lineno)d %(message)s')
+    fileHandler.setFormatter(formatter)
 global g_logger
 g_logger = logging.getLogger('ECY_client')
-g_logger.addHandler(fileHandler)
-# g_logger.setLevel(logging.DEBUG)
+if g_is_debug:
+    g_logger.addHandler(fileHandler)
+    g_logger.setLevel(logging.DEBUG)
 
 class _do(object):
     def __init__(self):
