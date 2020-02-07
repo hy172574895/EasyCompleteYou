@@ -40,8 +40,8 @@ function! s:MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
   if a:windows_to_show == 't'
     let l:windows_to_show = 't'
   endif
-  call utility#MoveToBuffer(a:line, a:colum, a:buffer_name,l:windows_to_show)
   call utility#ShowMsg("[ECY] You had gone to : " . utility#FormatPosition(a:line, a:colum) , 2)
+  call utility#MoveToBuffer(a:line, a:colum, a:buffer_name,l:windows_to_show)
 "}}}
 endfunction
 

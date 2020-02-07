@@ -52,7 +52,6 @@ class Server(object):
                     data_bytes += tcpCliSock.recv(self.BUFSIZ)
                     if not data_bytes:
                         return
-                    g_logger.debug("receive msg from client.") 
                     part_bytes = data_bytes.split(b'\n')
                     # we make sure every recived json can be loaded with no erro.
                     # a simple C/S
