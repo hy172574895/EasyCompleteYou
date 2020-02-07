@@ -39,12 +39,12 @@ class Source_interface(object):
     def GetSymbol(self, version):
         return self._return(version['VersionID'],
                 is_slience=False,
-                content='Current Source Have No GetSymbol Ability.')
+                content='Current Engine Have No GetSymbol Ability.')
 
     def Goto(self, version):
         return self._return(version['VersionID'], 
                 is_slience=False,
-                content='Current Source Have No Goto Ability.')
+                content='Current Engine Have No Goto Ability.')
 
     def FindStart(self, text, reg):
         # {{{
