@@ -1,6 +1,10 @@
-let s:is_input_working = v:false
-let g:ECY_testing_case = []
-let s:testing_case = 0
+
+fun! test#Init()
+  let s:is_input_working = v:false
+  let g:ECY_testing_case = []
+  let s:testing_case_nr = 0
+  let s:testing_windows_nr = -1
+endf
 
 fun! test#Execute(key)
   exe a:key
@@ -11,8 +15,7 @@ fun! s:Timer_cb(timer_id) abort
   if l:index == len(s:key_dict['key_list'])
     let s:is_input_working = v:false
     if exists("s:key_dict['callback']")
-      let l:Fuc = s:key_dict['callback']
-      call l:Fuc()
+      call s:Processor(s:key_dict['callback'])
     endif
     return
   endif
@@ -34,9 +37,9 @@ fun! test#Input(key, ...) abort
 endf
 
 fun! test#TestOK(test_name) abort
-  let g:ECY_testing_case[s:testing_case]['status'] = 'ok'
-  let s:testing_case += 1
-  call test#Starting(s:testing_case)
+  let g:ECY_testing_case[s:testing_case_nr]['status'] = 'ok'
+  let s:testing_case_nr += 1
+  call test#Starting(s:testing_case_nr)
 endf
 
 fun! test#AddTestToQueue(test_name, starting_fuc) abort
@@ -46,6 +49,10 @@ endf
 
 
 fun! test#Starting(index) abort
+  if s:testing_windows_nr != -1
+    call test#Execute("bd! ". string(s:testing_windows_nr))
+    let s:testing_windows_nr = -1
+  endif
   if len(g:ECY_testing_case) == 0
     throw "Have no testing case."
   endif
@@ -54,12 +61,27 @@ fun! test#Starting(index) abort
     echo "Testing Done."
     return
   endif
+  call test#Execute("new")
+  let s:testing_windows_nr = bufnr()
+  call s:Processor(g:ECY_testing_case[a:index]['starting_fuc'])
+endf
+
+fun! s:Processor(Fuc) abort
+
+  if s:testing_case_nr >= len(g:ECY_testing_case)
+    " end
+    echo "Testing Done."
+    return
+  endif
   try
-    let l:Fuc = g:ECY_testing_case[a:index]['starting_fuc']
-    call l:Fuc()
+    call a:Fuc()
   catch 
-    let g:ECY_testing_case[s:testing_case]['status'] = 'failed'
-    let s:testing_case += 1
-    call test#Starting(s:testing_case)
+    let g:ECY_testing_case[s:testing_case_nr]['status'] = 'failed'
+    let g:ECY_testing_case[s:testing_case_nr]['info'] = v:exception
+    let g:ECY_testing_case[s:testing_case_nr]['point'] = v:throwpoint
+    let s:testing_case_nr += 1
+    call test#Starting(s:testing_case_nr)
   endtry
 endf
+
+call test#Init()
