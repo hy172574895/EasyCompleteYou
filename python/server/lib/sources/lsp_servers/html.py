@@ -80,7 +80,7 @@ class Operate(scope_.Source_interface):
                 self._lsp.GetResponse(init_msg['Method'])
                 self.is_server_start = 'started'
         except Exception as e:
-            g_logger.exception("something wrong")
+            g_logger.exception(self._starting_server_cmd)
             self.is_server_start = 'failed to start'
             if self._deamon_queue is not None:
                 temp = self._build_erro_msg(2,
@@ -294,6 +294,7 @@ class HtmlHint:
             # user may have no htmlhint
             g_logger.exception("can not call htmlhint.")
             self.is_available = 2
+            g_logger.debug(results)
             return None
         results_list = []
         for item in results:

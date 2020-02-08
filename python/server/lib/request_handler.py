@@ -50,7 +50,6 @@ class EventHandler(object):
         # if the source's event will block for a while, the source can return
         # None, and then put the result into deamon_queue when it finished
         version_dict['DeamonQueue'] = self._pass_results_queue
-        g_logger.debug(version_dict)
         object_ = self.source_manager.GetSourceObjByName(source_name, file_type)
 
         # all the event must return something, if returning None
@@ -69,7 +68,6 @@ class EventHandler(object):
             temp = self.source_manager.InstallSource(version_dict['SourcePath'])
             results_.append(temp)
             temp = self.source_manager.GetAvailableSourceForFiletype(file_type)
-            g_logger.debug(temp)
         results_.append(temp)
         return results_
 
