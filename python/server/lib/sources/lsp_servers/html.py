@@ -3,6 +3,9 @@
 
 # for basic
 import re
+import logging
+global g_logger
+g_logger = logging.getLogger('ECY_server`')
 
 # for htmlhint
 import subprocess
@@ -27,7 +30,7 @@ class Operate(scope_.Source_interface):
         self.is_server_start = 'not started'
         self._deamon_queue = None
         self._starting_server_cmd = None
-        self._diagnosis_queue = queue.Queue()
+        self._diagnosis_queue = queue.Queue(maxsize=10)
         self._diagnosis = HtmlHint()
         self._is_http_server_started = None
         threading.Thread(target=self._diagnosis_notification).start()
@@ -48,12 +51,18 @@ class Operate(scope_.Source_interface):
             if 'StartingCMD' in version.keys():
                 self._starting_server_cmd = version['StartingCMD']
         if self._starting_server_cmd is not None:
-            self._start_server()
+            self._start_lsp_server()
         if self.is_server_start == 'started':
             return True
         return False
 
-    def _start_server(self):
+    def _build_erro_msg(self, code, msg):
+        temp = {'ID': -1, 'Results': 'ok', 'ErroCode': code,
+                'Event': 'erro_code',
+                'Description':msg}
+        return temp
+
+    def _start_lsp_server(self):
         ''' will only start once
         '''
         try:
@@ -70,13 +79,12 @@ class Operate(scope_.Source_interface):
                     initializationOptions=None, rootUri=None)
                 self._lsp.GetResponse(init_msg['Method'])
                 self.is_server_start = 'started'
-        except: # noqa
+        except Exception as e:
+            g_logger.exception("something wrong")
             self.is_server_start = 'failed to start'
             if self._deamon_queue is not None:
-                temp = {'ID': -1, 'Results': 'ok', 'ErroCode': 2,
-                        'Event': 'erro_code',
-                        'Description':
-                        'Failed to start LSP server. Check Log file of server to get more details.'}
+                temp = self._build_erro_msg(2,
+                        'Failed to start LSP server. Check Log file of server to get more details.')
                 self._deamon_queue.put(temp)
 
     def _did_open_or_change(self, uri, text):
@@ -121,8 +129,8 @@ class Operate(scope_.Source_interface):
             uri_ = self._lsp.PathToUri(version['FilePath'])
             line_text = version['AllTextList']
             self._did_open_or_change(uri_, line_text)
-            self.Diagnosis(version)
         # every event must return something. 'None' means send nothing to client
+        self.Diagnosis(version)
         return None
 
     def _return_label(self, all_text_list):
@@ -140,10 +148,10 @@ class Operate(scope_.Source_interface):
 
     def DoCompletion(self, version):
 # {{{
-        if not self._check(version):
-            return None
         if version['ReturnDiagnosis']:
             self.Diagnosis(version)
+        if not self._check(version):
+            return None
 
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         uri_ = self._lsp.PathToUri(version['FilePath'])
@@ -207,7 +215,12 @@ class Operate(scope_.Source_interface):
 # }}}
 
     def Diagnosis(self, version):
-        self._diagnosis_queue.put(version)
+        if self._diagnosis.is_available == 1:
+            self._diagnosis_queue.put(version)
+        elif self._diagnosis.is_available == 2:
+            self._diagnosis.is_available = 3
+            temp = self._build_erro_msg(4, "Failed to call HtmlHint.")
+            self._deamon_queue.put(temp)
         return None
 
     def _diagnosis_notification(self):
@@ -237,6 +250,7 @@ class Operate(scope_.Source_interface):
 class HtmlHint:
     def __init__(self):
         self._port = -1
+        self.is_available = 1
         self._cmd = " --format=json http://localhost:" + \
                 str(self.GetUnusedLocalhostPort())
 
@@ -261,6 +275,7 @@ class HtmlHint:
             temp = process.stdout.read()
             process.terminate()
         except Exception as e:
+            g_logger.exception("something wrong")
             temp = None
         return temp
 
@@ -271,9 +286,15 @@ class HtmlHint:
         if results is None:
             # time out or something wrong
             return None
-        results = results.split(b'\n')
-        results = results[0].decode("UTF-8")
-        results = json.loads(results)
+        try:
+            results = results.split(b'\n')
+            results = results[0].decode("UTF-8")
+            results = json.loads(results)
+        except Exception as e:
+            # user may have no htmlhint
+            g_logger.exception("can not call htmlhint.")
+            self.is_available = 2
+            return None
         results_list = []
         for item in results:
             for msg in item['messages']:
@@ -314,4 +335,6 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(hint_content.encode())
 
     def log_request(self, code='-', size='-'):
+        """ make server don't output msg to shell.
+        """
         pass
