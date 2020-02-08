@@ -366,39 +366,6 @@ function! s:SetUpPython() abort
 "}}}
 endfunction
 
-function! s:SetUpLeaderf() abort
-"{{{
-  if exists('s:is_init_leaderf_support')
-    return
-  endif
-  try
-    " Importance: so, at plugin manageer such as vunble or plug-vim
-    " the leaderf must be put upon ECY.
-    if !exists('g:leaderf_loaded')
-      " Leaderf Plugin
-      return
-    endif
-    call ECY_main#Do("from leaderf_plugin.selecting import *", v:false)
-
-    " In order to be listed by :LeaderfSelf
-    call g:LfRegisterSelf("ECY_selecting", "Plugin for EasyCompleteYou")
-
-    " In order to make this plugin in Leaderf available 
-    let l:extension = {
-                \   "name": "ECY_selecting",
-                \   "help": "check out Doc of ECY",
-                \   "registerFunc": "symbols#register",
-                \   "arguments": [
-                \   ]
-                \ }
-    call g:LfRegisterPythonExtension(l:extension.name, l:extension)
-    
-  catch 
-    return
-  endtry
-  let s:is_init_leaderf_support = v:true
-"}}}
-endfunction
 
 function! ECY_main#CompleteFunc( findstart, base ) abort
 "{{{
@@ -518,8 +485,6 @@ function! ECY_main#IsECYWorksAtCurrentBuffer() abort
 "{{{
 "return v:false means not working.
 
-  call s:SetUpLeaderf()
-
   if utility#IsCurrentBufferBigFile()
     return v:false
   endif
@@ -538,7 +503,6 @@ function! ECY_main#IsECYWorksAtCurrentBuffer() abort
   return v:true
 "}}}
 endfunction
-
 
 function! ECY_main#GetCurrentUsingSourceName() abort
 "{{{

@@ -12,6 +12,8 @@ if leaderf#versionCheck() == 0
     finish
 endif
 
+call ECY_main#Do("from leaderf_plugin.selecting import *", v:false)
+
 " the ECY_leaderf_selecting is from "~/python/client/leaderf_plugin/"
 " ==============================================================================
 function! leaderf_ECY#items_selecting#register(name)
