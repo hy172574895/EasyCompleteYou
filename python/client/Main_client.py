@@ -16,7 +16,7 @@ from lib import vim_or_neovim_support as vim_lib
 from lib import socket_
 from lib.event import *
 
-g_is_debug = False  
+g_is_debug = vim_lib.GetVariableValue('g:ECY_debug')
 if g_is_debug:
     fileHandler = logging.FileHandler(BASE_DIR + "/ECY_client.log", mode="w", encoding="UTF-8")
     formatter = logging.Formatter('%(asctime)s %(filename)s:%(lineno)d %(message)s')
@@ -59,6 +59,10 @@ class ECY_Client(_do):
 
     def UseStdio(self):
         self.is_using_stdio = True
+
+    def Log(self):
+        g_logger.debug("From Vim: " + vim_lib.GetVariableValue('g:ECY_log_msg'))
+        return 'ok'
 
     def StartDebugServer(self):
         self._debug_server = socket_.Socket_(1234, str(1234))

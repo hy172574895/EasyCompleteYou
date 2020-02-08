@@ -4,6 +4,9 @@
 import importlib
 import os
 import configparser
+import logging
+global g_logger
+g_logger = logging.getLogger('ECY_server`')
 
 
 class MyConf(configparser.ConfigParser):
@@ -172,6 +175,6 @@ class Operate(object):
     def GetSourceObjByName(self, source_name, file_type):
         if source_name not in self.sources_info:
             # while user provide a SourceName we don't have.
-            raise
+            raise "[ECY] source_name you provide not in Server."
         self.SetSourceForFileType(file_type, source_name=source_name)
         return self.sources_info[source_name]['Object']

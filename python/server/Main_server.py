@@ -41,7 +41,6 @@ else:
     output_log_dir = g_args.log_dir
 
 if g_args.debug_log:
-    print(g_args.debug_log)
     fileHandler = logging.FileHandler(output_log_dir, mode="w", encoding="UTF-8")
     formatter = logging.Formatter('%(asctime)s %(filename)s:%(lineno)d %(message)s')
     fileHandler.setFormatter(formatter)

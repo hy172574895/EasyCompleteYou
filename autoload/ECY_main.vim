@@ -303,10 +303,10 @@ function! s:SetVariable() abort
   try
     call UltiSnips#SnippetsInCurrentScope(1)
     let g:has_ultisnips_support = v:true
-    call s:Log('has UltiSnips')
+    call ECY_main#Log('has UltiSnips')
   catch
     let g:has_ultisnips_support = v:false
-    call s:Log('has no UltiSnips')
+    call ECY_main#Log('has no UltiSnips')
   endtry
 
   let  s:isSelecting          = v:false
@@ -450,8 +450,10 @@ endfunction
 
 function! s:DefaultSourcesCheck(current_sources_list) abort
 "{{{
+  if !ECY_main#IsECYWorksAtCurrentBuffer()
+    return
+  endif
   " to make ECY more out of the box.
-
   " check if snippets is installed
   if g:has_ultisnips_support == v:true && !exists('g:ECY_is_installed_snippets')
     let l:is_has = v:false
@@ -632,8 +634,10 @@ function! s:SetFileTypeSource_cb(msg) abort
         \a:msg['Dicts']['using_source']
   let g:ECY_file_type_info[a:msg['FileType']]['special_position']  =
         \{}
-  call s:DefaultSourcesCheck(l:available_sources)
+  " trigger events again
   call ECY_main#AfterUserChooseASource()
+
+  call s:DefaultSourcesCheck(l:available_sources)
 "}}}
 endfunction
 
@@ -902,10 +906,10 @@ function! s:StartCommunication() abort
         \ })
     if !s:is_using_stdio
       call s:PythonEval("ECY_Client_.ConnectSocketServer()")
-      if g:ECY_debug
-        " this is a another socket server that inputed with socket
-        call s:PythonEval("ECY_Client_.StartDebugServer()")
-      endif
+      " if g:ECY_debug
+      "   " this is a another socket server that inputed with socket
+      "   call s:PythonEval("ECY_Client_.StartDebugServer()")
+      " endif
     endif
   catch
     call s:ShowErroAndFinish("EasyCompletion unavailable: Can not start a necessary communication server of python.")
@@ -923,9 +927,13 @@ function! s:ShowErroAndFinish(msg) abort
 "}}}
 endfunction
 
-function! s:Log(msg) abort
+function! ECY_main#Log(msg) abort
 "{{{
- call add(g:ECY_log_msg, a:msg)
+  try
+    let g:ECY_log_msg = a:msg
+    call s:PythonEval("ECY_Client_.Log()")
+  catch 
+  endtry
 "}}}
 endfunction
 
