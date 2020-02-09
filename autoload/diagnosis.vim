@@ -63,7 +63,10 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
   let l:current_line_nr   = line('.')
   let l:current_buffer_path = utility#GetCurrentBufferPath()
   let l:index_list        = []
+  let i = 0
   for item in g:ECY_sign_lists
+    let item['index'] = i
+    let i += 1
     if item['buffer_name'] != l:current_buffer_path || 
           \item['position']['line'] != l:current_line_nr
       continue
@@ -152,7 +155,10 @@ function! s:ShowDiagnosis(index_list) abort
       endif
       let l:line = string(item['position']['line'])
       let l:colum = string(item['position']['range']['start']['colum'])
-      call add(l:text, item['kind'] . ' [' .l:line . ', ' . l:colum . ']',)
+      let l:index = string(item['index'])
+      let l:lists_len = string(len(g:ECY_sign_lists))
+      let l:nr = "(" . l:index . ', ' . l:lists_len . ')'
+      call add(l:text, item['kind'] . ' [' .l:line . ', ' . l:colum . '] ' . l:nr)
       call add(l:text, '(' . item['diagnosis'] . ')')
     endfor
     if g:ECY_PreviewWindows_style == 'append'
