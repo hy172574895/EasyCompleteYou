@@ -19,19 +19,20 @@ except Exception as e:
 
 import utils.interface as scope_
 
-PYFLAKES_ERROR_MESSAGES = (
-    messages.UndefinedName,
-    messages.UndefinedExport,
-    messages.UndefinedLocal,
-    messages.DuplicateArgument,
-    messages.FutureFeatureNotDefined,
-    messages.ReturnOutsideFunction,
-    messages.YieldOutsideFunction,
-    messages.ContinueOutsideLoop,
-    messages.BreakOutsideLoop,
-    messages.ContinueInFinally,
-    messages.TwoStarredExpressions,
-)
+if has_pyflake:
+    PYFLAKES_ERROR_MESSAGES = (
+        messages.UndefinedName,
+        messages.UndefinedExport,
+        messages.UndefinedLocal,
+        messages.DuplicateArgument,
+        messages.FutureFeatureNotDefined,
+        messages.ReturnOutsideFunction,
+        messages.YieldOutsideFunction,
+        messages.ContinueOutsideLoop,
+        messages.BreakOutsideLoop,
+        messages.ContinueInFinally,
+        messages.TwoStarredExpressions,
+    )
 
 global g_logger
 g_logger = logging.getLogger('ECY_server')
