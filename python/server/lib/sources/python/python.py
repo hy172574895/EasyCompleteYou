@@ -3,27 +3,56 @@
 
 import os
 import re
-import sys
+import queue
+import threading
+import logging
 try:
     import jedi
     has_jedi = True
 except Exception as e:
     has_jedi = False
+try:
+    from pyflakes import api as pyflakes_api, messages
+    has_pyflake = True
+except Exception as e:
+    has_pyflake = False
 
 import utils.interface as scope_
+
+PYFLAKES_ERROR_MESSAGES = (
+    messages.UndefinedName,
+    messages.UndefinedExport,
+    messages.UndefinedLocal,
+    messages.DuplicateArgument,
+    messages.FutureFeatureNotDefined,
+    messages.ReturnOutsideFunction,
+    messages.YieldOutsideFunction,
+    messages.ContinueOutsideLoop,
+    messages.BreakOutsideLoop,
+    messages.ContinueInFinally,
+    messages.TwoStarredExpressions,
+)
+
+global g_logger
+g_logger = logging.getLogger('ECY_server`')
 
 
 class Operate(scope_.Source_interface):
     def __init__(self):
+        # a jedi bug:
         # check https://github.com/davidhalter/jedi-vim/issues/870
         # revert to 0.9 of jedi can fix this
-        # sys.executable = os.path.join(sys.prefix, 'python.exe')
 
         # FIXME:when completing the last line of a method or a class will
         # show only a few of items, mabye, because the cache's system position
         # don't match with jedi
         # revert to 0.9 of jedi can also fix this
         self._name = 'python_jedi'
+        self._deamon_queue = None
+        if has_pyflake:
+            self._diagnosis_queue = queue.Queue(maxsize=10)
+            threading.Thread(target=self._output_diagnosis,
+                             daemon=True).start()
 
     def GetInfo(self):
         return {'Name': self._name, 'WhiteList': ['python'], 'Regex': r'[\w]',
@@ -40,6 +69,7 @@ class Operate(scope_.Source_interface):
                            path)
 
     def _check(self, version):
+        self._deamon_queue = version['DeamonQueue']
         if not has_jedi:
             return False
         return True
@@ -104,7 +134,7 @@ class Operate(scope_.Source_interface):
     # }}}
 
     def _build_func_snippet(self, name, params, using_PEP8=True):
-        # {{{ 
+        # {{{
         if len(params) == 0:
             snippet = str(name) + '($1)$0'
         else:
@@ -165,7 +195,7 @@ class Operate(scope_.Source_interface):
         results_list = []
         for item in temp:
             results_format = {'abbr': '', 'word': '', 'kind': '',
-                    'menu': '', 'info': '', 'user_data': ''}
+                              'menu': '', 'info': '', 'user_data': ''}
             results_format['abbr'] = item.name_with_symbols
             results_format['word'] = item.name
 
@@ -178,7 +208,7 @@ class Operate(scope_.Source_interface):
             temp = item.docstring()
             results_format['info'] = temp.split("\n")
             try:
-                if item.type in ['function','class']:
+                if item.type in ['function', 'class']:
                     params = self._analyze_params(temp)
                     snippet = self._build_func_snippet(item.name, params)
                     results_format['snippet'] = snippet
@@ -208,9 +238,11 @@ class Operate(scope_.Source_interface):
             # start_column is 0-based
             (start_line, start_column) = position.start_pos
             items = [{'name': '1', 'content': {'abbr': item.name, 'highlight': 'ECY_blue'}},
-                    {'name': '2', 'content': {'abbr': item.type, 'highlight': 'ECY_green'}},
-                    {'name': '3', 'content': {'abbr': str(position.start_pos),  'highlight':'ECY_yellow'}}]
-            position = {'line': start_line, 'colum': start_column, 'path': version['FilePath']}
+                     {'name': '2', 'content': {
+                         'abbr': item.type, 'highlight': 'ECY_green'}},
+                     {'name': '3', 'content': {'abbr': str(position.start_pos),  'highlight': 'ECY_yellow'}}]
+            position = {'line': start_line, 'colum': start_column,
+                        'path': version['FilePath']}
             temp = {'items': items,
                     'type': 'symbol',
                     'position': position}
@@ -237,7 +269,8 @@ class Operate(scope_.Source_interface):
                 if item == 'definition':
                     result_lists = self._goto_definition(version, result_lists)
                 if item == 'declaration':
-                    result_lists = self._goto_declaration(version, result_lists)
+                    result_lists = self._goto_declaration(
+                        version, result_lists)
                 if item == 'references':
                     result_lists = self._goto_reference(version, result_lists)
             except Exception as e:
@@ -258,7 +291,7 @@ class Operate(scope_.Source_interface):
     def _goto_reference(self, version, results):
         usages = self._GetJediScript(version).usages()
         return self._build_goto(usages, results, 'goto_reference')
-    
+
     def _build_goto(self, goto_sources, results, kind):
         for item in goto_sources:
             if item.in_builtin_module():
@@ -270,16 +303,131 @@ class Operate(scope_.Source_interface):
                 path = str(item.module_path)
                 file_size = str(int(os.path.getsize(path)/1000)) + 'KB'
                 pos = '[' + str(item.line) + ', ' + str(item.column) + ']'
-                position = {'line': item.line, 'colum': item.column, 'path': path}
+                position = {'line': item.line,
+                            'colum': item.column, 'path': path}
 
             items = [{'name': '1', 'content': {'abbr': item.description}},
-                    {'name': '2', 'content': {'abbr': kind}},
-                    {'name': '3', 'content': {'abbr': pos}},
-                    {'name': '4', 'content': {'abbr': path}},
-                    {'name': '5', 'content': {'abbr': file_size}}]
+                     {'name': '2', 'content': {'abbr': kind}},
+                     {'name': '3', 'content': {'abbr': pos}},
+                     {'name': '4', 'content': {'abbr': path}},
+                     {'name': '5', 'content': {'abbr': file_size}}]
 
             temp = {'items': items,
                     'type': kind,
                     'position': position}
             results.append(temp)
         return results
+
+    def Diagnosis(self, version):
+        if has_pyflake and self._deamon_queue is not None:
+            self._diagnosis_queue.put(version)
+        return None
+
+    def _output_diagnosis(self):
+        reporter = PyflakesDiagnosticReport('')
+        while 1:
+            try:
+                version = self._diagnosis_queue.get()
+                return_ = {'ID': version['VersionID'],
+                           'Server_name': self._name}
+                return_['Event'] = 'diagnosis'
+                return_['DocumentID'] = version['DocumentVersionID']
+                reporter.SetContent(version['AllTextList'])
+                pyflakes_api.check(
+                    version['AllTextList'],
+                    version['FilePath'],
+                    reporter=reporter)
+                return_['Lists'] = reporter.GetDiagnosis()
+                self._deamon_queue.put(return_)
+            except Exception as e:
+                g_logger.exception('diagnosis of python_jedi')
+
+
+class PyflakesDiagnosticReport(object):
+
+    def __init__(self, _):
+        self.lines = ''
+        self.results_list = []
+
+    def GetDiagnosis(self):
+        return self.results_list
+
+    def SetContent(self, lines):
+        self.lines = lines
+        self.results_list = []
+
+    def unexpectedError(self, file_path, msg):  # pragma: no cover
+        position = {'line': 1, 'range': {
+            'start': {'line': 1, 'colum': 0},
+            'end': {'line': 1, 'colum': 0}}}
+        diagnosis = 'unexpected Error'
+        pos_string = '[1, 0]'
+        kind = 1
+        kind_name = 'unexpectedError'
+        temp = [{'name': '1', 'content': {'abbr': diagnosis}},
+                {'name': '2', 'content': {'abbr': kind_name}},
+                {'name': '3', 'content': {'abbr': file_path}},
+                {'name': '4', 'content': {'abbr': pos_string}}]
+        temp = {'items': temp,
+                'type': 'diagnosis',
+                'file_path': file_path,
+                'kind': kind,
+                'diagnosis': diagnosis,
+                'position': position}
+        self.results_list.append(temp)
+
+    def syntaxError(self, file_path, diagnosis, lineno, offset, text):
+        # We've seen that lineno and offset can sometimes be None
+        lineno = lineno or 1
+        offset = offset or 0
+
+        erro_line_nr = lineno - 1
+        position = {'line': erro_line_nr, 'range': {
+            'start': {'line': erro_line_nr, 'colum': offset},
+            'end': {'line': erro_line_nr, 'colum': offset + len(text)}}}
+        pos_string = '[' + str(erro_line_nr) + ', ' + str(offset)+']'
+        kind = 1
+        kind_name = 'syntaxError'
+        temp = [{'name': '1', 'content': {'abbr': diagnosis}},
+                {'name': '2', 'content': {'abbr': kind_name}},
+                {'name': '3', 'content': {'abbr': file_path}},
+                {'name': '4', 'content': {'abbr': pos_string}}]
+
+        temp = {'items': temp,
+                'type': 'diagnosis',
+                'file_path': file_path,
+                'kind': kind,
+                'diagnosis': diagnosis,
+                'position': position}
+        self.results_list.append(temp)
+
+    def flake(self, message):
+        """ Get message like <filename>:<lineno>: <msg> """
+        # 0-based
+        erro_line_nr = message.lineno
+        position = {'line': erro_line_nr, 'range': {
+            'start': {'line': erro_line_nr, 'colum': message.col},
+            'end': {'line': erro_line_nr, 'colum': len(self.lines[message.lineno - 1])}}}
+        pos_string = '[' + str(erro_line_nr) + ', ' + str(message.col)+']'
+
+        kind_name = 'syntaxWarning'
+        kind = 2
+        diagnosis = message.message % message.message_args
+        file_path = message.filename
+        for message_type in PYFLAKES_ERROR_MESSAGES:
+            if isinstance(message, message_type):
+                kind_name = 'syntaxError'
+                kind = 1
+                break
+        temp = [{'name': '1', 'content': {'abbr': diagnosis}},
+                {'name': '2', 'content': {'abbr': kind_name}},
+                {'name': '3', 'content': {'abbr': file_path}},
+                {'name': '4', 'content': {'abbr': pos_string}}]
+
+        temp = {'items': temp,
+                'type': 'diagnosis',
+                'file_path': file_path,
+                'kind': kind,
+                'diagnosis': diagnosis,
+                'position': position}
+        self.results_list.append(temp)
