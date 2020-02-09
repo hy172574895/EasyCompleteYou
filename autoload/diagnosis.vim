@@ -332,7 +332,7 @@ endfunction
 
 function! diagnosis#ShowSelecting() abort
 "{{{ show all
-  call leaderf_ECY#items_selecting#Start(g:ECY_sign_lists, 'diagnosis#Selecting_cb')
+  call utility#StartLeaderfSelecting(g:ECY_sign_lists, 'diagnosis#Selecting_cb')
 "}}}
 endfunction
 

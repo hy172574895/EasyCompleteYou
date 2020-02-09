@@ -53,7 +53,7 @@ function! goto#Go_cb(items) abort
   endif
   let s:goto_lists = a:items['Results']
   if len(s:goto_lists) > 1
-    call leaderf_ECY#items_selecting#Start(s:goto_lists, 'goto#Selecting_cb')
+    call utility#StartLeaderfSelecting(s:goto_lists, 'goto#Selecting_cb')
   elseif len(s:goto_lists) == 0
       call utility#ShowMsg(
             \"[ECY] Source return none at current position.", 2)
@@ -66,7 +66,7 @@ function! goto#Go_cb(items) abort
             \l:item['path'], 
             \'current buffer')
     else
-      call leaderf_ECY#items_selecting#Start(s:goto_lists, 'goto#Selecting_cb')
+      call utility#StartLeaderfSelecting(s:goto_lists, 'goto#Selecting_cb')
     endif
   endif
 "}}}

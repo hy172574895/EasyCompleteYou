@@ -24,5 +24,5 @@ function! symbols#Selecting_cb(line, event, index, nodes) abort
 endfunction
 
 function! symbols#ReturingResults_cb(items_2_show) abort
-  call leaderf_ECY#items_selecting#Start(a:items_2_show, 'symbols#Selecting_cb')
+  call utility#StartLeaderfSelecting(a:items_2_show, 'symbols#Selecting_cb')
 endfunction
