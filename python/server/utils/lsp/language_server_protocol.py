@@ -139,7 +139,7 @@ class LSP(conec.Operate):
                     },
                 "workspaceFolders": False,
                 "configuration": False
-                } # noqa
+                }  # noqa
         TextDocumentClientCapabilities = {
                 "synchronization": {
                     "dynamicRegistration": False,
@@ -235,7 +235,7 @@ class LSP(conec.Operate):
                         "rangeLimit": False,
                         "lineFoldingOnly": False
                         }
-                } # noqa
+                }  # noqa
         Capabilities = {'workspace': WorkspaceClientCapabilities,
                         'textDocument': TextDocumentClientCapabilities,
                         'experimental': None}
@@ -265,7 +265,7 @@ class LSP(conec.Operate):
         textDocument = {'uri': uri, 'languageId': languageId,
                         'text': text, 'version': version}
         params = {'textDocument': textDocument}
-        return self._build_request(params,'textDocument/didOpen', isNotification=True)
+        return self._build_request(params, 'textDocument/didOpen', isNotification=True)
 
     def didchange(self, uri, text, version=None, range_=None, rangLength=None):
         textDocument = {'version': version, 'uri': uri}
@@ -298,7 +298,7 @@ class LSP(conec.Operate):
         return temp
 
     def GetDiagnosticSeverity(self, kindNr):
-        # {{{ 
+        # {{{
         if KindNr == 1:
             return 'Error'
         if KindNr == 2:

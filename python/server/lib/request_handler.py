@@ -1,19 +1,18 @@
-# stdlib
 import os
 import sys
 import logging
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(BASE_DIR)
 global g_logger
 g_logger = logging.getLogger('ECY_server`')
 
 # local lib
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(BASE_DIR)
-import on_buffer
-import completion
-import completor_manager
-import integration
-import diagnosis
 import goto
+import diagnosis
+import integration
+import completor_manager
+import completion
+import on_buffer
 
 
 class EventHandler(object):
@@ -37,7 +36,6 @@ class EventHandler(object):
         file_type = version_dict['FileType']
         source_name = version_dict['SourceName']
 
-
         results_ = []
         # all the request must choose a source, when it's omit, we will give it
         # one
@@ -50,7 +48,8 @@ class EventHandler(object):
         # if the source's event will block for a while, the source can return
         # None, and then put the result into deamon_queue when it finished
         version_dict['DeamonQueue'] = self._pass_results_queue
-        object_ = self.source_manager.GetSourceObjByName(source_name, file_type)
+        object_ = self.source_manager.GetSourceObjByName(
+            source_name, file_type)
 
         # all the event must return something, if returning None
         # means returning nothing that do not need to send back to vim's side.
@@ -65,10 +64,9 @@ class EventHandler(object):
         elif event_ == 'integration':
             temp = self.integration.HandleIntegration(object_, version_dict)
         elif event_ == 'InstallSource':
-            temp = self.source_manager.InstallSource(version_dict['SourcePath'])
+            temp = self.source_manager.InstallSource(
+                version_dict['SourcePath'])
             results_.append(temp)
             temp = self.source_manager.GetAvailableSourceForFiletype(file_type)
         results_.append(temp)
         return results_
-
-

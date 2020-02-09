@@ -74,7 +74,7 @@ class Operate(object):
                 # name_temp = 'lib.sources.label.Label'
                 module_temp = importlib.import_module(name_temp)
                 obj_temp = module_temp.Operate()
-                module_temp = obj_temp.GetInfo() # return a dict
+                module_temp = obj_temp.GetInfo()  # return a dict
                 module_temp['Object'] = obj_temp
                 completor_name = module_temp['Name']
                 self.sources_info[completor_name] = module_temp
@@ -98,7 +98,7 @@ class Operate(object):
                     'Status': 0,
                     'Name': source_path,
                     'Description': 'Installation succeed.'}
-        except: # noqa
+        except:  # noqa
             # TODO
             return {'Event': 'install_source',
                     'Status': 1,
@@ -136,7 +136,7 @@ class Operate(object):
                 'FileType': file_type,
                 'Dicts': self.file_type_available_source[file_type]}
 
-    def SetSourceForFileType(self, file_type, source_name=None, is_next_or_pre='next'): # noqa
+    def SetSourceForFileType(self, file_type, source_name=None, is_next_or_pre='next'):  # noqa
         # init, firstly
         self.GetAvailableSourceForFiletype(file_type)
 

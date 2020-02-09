@@ -3,6 +3,7 @@
 
 import utils.fuzzy_match as fm
 
+
 class Operate(object):
     def __init__(self):
         self.symbols_cache_list = []
@@ -24,8 +25,8 @@ class Operate(object):
         if return_ is None:
             return_ = {'Results': 'ok',
                        'ErroCode': 3,
-                       'Event':'erro_code',
-                       'Description':'have no "' + event_ + '" event'}
+                       'Event': 'erro_code',
+                       'Description': 'have no "' + event_ + '" event'}
         else:
             return_['Event'] = 'integration'
             return_['Integration_event'] = event_

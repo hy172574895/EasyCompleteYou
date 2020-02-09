@@ -12,9 +12,10 @@ from leaderf.utils import *
 from leaderf.explorer import *
 from leaderf.manager import *
 
-#*****************************************************
+# *****************************************************
 # ECYDiagnosisExplorer
-#*****************************************************
+# *****************************************************
+
 
 class ECYDiagnosisExplorer(Explorer):
     def __init__(self):
@@ -43,7 +44,7 @@ class ECYDiagnosisExplorer(Explorer):
             temp = ""
             k = 0
             for line in item['items']:
-                abbr = line['content']['abbr'] 
+                abbr = line['content']['abbr']
                 name = line['name']
                 i = 0
                 to_be_add = ""
@@ -51,7 +52,7 @@ class ECYDiagnosisExplorer(Explorer):
                     to_be_add += " "
                     i += 1
                 abbr += to_be_add
-                abbr = abbr.replace('|','\\')
+                abbr = abbr.replace('|', '\\')
                 if k == 0:
                     abbr += "| "
                 temp += abbr
@@ -74,9 +75,9 @@ class ECYDiagnosisExplorer(Explorer):
         # result = lfEval("rooter#GetCurrentBufferWorkSpace()")
 
 
-#*****************************************************
+# *****************************************************
 # ECYDiagnosisManager
-#*****************************************************
+# *****************************************************
 class ECYDiagnosisManager(Manager):
     def __init__(self):
         super(ECYDiagnosisManager, self).__init__()
@@ -94,7 +95,7 @@ class ECYDiagnosisManager(Manager):
         if line_content is not None:
             line_content = line_content.replace("'", "\"")
         cmd = "call leaderf_ECY#items_selecting#LeaderF_cb('{0}','{1}','{2}','{3}','{4}')".\
-                format(line_content, event_name, index, modes, g_callback_name)
+            format(line_content, event_name, index, modes, g_callback_name)
         lfCmd(cmd)
 
     def _get_index(self, line):
@@ -148,17 +149,19 @@ class ECYDiagnosisManager(Manager):
     def _createHelp(self):
         help = []
         help.append('" <CR>/<double-click>/o : execute command under cursor')
-        help.append('" x : open file under cursor in a horizontally split window')
+        help.append(
+            '" x : open file under cursor in a horizontally split window')
         help.append('" v : open file under cursor in a vertically split window')
         help.append('" t : open file under cursor in a new tabpage')
         help.append('" i : switch to input mode')
         help.append('" p : preview the result')
         help.append('" q : quit')
         help.append('" <F1> : toggle this help')
-        help.append('" ---------------------------------------------------------')
+        help.append(
+            '" ---------------------------------------------------------')
         return help
 
-    #TODO: highlight for line.
+    # TODO: highlight for line.
     # def _afterEnter(self):
     #     super(ECYDiagnosisManager, self)._afterEnter()
     #     id = int(lfEval('''matchadd('Lf_hl_marksTitle', '^mark line .*$')'''))
@@ -192,10 +195,9 @@ class ECYDiagnosisManager(Manager):
             vim.options['eventignore'] = saved_eventignore
 
 
-
-#*****************************************************
+# *****************************************************
 # ECYDiagnosisManager is a singleton
-#*****************************************************
+# *****************************************************
 ECY_leaderf_selecting = ECYDiagnosisManager()
 
 __all__ = ['ECY_leaderf_selecting']

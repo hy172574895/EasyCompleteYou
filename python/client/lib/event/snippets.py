@@ -4,10 +4,11 @@
 import lib.scope as scope_
 import lib.vim_or_neovim_support as vim_lib
 
+
 class SnippetsEvent(scope_.Event):
     def __init__(self, source_name):
         scope_.Event.__init__(self, source_name)
-        
+
     def _pack(self, msg, event_name):
         msg = self._basic(msg)
         msg['Event'] = event_name

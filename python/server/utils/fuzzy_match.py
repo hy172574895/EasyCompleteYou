@@ -18,11 +18,11 @@ class FuzzyMatch(object):
         self._fully_match = fully_match
         self._matched_point = []
 
-    def FilterItems(self, sort_text, items, 
-                isfully_match=True, 
-                isreturn_match_point=False, 
-                isindent=False, 
-                max_len_2_show=15 ):
+    def FilterItems(self, sort_text, items,
+                    isfully_match=True,
+                    isreturn_match_point=False,
+                    isindent=False,
+                    max_len_2_show=15):
         """items formmat:
         [{'abbr':'xxxxyy','something_else':'will not affect',...},
         ...
@@ -34,7 +34,7 @@ class FuzzyMatch(object):
             if len(item['abbr']) >= sort_text_len:
                 goal = self.CalculateGoal(sort_text, item['abbr'])
                 if isreturn_match_point:
-                    # the self._matched_point will be changed when calling 
+                    # the self._matched_point will be changed when calling
                     # self.CalculateGoal
                     item['match_point'] = self._matched_point
                 i = len(vim_items) - 1
@@ -89,7 +89,6 @@ class FuzzyMatch(object):
             return lists
 
         return results_list
-
 
     def sub(self, string, position, replace_char):
         new = []

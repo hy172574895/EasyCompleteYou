@@ -3,16 +3,21 @@
 
 import lib.vim_or_neovim_support as vim_lib
 
+
 class Event(object):
     """
     """
+
     def __init__(self, source_name):
-        self._workspace              = None
-        self.source_name             = source_name
-        self._is_return_match_point  = vim_lib.GetVariableValue("g:ECY_use_floating_windows_to_be_popup_windows")
-        self._trigger_len            = vim_lib.GetVariableValue("g:ECY_triggering_length")
-        self.has_ultisnippet_support = vim_lib.GetVariableValue("g:has_ultisnips_support")
-        self._is_return_diagnosis    = vim_lib.GetVariableValue("g:ECY_update_diagnosis_mode")
+        self._workspace = None
+        self.source_name = source_name
+        self._is_return_match_point = vim_lib.GetVariableValue(
+            "g:ECY_use_floating_windows_to_be_popup_windows")
+        self._trigger_len = vim_lib.GetVariableValue("g:ECY_triggering_length")
+        self.has_ultisnippet_support = vim_lib.GetVariableValue(
+            "g:has_ultisnips_support")
+        self._is_return_diagnosis = vim_lib.GetVariableValue(
+            "g:ECY_update_diagnosis_mode")
 
     def GetCurrentWorkSpace(self):
         temp = vim_lib.CallEval("rooter#GetCurrentBufferWorkSpace()")
@@ -35,7 +40,8 @@ class Event(object):
 
     def InstallSource(self):
         msg = {}
-        msg['SourcePath'] = vim_lib.GetVariableValue('g:ecy_source_name_2_install')
+        msg['SourcePath'] = vim_lib.GetVariableValue(
+            'g:ecy_source_name_2_install')
         return self._pack(msg, 'InstallSource')
 
     def OnBufferEnter(self):
@@ -49,7 +55,8 @@ class Event(object):
 
     def Integration(self):
         msg = {}
-        msg['Integration_event'] = vim_lib.GetVariableValue('g:ECY_do_something_event')
+        msg['Integration_event'] = vim_lib.GetVariableValue(
+            'g:ECY_do_something_event')
         return self._pack(msg, 'integration')
 
     def GetAvailableSources(self):
@@ -69,7 +76,7 @@ class Event(object):
                 vim_lib.CallEval('UltiSnips#SnippetsInCurrentScope(1)')
                 results['UltisnipsSnippets'] = vim_lib.\
                     GetVariableValue('g:current_ulti_dict_info')
-            except: # noqa
+            except:  # noqa
                 results = {'HasSnippetSupport': False}
         return results
 
@@ -85,4 +92,3 @@ class Event(object):
         msg['SourceName'] = self.source_name
         msg['WorkSpace'] = self._workspace
         return msg
-

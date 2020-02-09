@@ -2,7 +2,7 @@
 # License: WTFPL
 
 from base64 import b64encode
-from socket import * # noqa
+from socket import *  # noqa
 import hmac
 import hashlib
 import queue
@@ -12,6 +12,7 @@ import logging
 
 global g_logger
 g_logger = logging.getLogger('ECY_client')
+
 
 class Socket_(object):
     def __init__(self, PORT, HMAC_KEY_str):
@@ -29,12 +30,12 @@ class Socket_(object):
         try:
             if self._isconnected:
                 return
-            self.tcpCliSock = socket() # noqa
+            self.tcpCliSock = socket()  # noqa
             self.tcpCliSock.connect(self.ADDR)
             self._HMAC_KEY = bytes(str(self._HMAC_KEY), encoding='utf-8')
             self._isconnected = True
             g_logger.debug("connect successfully")
-        except: # noqa
+        except:  # noqa
             self._isconnected = False
             raise
 
@@ -51,7 +52,7 @@ class Socket_(object):
         msg_bytes = bytes(msg_str, encoding='utf-8')
         # And for compatibility, we must specify 'digestmod'
         HMAC_abstract1 = hmac.new(
-                self._HMAC_KEY,msg_bytes,digestmod=hashlib.md5).digest()
+            self._HMAC_KEY, msg_bytes, digestmod=hashlib.md5).digest()
         HMAC_abstract1 = b64encode(HMAC_abstract1)
         HMAC_abstract1 = HMAC_abstract1.decode('utf-8')
         send_data = {'Method': 'receive_all_msg', 'Key': HMAC_abstract1,
@@ -68,7 +69,7 @@ class Socket_(object):
                     # todo abandom
                     continue
                 self.BuildMsg(todo)
-        except:# noqa
+        except:  # noqa
             pass
         finally:
             if self._isconnected:

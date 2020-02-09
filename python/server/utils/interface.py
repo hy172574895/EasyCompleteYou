@@ -8,7 +8,7 @@ class Source_interface(object):
 
     def _return(self, _id, is_slience=True, content='not implemented'):
         if is_slience:
-            # 'ErroCode' 1 means source did not impletment that method
+            # 'ErroCode' 1 means engine did not impletment that method
             # and don't show description to user
             erro_code = 1
         else:
@@ -38,13 +38,13 @@ class Source_interface(object):
 
     def GetSymbol(self, version):
         return self._return(version['VersionID'],
-                is_slience=False,
-                content='Current Engine Have No GetSymbol Ability.')
+                            is_slience=False,
+                            content='Current Engine Have No GetSymbol Ability.')
 
     def Goto(self, version):
-        return self._return(version['VersionID'], 
-                is_slience=False,
-                content='Current Engine Have No Goto Ability.')
+        return self._return(version['VersionID'],
+                            is_slience=False,
+                            content='Current Engine Have No Goto Ability.')
 
     def FindStart(self, text, reg):
         # {{{

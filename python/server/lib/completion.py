@@ -35,7 +35,7 @@ class Operate(object):
                 or self.completion_items['Server_name'] != source_info['Name']:
             # reflesh cache
             return_ = source_obj.DoCompletion(version)
-            if  return_ is None or 'ErroCode' in return_:
+            if return_ is None or 'ErroCode' in return_:
                 return return_
             self.completion_items = return_
             self.start_position[source_info['Name']] = current_start_postion
@@ -52,8 +52,8 @@ class Operate(object):
             else:
                 isIndent = False
             return_ = self.fuzzy_match.FilterItems(filter_words,
-                    all_list, isreturn_match_point=isIndent,
-                    isindent=isIndent)
+                                                   all_list, isreturn_match_point=isIndent,
+                                                   isindent=isIndent)
 
         addtional_data = None
         if 'AddtionalData' in self.completion_items.keys():

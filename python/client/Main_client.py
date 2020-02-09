@@ -3,29 +3,31 @@
 
 import random
 import threading
-import json
 import logging
 import sys
 import os
-from socket import * # noqa
+from socket import *  # noqa
 
 # local lib
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
-from lib import vim_or_neovim_support as vim_lib
-from lib import socket_
 from lib.event import *
+from lib import socket_
+from lib import vim_or_neovim_support as vim_lib
 
 g_is_debug = vim_lib.GetVariableValue('g:ECY_debug')
 if g_is_debug:
-    fileHandler = logging.FileHandler(BASE_DIR + "/ECY_client.log", mode="w", encoding="UTF-8")
-    formatter = logging.Formatter('%(asctime)s %(filename)s:%(lineno)d %(message)s')
+    fileHandler = logging.FileHandler(
+        BASE_DIR + "/ECY_client.log", mode="w", encoding="UTF-8")
+    formatter = logging.Formatter(
+        '%(asctime)s %(filename)s:%(lineno)d %(message)s')
     fileHandler.setFormatter(formatter)
 global g_logger
 g_logger = logging.getLogger('ECY_client')
 if g_is_debug:
     g_logger.addHandler(fileHandler)
     g_logger.setLevel(logging.DEBUG)
+
 
 class _do(object):
     def __init__(self):
@@ -50,8 +52,8 @@ class ECY_Client(_do):
     def __init__(self):
         _do.__init__(self)
         self._lock = threading.Lock()
-        self._completion_id = 0 
-        self._document_id = 0 
+        self._completion_id = 0
+        self._document_id = 0
         self._HMAC_KEY = -1
         self._port = -1
         self.isdebug = False
@@ -61,7 +63,8 @@ class ECY_Client(_do):
         self.is_using_stdio = True
 
     def Log(self):
-        g_logger.debug("From Vim: " + vim_lib.GetVariableValue('g:ECY_log_msg'))
+        g_logger.debug(
+            "From Vim: " + vim_lib.GetVariableValue('g:ECY_log_msg'))
         return 'ok'
 
     def StartDebugServer(self):
@@ -104,7 +107,7 @@ class ECY_Client(_do):
 
     def GetUnusedLocalhostPort(self):
         if self._port == -1:
-            sock = socket() # noqa
+            sock = socket()  # noqa
             # This tells the OS to give us any free port in the
             # range [1024 - 65535]
             sock.bind(('', 0))

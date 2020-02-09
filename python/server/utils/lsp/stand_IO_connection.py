@@ -52,7 +52,7 @@ class ThreadOfJob(object):
                     # get all of buffer, waitting for next response
                     self._content_size = -1
                 self._data = ""
-            except: # noqa
+            except:  # noqa
                 self._log.exception("something wrong with Start()")
                 # break
 
@@ -125,7 +125,7 @@ class Operate:
             self.server_info[self.server_count]['cmd'] = cmd
             self.server_info[self.server_count]['proc_object'] = self._p
             self.server_info[self.server_count]['thread_object'] = self._job
-        except: # noqa
+        except:  # noqa
             self._log.exception("something wrong with startjob.")
             return 0
         return 1
@@ -152,7 +152,7 @@ class Operate:
         try:
             # return None if server have not be terminated
             return self.server_info[self.server_count]['proc_object'].poll()
-        except: # noqa
+        except:  # noqa
             # -2 means unkonw erro
             self._log.exception("something wrong with GetServerStatus.")
             return -2

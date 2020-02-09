@@ -13,6 +13,7 @@ import logging
 global g_logger
 g_logger = logging.getLogger('ECY')
 
+
 class Server(object):
     def __init__(self, port, hmac_str, is_use_socket_to_get_msg=True):
         self._results_queue = queue.Queue()
@@ -33,7 +34,7 @@ class Server(object):
 
             self.thread = threading.Thread(target=self.SocketLoop)
             # with HMAC for socket
-            self._HMAC_KEY = bytes(str(hmac_str), encoding='utf-8') 
+            self._HMAC_KEY = bytes(str(hmac_str), encoding='utf-8')
             self.thread.daemon = True
 
     def GetResults(self):
@@ -41,11 +42,11 @@ class Server(object):
         return self._results_queue
 
     def SocketLoop(self):
-        g_logger.debug("using socket to input") 
+        g_logger.debug("using socket to input")
         while True:
             tcpCliSock, addr = self.tcpSerSock.accept()
             data_bytes = b''
-            g_logger.debug("server connect successfully.") 
+            g_logger.debug("server connect successfully.")
             # tcpCliSock.settimeout(5)
             try:
                 while True:
@@ -79,10 +80,11 @@ class Server(object):
             _msg_byte = bytes(str(data_dict['Msg']), encoding='utf-8')
             HMAC_abstract2 = bytes(data_dict['Key'], encoding='utf-8')
             HMAC_abstract2 = b64decode(HMAC_abstract2)
-            # we are using MD5, it's safe enough for us, because the key is 
+            # we are using MD5, it's safe enough for us, because the key is
             # too complicated.
             # And for compatibility, we must specify 'digestmod'
-            HMAC_abstract1 = hmac.new(self._HMAC_KEY, _msg_byte, digestmod=hashlib.md5).digest()
+            HMAC_abstract1 = hmac.new(
+                self._HMAC_KEY, _msg_byte, digestmod=hashlib.md5).digest()
             if hmac.compare_digest(HMAC_abstract1, HMAC_abstract2):
                 data_dict = {'Msg': data_dict['Msg']}
                 self._results_queue.put(data_dict)
