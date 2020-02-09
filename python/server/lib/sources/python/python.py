@@ -34,7 +34,7 @@ PYFLAKES_ERROR_MESSAGES = (
 )
 
 global g_logger
-g_logger = logging.getLogger('ECY_server`')
+g_logger = logging.getLogger('ECY_server')
 
 
 class Operate(scope_.Source_interface):
@@ -387,7 +387,7 @@ class PyflakesDiagnosticReport(object):
             'end': {'line': erro_line_nr, 'colum': offset + len(text)}}}
         pos_string = '[' + str(erro_line_nr) + ', ' + str(offset)+']'
         kind = 1
-        kind_name = 'syntaxError'
+        kind_name = 'syntaxError1'
         temp = [{'name': '1', 'content': {'abbr': diagnosis}},
                 {'name': '2', 'content': {'abbr': kind_name}},
                 {'name': '3', 'content': {'abbr': file_path}},
@@ -407,7 +407,9 @@ class PyflakesDiagnosticReport(object):
         erro_line_nr = message.lineno
         position = {'line': erro_line_nr, 'range': {
             'start': {'line': erro_line_nr, 'colum': message.col},
-            'end': {'line': erro_line_nr, 'colum': len(self.lines[message.lineno - 1])}}}
+            'end': {
+                'line': erro_line_nr,
+                'colum': message.col}}}
         pos_string = '[' + str(erro_line_nr) + ', ' + str(message.col)+']'
 
         kind_name = 'syntaxWarning'
@@ -416,7 +418,7 @@ class PyflakesDiagnosticReport(object):
         file_path = message.filename
         for message_type in PYFLAKES_ERROR_MESSAGES:
             if isinstance(message, message_type):
-                kind_name = 'syntaxError'
+                kind_name = 'syntaxError2'
                 kind = 1
                 break
         temp = [{'name': '1', 'content': {'abbr': diagnosis}},
