@@ -153,7 +153,7 @@ function! s:ShowDiagnosis(index_list) abort
       let l:colum = string(item['position']['range']['start']['colum'])
       let l:index = string(item['index'])
       let l:lists_len = string(len(g:ECY_sign_lists))
-      let l:nr = "(" . l:index . ', ' . l:lists_len . ')'
+      let l:nr = "(" . l:index . '/' . l:lists_len . ')'
       call add(l:text, item['kind'] . ' [' .l:line . ', ' . l:colum . '] ' . l:nr)
       call add(l:text, '(' . item['diagnosis'] . ')')
     endfor
