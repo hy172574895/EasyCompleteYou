@@ -2,6 +2,9 @@
 # License: WTFPL
 
 import re
+import logging
+global g_logger
+g_logger = logging.getLogger('ECY_server`')
 # local lib
 import utils.fuzzy_match as fm
 
@@ -10,6 +13,7 @@ class Operate(object):
     def __init__(self):
         self.fuzzy_match = fm.FuzzyMatch()
         self.start_position = {}
+        self.buffer_cache = {}
         self.completion_items = {'Server_name': 'nothing', 'Lists': []}
 
     def DoCompletion(self, source_obj, version):
@@ -39,6 +43,7 @@ class Operate(object):
                 return return_
             self.completion_items = return_
             self.start_position[source_info['Name']] = current_start_postion
+            self._update_buffer_cache(version)
 
         # filter the items with keywords
         all_list = self.completion_items['Lists']
@@ -52,8 +57,19 @@ class Operate(object):
             else:
                 isIndent = False
             return_ = self.fuzzy_match.FilterItems(filter_words,
-                                                   all_list, isreturn_match_point=isIndent,
+                                                   all_list,
+                                                   isreturn_match_point=isIndent,
                                                    isindent=isIndent)
+            if return_ == []:
+                all_text = ''
+                for key, content in self.buffer_cache.items():
+                    all_text += content
+                all_text = self._return_label(all_text)
+                g_logger.debug('using _return_label')
+                return_ = self.fuzzy_match.FilterItems(filter_words,
+                                                       all_text,
+                                                       isreturn_match_point=isIndent,
+                                                       isindent=isIndent)
 
         addtional_data = None
         if 'AddtionalData' in self.completion_items.keys():
@@ -90,3 +106,31 @@ class Operate(object):
                 last_key = text[0]
         return start_position, match_words, last_key
 # }}}
+
+    def _return_label(self, all_text_list, reg=r'[\w\-]+'):
+        items_list = list(set(re.findall(reg, all_text_list)))
+        results_list = []
+        for item in items_list:
+            # the results_format must at least contain the following keys.
+            results_format = {'abbr': '', 'word': '', 'kind': '',
+                    'menu': '', 'info': '','user_data':''}
+            results_format['abbr'] = item
+            results_format['word'] = item
+            results_format['kind'] = '[Buffer]'
+            results_list.append(results_format)
+        return results_list
+
+    def _update_buffer_cache(self, version):
+        file_path = version['FilePath']
+        buffer_size = 0
+        if file_path == '':
+            file_path = 'nothing'
+        for key, text in self.buffer_cache.items():
+            buffer_size += len(text)
+        items_list = version['AllTextList']
+        if file_path in self.buffer_cache:
+            self.buffer_cache[file_path] = items_list
+        else:
+            if buffer_size < 100000:
+                items_list = version['AllTextList']
+                self.buffer_cache[file_path] = items_list

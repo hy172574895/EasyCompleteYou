@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import logging
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
@@ -54,7 +55,7 @@ class EventHandler(object):
         # all the event must return something, if returning None
         # means returning nothing that do not need to send back to vim's side.
         if event_ == 'DoCompletion':
-            temp = self.completion.DoCompletion(object_, version_dict)
+            temp = self.completion.DoCompletion(object_,version_dict)
         elif event_ == 'OnBufferEnter':
             temp = self.on_buffer.OnBufferEnter(object_, version_dict)
         elif event_ == 'Diagnosis':
