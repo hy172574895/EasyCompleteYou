@@ -3,11 +3,7 @@
  
 function diagnosis#Init() abort
 "{{{ var init
-  hi ECY_diagnosis_erro  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
-  hi ECY_diagnosis_warn  guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
   hi ECY_diagnosis_highlight  term=undercurl gui=undercurl guisp=DarkRed cterm=underline
-  let g:ECY_diagnosis_erro      = get(g:,'ECY_diagnosis_erro', 'ECY_diagnosis_erro')
-  let g:ECY_diagnosis_warn      = get(g:,'ECY_diagnosis_warn', 'ECY_diagnosis_warn')
   let g:ECY_diagnosis_highlight = get(g:,'ECY_diagnosis_highlight','ECY_diagnosis_highlight')
 
   hi ECY_erro_sign_highlight  guifg=red	    ctermfg=red	
@@ -176,9 +172,9 @@ function! s:ShowDiagnosis(index_list) abort
           \ 'padding': [0,1,0,1],
           \ 'zindex': 2000}
       let l:nr = popup_atcursor(l:text, l:opts)
-      call setbufvar(winbufnr(l:nr), '&filetype', &filetype)
-      let l:exe = "call prop_add(1, 1, {'length': 100,'type': 'ECY_diagnosis_text'})"
-      call win_execute(l:nr, l:exe)
+      call setbufvar(winbufnr(l:nr), '&syntax', 'ECY_d')
+      " let l:exe = "call prop_add(1, 1, {'length': 100,'type': 'ECY_diagnosis_text'})"
+      " call win_execute(l:nr, l:exe)
       let s:current_diagnosis_nr = l:nr
     endif
   endif
