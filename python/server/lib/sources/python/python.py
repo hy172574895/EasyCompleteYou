@@ -188,7 +188,12 @@ class Operate(scope_.Source_interface):
             return_['Lists'] = self._return_label(version['AllTextList'])
             return return_
 
-        temp = self._GetJediScript(version).completions()
+        try:
+            # sometimes, jedi will fail, so we try.
+            temp = self._GetJediScript(version).completions()
+        except Exception as e:
+            g_logger.exception("jedi bug:")
+            temp = []
         if len(temp) == 0:
             return_['Lists'] = self._return_label(version['AllTextList'])
             return return_
