@@ -13,10 +13,9 @@ class Operate(object):
     def __init__(self):
         self.fuzzy_match = fm.FuzzyMatch()
         self.start_position = {}
-        self.buffer_cache = {}
         self.completion_items = {'Server_name': 'nothing', 'Lists': []}
 
-    def DoCompletion(self, source_obj, version):
+    def DoCompletion(self, source_obj, version, buffer_cache):
         # we get regex from instance
         source_info = source_obj.GetInfo()
 
@@ -43,7 +42,6 @@ class Operate(object):
                 return return_
             self.completion_items = return_
             self.start_position[source_info['Name']] = current_start_postion
-            self._update_buffer_cache(version)
 
         # filter the items with keywords
         all_list = self.completion_items['Lists']
@@ -62,7 +60,7 @@ class Operate(object):
                                                    isindent=isIndent)
             if return_ == []:
                 all_text = ''
-                for key, content in self.buffer_cache.items():
+                for key, content in buffer_cache.items():
                     all_text += content
                 all_text = self._return_label(all_text)
                 g_logger.debug('using _return_label')
@@ -120,17 +118,3 @@ class Operate(object):
             results_list.append(results_format)
         return results_list
 
-    def _update_buffer_cache(self, version):
-        file_path = version['FilePath']
-        buffer_size = 0
-        if file_path == '':
-            file_path = 'nothing'
-        for key, text in self.buffer_cache.items():
-            buffer_size += len(text)
-        items_list = version['AllTextList']
-        if file_path in self.buffer_cache:
-            self.buffer_cache[file_path] = items_list
-        else:
-            if buffer_size < 100000:
-                items_list = version['AllTextList']
-                self.buffer_cache[file_path] = items_list
