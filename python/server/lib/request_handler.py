@@ -1,11 +1,10 @@
 import os
 import sys
-import re
 import logging
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
 global g_logger
-g_logger = logging.getLogger('ECY_server`')
+g_logger = logging.getLogger('ECY_server')
 
 # local lib
 import goto
@@ -27,7 +26,7 @@ class EventHandler(object):
             self.integration = integration.Operate()
             self.diagnosis = diagnosis.Operate()
             self.goto = goto.Operate()
-        except Exception as e:
+        except:
             g_logger.exception("")
             raise
 

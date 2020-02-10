@@ -48,7 +48,7 @@ if g_args.debug_log:
         '%(asctime)s %(filename)s:%(lineno)d %(message)s')
     fileHandler.setFormatter(formatter)
 global g_logger
-g_logger = logging.getLogger('ECY_server`')
+g_logger = logging.getLogger('ECY_server')
 if g_args.debug_log:
     g_logger.addHandler(fileHandler)
     g_logger.setLevel(logging.DEBUG)
@@ -78,7 +78,7 @@ class Handler(object):
                 for item in todo_dict:
                     if item is not None:
                         self._pass_results_queue.put(item)
-            except Exception as erro:
+            except:
                 g_logger.exception("something wrong")
                 # self._pass_results_queue.put({'Event': 'erro', 'Erro': erro})
 
@@ -94,7 +94,7 @@ class Handler(object):
                 if self._is_output_socket:
                     # TODO
                     pass
-        except Exception as erro:
+        except:
             g_logger.exception("something wrong")
 
     def StdioOutput(self, sending_data_bytes):

@@ -6,15 +6,17 @@ import re
 import queue
 import threading
 import logging
+global g_logger
+g_logger = logging.getLogger('ECY_server')
 try:
     import jedi
     has_jedi = True
-except Exception as e:
+except:
     has_jedi = False
 try:
     from pyflakes import api as pyflakes_api, messages
     has_pyflake = True
-except Exception as e:
+except:
     has_pyflake = False
 
 import utils.interface as scope_
@@ -34,8 +36,6 @@ if has_pyflake:
         messages.TwoStarredExpressions,
     )
 
-global g_logger
-g_logger = logging.getLogger('ECY_server')
 
 
 class Operate(scope_.Source_interface):
@@ -50,6 +50,7 @@ class Operate(scope_.Source_interface):
         # revert to 0.9 of jedi can also fix this
         self._name = 'python_jedi'
         self._deamon_queue = None
+        g_logger.debug('python_jedi has pyflakes:' + str(has_pyflake))
         if has_pyflake:
             self._diagnosis_queue = queue.Queue(maxsize=10)
             threading.Thread(target=self._output_diagnosis,
@@ -191,7 +192,7 @@ class Operate(scope_.Source_interface):
         try:
             # sometimes, jedi will fail, so we try.
             temp = self._GetJediScript(version).completions()
-        except Exception as e:
+        except:
             g_logger.exception("jedi bug:")
             temp = []
         if len(temp) == 0:
@@ -236,7 +237,7 @@ class Operate(scope_.Source_interface):
             definitions = jedi.api.names(source=version['AllTextList'],
                                          all_scopes=True, definitions=True,
                                          references=False, path=version['FilePath'])
-        except Exception as e:
+        except:
             definitions = []
         lists = []
         for item in definitions:
@@ -279,7 +280,7 @@ class Operate(scope_.Source_interface):
                         version, result_lists)
                 if item == 'references':
                     result_lists = self._goto_reference(version, result_lists)
-            except Exception as e:
+            except:
                 # will return []
                 pass
         return_['Results'] = result_lists
@@ -345,7 +346,7 @@ class Operate(scope_.Source_interface):
                     reporter=reporter)
                 return_['Lists'] = reporter.GetDiagnosis()
                 self._deamon_queue.put(return_)
-            except Exception as e:
+            except:
                 g_logger.exception('diagnosis of python_jedi')
 
 

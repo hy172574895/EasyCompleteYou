@@ -5,7 +5,7 @@
 import re
 import logging
 global g_logger
-g_logger = logging.getLogger('ECY_server`')
+g_logger = logging.getLogger('ECY_server')
 
 # for htmlhint
 import subprocess
@@ -79,7 +79,7 @@ class Operate(scope_.Source_interface):
                     initializationOptions=None, rootUri=None)
                 self._lsp.GetResponse(init_msg['Method'])
                 self.is_server_start = 'started'
-        except Exception as e:
+        except:
             g_logger.exception(self._starting_server_cmd)
             self.is_server_start = 'failed to start'
             if self._deamon_queue is not None:
@@ -232,7 +232,7 @@ class Operate(scope_.Source_interface):
             return_ = {'ID': version['VersionID'], 'Server_name': self._name}
             return_['Event'] = 'diagnosis'
             return_['DocumentID'] = version['DocumentVersionID']
-            workspace = version['WorkSpace']
+            # workspace = version['WorkSpace']
             # if workspace is not None:
             #     cmd += '--config ' + workspace + '/.htmlhintrc'
             diagnosis_lists = self._diagnosis.GetDiagnosis(
@@ -274,7 +274,7 @@ class HtmlHint:
             process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
             temp = process.stdout.read()
             process.terminate()
-        except Exception as e:
+        except:
             g_logger.exception("something wrong")
             temp = None
         return temp
@@ -290,7 +290,7 @@ class HtmlHint:
             results = results.split(b'\n')
             results = results[0].decode("UTF-8")
             results = json.loads(results)
-        except Exception as e:
+        except:
             # user may have no htmlhint
             g_logger.exception("can not call htmlhint.")
             self.is_available = 2

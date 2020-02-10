@@ -4,7 +4,7 @@
 import re
 import logging
 global g_logger
-g_logger = logging.getLogger('ECY_server`')
+g_logger = logging.getLogger('ECY_server')
 # local lib
 import utils.fuzzy_match as fm
 

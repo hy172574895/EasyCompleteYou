@@ -6,7 +6,7 @@ import os
 import configparser
 import logging
 global g_logger
-g_logger = logging.getLogger('ECY_server`')
+g_logger = logging.getLogger('ECY_server')
 
 
 class MyConf(configparser.ConfigParser):
