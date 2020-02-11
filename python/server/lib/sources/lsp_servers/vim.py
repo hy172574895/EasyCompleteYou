@@ -1,6 +1,11 @@
 # Author: Jimmy Huang (1902161621@qq.com)
 # License: WTFPL
 
+import logging
+import threading
+global g_logger
+g_logger = logging.getLogger('ECY_server')
+
 import utils.interface as scope_
 import utils.lsp.language_server_protocol as lsp
 
@@ -10,43 +15,73 @@ class Operate(scope_.Source_interface):
         self._name = 'vim_lsp'
         self._did_open_list = {}
         self._lsp = lsp.LSP()
-        self.is_server_start = 0
+        self.is_server_start = 'not_started'
+        self.DocumentVersionID = -1
         self._deamon_queue = None
 
     def GetInfo(self):
         return {'Name': self._name, 'WhiteList': ['vim'],
                 'Regex': r'[\w\#\&\:]',
-                'TriggerKey': ['.', '[', '$', '<', '"', "'"]}
+                'TriggerKey': ['.', ':', '#', '[', '&', '$', '<', '"', "'"]}
 
-    def _erro_handler(self):
-        self._start_server()
-        if self.is_server_start == 2:
+    def _check(self, version):
+        self._deamon_queue = version['DeamonQueue']
+        self._start_server(version['StartingCMD'],
+                version['Vimruntime'], version['Runtimepath'])
+        if self.is_server_start == 'started':
             return True
         return False
 
-    def _start_server(self):
+    def _start_server(self, starting_cmd, vimruntime="", runtimepath=""):
         try:
-            if self.is_server_start == 0:
-                self._lsp.StartJob('node C:/Users/qwe/AppData/Local/coc/extensions/node_modules/coc-vimlsp/node_modules/vim-language-server/bin --stdio')
-                init_opts = {'vimruntime':'D:/gvim/vim81','runtimepath':'C:/Users/qwe/vimfiles,D:/gvim/vimfiles/MyPlugins/vim-fugitive,D:/gvim/vimfiles/MyPlugins/vim-plug,D:/gvim/vimfiles/MyPlugins/LeaderF,D:/gvim/vimfiles/MyPlugins/Tabsmanager,D:/gvim/vimfiles/MyPlugins/vim-indent-guides,D:/gvim/vimfiles/MyPlugins/emmet-vim,D:/gvim/vimfiles/MyPlugins/vim-easymotion,D:/gvim/vimfiles/MyPlugins/vim-surround,D:/gvim/vimfiles/MyPlugins/nerdtree,D:/gvim/vimfiles/MyPlugins/popup,D:/gvim/vimfiles/MyPlugins/vim-mark,D:/gvim/vimfiles/MyPlugins/vim-ingo-library,D:/gvim/vimfiles/MyPlugins/vim-startify,D:/gvim/vimfiles/MyPlugins/vim-airline,D:/gvim/vimfiles/MyPlugins/vim-easy-align,D:/gvim/vimfiles/MyPlugins/vim-commentary,D:/gvim/vimfiles/MyPlugins/rainbow,D:/gvim/vimfiles/MyPlugins/winresizer.vim,D:/gvim/vimfiles/MyPlugins/is.vim,D:/gvim/vimfiles/MyPlugins/vim-repeat,D:/gvim/vimfiles/MyPlugins/CompleteParameter.vim,D:/gvim/vimfiles/MyPlugins/vim-bookmarks,D:/gvim/vimfiles/MyPlugins/delimitMate,D:/gvim/vimfiles/MyPlugins/GoSymbol,D:/gvim/vimfiles/MyPlugins/vim-edgemotion,D:/gvim/vimfiles/MyPlugins/ultisnips,D:/gvim/vimfiles/MyPlugins/vim-snippets,D:/gvim/vimfiles/MyPlugins/ctrlp.vim,D:/gvim/vimfiles/MyPlugins/html5.vim,D:/gvim/vimfiles/MyPlugins/vim-autoformat,D:/gvim/vimfiles/MyPlugins/LeaderF-marks,D:/gvim/vimfiles/MyPlugins/targets.vim,D:/gvim/vimfiles,D:/gvim/vim81,D:/gvim/vim81/pack/dist/opt/matchit,D:/gvim/vimfiles/after,D:/gvim/vimfiles/MyPlugins/CompleteParameter.vim/after,D:/gvim/vimfiles/MyPlugins/ultisnips/after,D:/gvim/vimfiles/MyPlugins/html5.vim/after,D:/gvim/vimfiles/MyPlugins/LeaderF-marks/after,C:/Users/qwe/vimfiles/after', 'diagnostic':{'enable':True},'indexes':{'runtimepath':True,'gap':100,'count':3}, 'filetypes':['vim'],'suggest':{'fromVimruntime':True,'fromRuntimepath':True}}
+            if self.is_server_start == 'not_started':
+                # such as : node C:/Windows/SysWOW64/node_modules/vim-language-server/bin/index.js --stdio
+                starting_cmd = "node C:/Windows/SysWOW64/node_modules/vim-language-server/bin/index.js --stdio"
+                self._lsp.StartJob(starting_cmd)
+                init_opts = {
+                    "iskeyword": "@,48-57,_,192-255,-#",
+                    "vimruntime": vimruntime,
+                    "runtimepath": runtimepath,
+                    "diagnostic": {
+                        "enable": True
+                    },
+                    "indexes": {
+                        "runtimepath": True,
+                        "gap": 100,
+                        "count": 3,
+                        "projectRootPatterns": ["strange-root-pattern",
+                                                ".git",
+                                                "autoload",
+                                                "plugin"]
+                    },
+                    "suggest": {
+                        "fromVimruntime": True,
+                        "fromRuntimepath": True
+                    }
+                }
+                g_logger.debug(init_opts)
                 temp = self._lsp.initialize(
                     initializationOptions=init_opts)
+                # if time out will raise, meanning can not start a job.
                 self._lsp.GetResponse(temp['Method'])
-                self.is_server_start = 1
+                self.is_server_start = 'started'
+                threading.Thread(target=self._get_diagnosis, daemon=True).start()
         except: # noqa
-            self.is_server_start = 2
+            self.is_server_start = 'started_error'
+            g_logger.exception('vim_lsp: can not start Sever.' )
 
-    def _did_open_or_change(self, uri, text):
+    def _did_open_or_change(self, uri, text, DocumentVersionID):
         # {{{
         # LSP require the edit-version
         if uri not in self._did_open_list:
-            return_id = self._lsp.didopen(uri, 'viml', text, version=0)
+            return_id = self._lsp.didopen(uri, 'vim', text, version=0)
             self._did_open_list[uri] = {}
             self._did_open_list[uri]['change_version'] = 0
         else:
             self._did_open_list[uri]['change_version'] += 1
             return_id = self._lsp.didchange(
                 uri, text, version=self._did_open_list[uri]['change_version'])
+        self.DocumentVersionID = DocumentVersionID
         return return_id
         # }}}
 
@@ -61,40 +96,36 @@ class Operate(scope_.Source_interface):
                 if self.return_data['id'] == version_id:
                     break
             except: # noqa
-                self._log.exception("a timeout queue.")
                 return None
         return self.return_data
         # }}}
 
     def OnBufferEnter(self, version):
-        self._deamon_queue = version['DeamonQueue']
-        if not self._erro_handler():
-            uri_ = self._lsp.PathToUri(version['FileType'])
-            line_text = version['AllTextList']
-            self._did_open_or_change(uri_, line_text)
-        # return self._erro_handler()
+        self.Diagnosis(version)
         return None
 
-    def OnInstall(self, version):
-        pass
-
     def DoCompletion(self, version):
+        if not self._check(version):
+            return None
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
-        uri_ = self._lsp.PathToUri(version['FileType'])
+        uri_ = self._lsp.PathToUri(version['FilePath'])
         line_text = version['AllTextList']
         current_start_postion = \
             {'line': version['StartPosition']['Line'],
              'character': version['StartPosition']['Colum']}
-        self._did_open_or_change(uri_, line_text)
+        self._did_open_or_change(uri_, line_text, version['DocumentVersionID'])
         temp = self._lsp.completion(uri_, current_start_postion)
 
         # we can set this raising a erro when it is timeout.
         _return_data = self._waitting_for_response(temp['Method'], temp['ID'])
 
-        try:
-            items_list = _return_data['result']['items']
-        except:
+        if _return_data is None:
             items_list = []
+        else:
+            if _return_data['result'] is None:
+                items_list = []
+            else:
+                items_list = _return_data['result']
 
         results_list = []
         if items_list == []:
@@ -110,10 +141,78 @@ class Operate(scope_.Source_interface):
         else:
             for item in items_list:
                 results_format = {'abbr': '', 'word': '', 'kind': '',
-                                  'menu': '', 'info': '', 'user_data':''}
+                                  'menu': '', 'info': [], 'user_data':''}
                 results_format['abbr'] = item['label']
                 results_format['word'] = item['label']
                 results_format['kind'] = self._lsp.GetKindNameByNumber(item['kind'])
+                if 'detail' in item:
+                    results_format['menu'] = item['detail']
+                try:
+                    if item['insertTextFormat'] == 2:
+                        results_format['snippet'] = item['insertText']
+                        results_format['kind'] += '~'
+                except:
+                    pass
                 results_list.append(results_format)
         return_['Lists'] = results_list
         return return_
+
+    def Diagnosis(self, version):
+        if self._check(version):
+            uri_ = self._lsp.PathToUri(version['FilePath'])
+            line_text = version['AllTextList']
+            self._did_open_or_change(uri_, line_text, version['DocumentVersionID'])
+        return None
+
+    def _get_diagnosis(self):
+        return_ = {'Event': 'diagnosis'}
+        while 1:
+            try:
+                # we alwayes Get Response after we didchange/didopen textDocument,
+                # so(maybe) this safe Thread.
+                temp = self._lsp.GetResponse('textDocument/publishDiagnostics',
+                        timeout_=-1)
+                if self._deamon_queue is not None:
+                    temp = self._diagnosis_analysis(temp['params'])
+                    return_['DocumentID'] = self.DocumentVersionID
+                    return_['Lists'] = temp
+                    self._deamon_queue.put(return_)
+                    g_logger.debug(return_)
+            except:
+                g_logger.exception('')
+
+    def _diagnosis_analysis(self, params):
+        results_list = []
+        g_logger.debug(params)
+        file_path = self._lsp.UriToPath(params['uri'])
+        if file_path == '':
+            return results_list
+        for item in params['diagnostics']:
+            ranges = item['range']
+            start_line = ranges['start']['line'] + 1
+            start_colum = ranges['start']['character']
+            end_line = ranges['end']['line'] + 1
+            end_colum = ranges['end']['character']
+            pos_string = '[' + str(start_line) + ', ' + str(start_colum)+']'
+            position = {'line': start_line, 'range': {
+                'start': {'line': start_line, 'colum': start_colum},
+                'end': {'line': end_line, 'colum': end_colum}}}
+            diagnosis = item['message']
+            if item['severity'] == 1:
+                kind = 1
+            else:
+                kind = 2
+            kind_name = self._lsp.GetDiagnosticSeverity(item['severity'])
+            temp = [{'name': '1', 'content': {'abbr': diagnosis}},
+                    {'name': '2', 'content': {'abbr': kind_name}},
+                    {'name': '3', 'content': {'abbr': file_path}},
+                    {'name': '4', 'content': {'abbr': pos_string}}]
+            temp = {'items': temp,
+                    'type': 'diagnosis',
+                    'file_path': file_path,
+                    'kind': kind,
+                    'diagnosis': diagnosis,
+                    'position': position}
+            results_list.append(temp)
+        return results_list
+

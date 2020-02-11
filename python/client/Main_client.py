@@ -34,8 +34,10 @@ class _do(object):
         import lib.event.genernal as genernal
         import lib.event.html_lsp as html_lsp
         import lib.event.snippets as snippets
+        import lib.event.vim      as vim_lsp
         self.event_obj = {'genernal': genernal.GenernalEvent('genernal'),
                           'html_lsp': html_lsp.HtmlLSPEvent('html_lsp'),
+                          'vim_lsp': vim_lsp.VimEvent('vim_lsp'),
                           'snippets': snippets.SnippetsEvent('snippets')}
 
     def GetCurrentSource(self):
