@@ -39,7 +39,7 @@
 #### 途径 1:
 使用插件管理插件 例如：Plug-vim or Vunble:  
 把下面一代代码插入，然后安装即可.  
-> hy172574895/EasyCompleteYou
+> Plug 'https://gitee.com/Jimmy_Huang/EasyCompleteYou'
 
 #### 途径 2:  
 下载整个工程，然后让vim能索引到ECY，即把ECY的工程目录放进vim的 `runtimepath`.  
