@@ -8,6 +8,7 @@ import threading
 import logging
 global g_logger
 g_logger = logging.getLogger('ECY_server')
+
 try:
     import jedi
     has_jedi = True

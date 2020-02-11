@@ -312,7 +312,6 @@ class HtmlHint:
                 else:
                     # warn
                     kind = 2
-                kind 
                 temp = [{'name': '1', 'content': {'abbr': diagnosis}},
                         {'name': '2', 'content': {'abbr': msg['type']}},
                         {'name': '3', 'content': {'abbr': file_path}},
