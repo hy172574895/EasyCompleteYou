@@ -2,7 +2,8 @@
 # License: WTFPL
 
 import json
-from pathlib import Path
+from urllib.parse import urljoin
+from urllib.request import pathname2url
 import threading
 import queue
 
@@ -49,7 +50,7 @@ class LSP(conec.Operate):
     def GetResponse(self, _method_name, timeout_=5):
         if _method_name not in self._queue_dict:
             # new
-            self._queue_dict[_method_name] = queue.Queue()
+            self._queue_dict[_method_name] = queue.Queue(maxsize=10)
         if timeout_ == -1:
             return self._queue_dict[_method_name].get()
         else:
@@ -294,8 +295,7 @@ class LSP(conec.Operate):
         return self._build_request(params, 'textDocument/completion')
 
     def PathToUri(self, file_path):
-        temp = Path(file_path).as_uri()
-        return temp
+        return urljoin('file:', pathname2url(file_path))
 
     def GetDiagnosticSeverity(self, kindNr):
         # {{{
@@ -374,7 +374,3 @@ class LSP(conec.Operate):
         if KindNr == 25:
             return 'TypeParameter'
         return 'Unkonw'  # }}}
-
-    def Hover(self, file_path):
-        temp = Path(file_path).as_uri()
-        return temp
