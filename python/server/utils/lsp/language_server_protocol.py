@@ -2,10 +2,14 @@
 # License: WTFPL
 
 import json
-from urllib.parse import urljoin
-from urllib.request import pathname2url
+import sys
 import threading
 import queue
+import pathlib
+from urllib.parse import urljoin
+from urllib.request import pathname2url
+from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 # local lib
 import utils.lsp.stand_IO_connection as conec
@@ -297,80 +301,92 @@ class LSP(conec.Operate):
     def PathToUri(self, file_path):
         return urljoin('file:', pathname2url(file_path))
 
+    def UriToPath(self, uri):
+        return url2pathname(urlparse(uri).path)
+
     def GetDiagnosticSeverity(self, kindNr):
         # {{{
-        if KindNr == 1:
+        if kindNr == 1:
             return 'Error'
-        if KindNr == 2:
+        if kindNr == 2:
             return 'Warning'
-        if KindNr == 3:
+        if kindNr == 3:
             return 'Information'
-        if KindNr == 4:
+        if kindNr == 4:
             return 'Hint'
         # }}}
 
     def GetMessageType(self, kindNr):
         # {{{
-        if KindNr == 1:
+        if kindNr == 1:
             return 'Error'
-        if KindNr == 2:
+        if kindNr == 2:
             return 'Warning'
-        if KindNr == 3:
+        if kindNr == 3:
             return 'Info'
-        if KindNr == 4:
+        if kindNr == 4:
             return 'Log'
 # }}}
 
-    def GetKindNameByNumber(self, KindNr):
+    def GetKindNameByNumber(self, kindNr):
         # {{{
-        if KindNr == 1:
+        if kindNr == 1:
             return 'Text'
-        if KindNr == 2:
+        if kindNr == 2:
             return 'Method'
-        if KindNr == 3:
+        if kindNr == 3:
             return 'Function'
-        if KindNr == 4:
+        if kindNr == 4:
             return 'Constructor'
-        if KindNr == 5:
+        if kindNr == 5:
             return 'Field'
-        if KindNr == 6:
+        if kindNr == 6:
             return 'Variable'
-        if KindNr == 7:
+        if kindNr == 7:
             return 'Class'
-        if KindNr == 8:
+        if kindNr == 8:
             return 'Interface'
-        if KindNr == 9:
+        if kindNr == 9:
             return 'Module'
-        if KindNr == 10:
+        if kindNr == 10:
             return 'Property'
-        if KindNr == 11:
+        if kindNr == 11:
             return 'Unit'
-        if KindNr == 12:
+        if kindNr == 12:
             return 'Value'
-        if KindNr == 13:
+        if kindNr == 13:
             return 'Enum'
-        if KindNr == 14:
+        if kindNr == 14:
             return 'Keyword'
-        if KindNr == 15:
+        if kindNr == 15:
             return 'Snippet'
-        if KindNr == 16:
+        if kindNr == 16:
             return 'Color'
-        if KindNr == 17:
+        if kindNr == 17:
             return 'File'
-        if KindNr == 18:
+        if kindNr == 18:
             return 'Reference'
-        if KindNr == 19:
+        if kindNr == 19:
             return 'Folder'
-        if KindNr == 20:
+        if kindNr == 20:
             return 'EnumMember'
-        if KindNr == 21:
+        if kindNr == 21:
             return 'Constant'
-        if KindNr == 22:
+        if kindNr == 22:
             return 'Struct'
-        if KindNr == 23:
+        if kindNr == 23:
             return 'Event'
-        if KindNr == 24:
+        if kindNr == 24:
             return 'Operator'
-        if KindNr == 25:
+        if kindNr == 25:
             return 'TypeParameter'
         return 'Unkonw'  # }}}
+
+    def _current_system(self):
+        temp = sys.platform
+        if temp == 'win32':
+            return 'Windows'
+        if temp == 'cygwin':
+            return 'Cygwin'
+        if temp == 'darwin':
+            return 'Mac'
