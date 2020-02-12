@@ -11,7 +11,7 @@ from base64 import b64decode
 import logging
 
 global g_logger
-g_logger = logging.getLogger('ECY')
+g_logger = logging.getLogger('ECY_server')
 
 
 class Server(object):
