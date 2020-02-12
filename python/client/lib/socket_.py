@@ -9,6 +9,7 @@ import queue
 import json
 import threading
 import logging
+import time
 
 global g_logger
 g_logger = logging.getLogger('ECY_client')
@@ -27,17 +28,21 @@ class Socket_(object):
         self.callback_queue.put(todo)
 
     def _connect_socket(self):
-        try:
+        i = 0
+        while i < 4:
             if self._isconnected:
+                g_logger.debug("connect successfully:")
                 return
-            self.tcpCliSock = socket()  # noqa
-            self.tcpCliSock.connect(self.ADDR)
-            self._HMAC_KEY = bytes(str(self._HMAC_KEY), encoding='utf-8')
-            self._isconnected = True
-            g_logger.debug("connect successfully")
-        except:  # noqa
-            self._isconnected = False
-            raise
+            time.sleep(1)
+            try:
+                self.tcpCliSock = socket()  # noqa
+                self.tcpCliSock.connect(self.ADDR)
+                self._HMAC_KEY = bytes(str(self._HMAC_KEY), encoding='utf-8')
+                self._isconnected = True
+            except:  # noqa
+                self._isconnected = False
+                g_logger.exception("connect failed:")
+            i += 1
 
     def ConnectSocket(self):
         threading.Thread(target=self._connect_socket).start()
