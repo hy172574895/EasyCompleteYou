@@ -93,8 +93,6 @@ class Server(object):
         return HMAC_abstract1
     
     def _compare_key(self, key1_bytes, key2_bytes):
-        g_logger.debug(key1_bytes)
-        g_logger.debug(key2_bytes)
         return hmac.compare_digest(key1_bytes, key2_bytes) 
 
     def HandData(self, data_dict):
@@ -105,5 +103,8 @@ class Server(object):
                 data_dict = {'Msg': data_dict['Msg']}
                 self._results_queue.put(data_dict)
             else:
+                g_logger.debug(key1)
+                g_logger.debug(key1)
+                g_logger.debug("a msg was abandomed.")
                 # TODO: handle an unkonw msg
                 pass
