@@ -178,7 +178,7 @@ function! utility#StartLeaderfSelecting(content, callback_name) abort
   try
     call leaderf_ECY#items_selecting#Start(a:content, a:callback_name)
   catch 
-    call utility#ShowMsg("[ECY] You are missing 'Leaderf'. Please install it.", 2)
+    call utility#ShowMsg("[ECY] You are missing 'Leaderf' or its version is too low. Please install/update it.", 2)
   endtry
 "}}}
 endfunction
