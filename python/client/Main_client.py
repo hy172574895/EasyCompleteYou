@@ -80,7 +80,6 @@ class ECY_Client(_do):
         self.GetUnusedLocalhostPort()
         self.socket_connection = socket_.Socket_(
             self.GetUnusedLocalhostPort(), str(self.CreateHMACKey()))
-        self.socket_connection.ConnectSocket()
         self.is_using_stdio = False
         return 'ok'
 # {{{

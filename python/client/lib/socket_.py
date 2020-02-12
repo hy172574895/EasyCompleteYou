@@ -9,7 +9,6 @@ import queue
 import json
 import threading
 import logging
-import time
 
 global g_logger
 g_logger = logging.getLogger('ECY_client')
@@ -22,27 +21,24 @@ class Socket_(object):
         self._HMAC_KEY = HMAC_KEY_str
         self._isconnected = False
         self.callback_queue = queue.Queue()
-        threading.Thread(target=self.Loop, daemon=True).start()
+        # threading.Thread(target=self.Loop, daemon=True).start()
 
     def AddTodo(self, todo):
-        self.callback_queue.put(todo)
+        self.Send(todo)
+        # self.callback_queue.put(todo)
 
     def _connect_socket(self):
-        i = 0
-        while i < 4:
-            if self._isconnected:
-                g_logger.debug("connect successfully:")
-                return
-            time.sleep(1)
-            try:
-                self.tcpCliSock = socket()  # noqa
-                self.tcpCliSock.connect(self.ADDR)
-                self._HMAC_KEY = bytes(str(self._HMAC_KEY), encoding='utf-8')
-                self._isconnected = True
-            except:  # noqa
-                self._isconnected = False
-                g_logger.exception("connect failed:")
-            i += 1
+        if self._isconnected:
+            g_logger.debug("connect successfully:")
+            return
+        try:
+            self.tcpCliSock = socket()  # noqa
+            self.tcpCliSock.connect(self.ADDR)
+            self._HMAC_KEY = bytes(str(self._HMAC_KEY), encoding='utf-8')
+            self._isconnected = True
+        except:  # noqa
+            self._isconnected = False
+            g_logger.exception("connect failed:")
 
     def ConnectSocket(self):
         threading.Thread(target=self._connect_socket).start()
@@ -65,6 +61,12 @@ class Socket_(object):
         send_data = bytes(json.dumps(send_data), encoding='utf-8')
         # there are no '\n' in json's string, so we use that to split the text.
         self.tcpCliSock.sendall(send_data+b'\n')
+
+    def Send(self, msg):
+        if not self._isconnected:
+            # todo abandom
+            return
+        self.BuildMsg(msg)
 
     def Loop(self):
         try:
