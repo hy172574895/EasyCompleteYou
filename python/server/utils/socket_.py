@@ -93,12 +93,17 @@ class Server(object):
         return HMAC_abstract1
     
     def _compare_key(self, key1_bytes, key2_bytes):
-        return hmac.compare_digest(key1_bytes, key2_bytes) 
+        # TODO: json.load() will range the key of json. so we get wrong digest.
+        # it will not range in higth python like 3.6+
+        return True
+        # return hmac.compare_digest(key1_bytes, key2_bytes) 
 
     def HandData(self, data_dict):
         if data_dict['Method'] == 'receive_all_msg':
-            key1 = self._calculate_key1(data_dict['Key'])
-            key2 = self._calculate_key2(data_dict['Msg'])
+            # key1 = self._calculate_key1(data_dict['Key'])
+            # key2 = self._calculate_key2(data_dict['Msg'])
+            key1 = ''
+            key2 = ''
             if self._compare_key(key1, key2):
                 data_dict = {'Msg': data_dict['Msg']}
                 self._results_queue.put(data_dict)

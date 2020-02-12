@@ -59,7 +59,8 @@ class Socket_(object):
         self._id += 1
         msg_str = str(msg_dict)
         msg_length = len(msg_str)
-        key1 = self._calculate_key1(msg_str)
+        # key1 = self._calculate_key1(msg_str)
+        key1 = ''
         # And for compatibility, we must specify 'digestmod'
         send_data = {'Method': 'receive_all_msg', 'Key': key1,
                      'ID': self._id, 'Msg_length': msg_length, 'Msg': msg_dict}

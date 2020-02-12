@@ -16,12 +16,16 @@ function diagnosis#Init() abort
     call prop_type_add('ECY_diagnosis_text', {'highlight': g:ECY_diagnosis_text})
   endif
 
-  call sign_define("ECY_diagnosis_erro", {
-    \ "text" : ">>",
-    \ "texthl" : g:ECY_erro_sign_highlight})
-  call sign_define("ECY_diagnosis_warn", {
-    \ "text" : "!!",
-    \ "texthl" : g:ECY_warn_sign_highlight})
+  " can not use sign_define()
+  execute 'sign define ECY_diagnosis_erro text=>> texthl=' . g:ECY_erro_sign_highlight
+  execute 'sign define ECY_diagnosis_warn text=!! texthl=' . g:ECY_warn_sign_highlight
+
+  " call sign_define("ECY_diagnosis_erro", {
+  "   \ "text" : ">>",
+  "   \ "texthl" : g:ECY_erro_sign_highlight})
+  " call sign_define("ECY_diagnosis_warn", {
+  "   \ "text" : "!!",
+  "   \ "texthl" : g:ECY_warn_sign_highlight})
 
   let g:ECY_sign_lists       = []
   let s:current_diagnosis    = {}
