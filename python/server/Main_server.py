@@ -37,7 +37,7 @@ parser.add_argument('--log_dir', help='the file of log to output')
 g_args = parser.parse_args()
 
 if g_args.log_dir is None:
-    output_log_dir = BASE_DIR + "/server_log/ECY_server.log"
+    output_log_dir = BASE_DIR + "/ECY_server.log"
 else:
     output_log_dir = g_args.log_dir
 

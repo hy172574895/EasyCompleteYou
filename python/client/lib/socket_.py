@@ -29,13 +29,13 @@ class Socket_(object):
 
     def _connect_socket(self):
         if self._isconnected:
-            g_logger.debug("connect successfully:")
             return
         try:
             self.tcpCliSock = socket()  # noqa
             self.tcpCliSock.connect(self.ADDR)
             self._HMAC_KEY = bytes(str(self._HMAC_KEY), encoding='utf-8')
             self._isconnected = True
+            g_logger.debug("connect successfully:")
         except:  # noqa
             self._isconnected = False
             g_logger.exception("connect failed:")
@@ -43,32 +43,42 @@ class Socket_(object):
     def ConnectSocket(self):
         threading.Thread(target=self._connect_socket).start()
 
+    def _calculate_key1(self, dicts_str):
+        """ return str encoded by 64base.
+        """
+        msg_bytes = bytes(dicts_str, encoding='utf-8')
+        HMAC_abstract1 = hmac.new(
+            self._HMAC_KEY, msg_bytes, digestmod=hashlib.md5).digest()
+        HMAC_abstract1 = b64encode(HMAC_abstract1)
+        HMAC_abstract1 = str(HMAC_abstract1, encoding='utf-8')
+        return HMAC_abstract1
+
     def BuildMsg(self, msg_dict):
         """build a msg and send it to server
         """
         self._id += 1
-        # convert to unicode, then calculate the HMAC
         msg_str = str(msg_dict)
         msg_length = len(msg_str)
-        msg_bytes = bytes(msg_str, encoding='utf-8')
+        key1 = self._calculate_key1(msg_str)
         # And for compatibility, we must specify 'digestmod'
-        HMAC_abstract1 = hmac.new(
-            self._HMAC_KEY, msg_bytes, digestmod=hashlib.md5).digest()
-        HMAC_abstract1 = b64encode(HMAC_abstract1)
-        HMAC_abstract1 = HMAC_abstract1.decode('utf-8')
-        send_data = {'Method': 'receive_all_msg', 'Key': HMAC_abstract1,
+        send_data = {'Method': 'receive_all_msg', 'Key': key1,
                      'ID': self._id, 'Msg_length': msg_length, 'Msg': msg_dict}
         send_data = bytes(json.dumps(send_data), encoding='utf-8')
         # there are no '\n' in json's string, so we use that to split the text.
         self.tcpCliSock.sendall(send_data+b'\n')
+        g_logger.debug('sended a msg.')
 
     def Send(self, msg):
-        if not self._isconnected:
-            # todo abandom
-            return
-        self.BuildMsg(msg)
+        try:
+            if not self._isconnected:
+                g_logger.debug('todo abandom')
+                return
+            self.BuildMsg(msg)
+        except Exception as e:
+            g_logger.exception('')
 
     def Loop(self):
+        # legacy code, some python in vim can not use `queue`
         try:
             while 1:
                 todo = self.callback_queue.get()

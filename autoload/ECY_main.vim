@@ -5,8 +5,8 @@
 " 2020-02-02 22:25  Happy 2020-0202.
 
 " must put these outside a function
-let  s:python_script_folder_path = expand( '<sfile>:p:h:h' ).'\python'
-let  s:python_script_folder_path = escape( s:python_script_folder_path, '\' )
+let  s:python_script_folder_path = expand( '<sfile>:p:h:h' ).'/python'
+let  s:python_script_folder_path = tr(s:python_script_folder_path, '\', '/')
   
 function! s:SetUpEvent() abort
 "{{{
@@ -870,6 +870,7 @@ function! s:StartCommunication() abort
         \ })
     if !s:is_using_stdio
       call s:PythonEval("ECY_Client_.ConnectSocketServer()")
+      call timer_start(1000, function('s:StartClient'))
       " if g:ECY_debug
       "   " this is a another socket server that inputed with socket
       "   call s:PythonEval("ECY_Client_.StartDebugServer()")
@@ -878,6 +879,12 @@ function! s:StartCommunication() abort
   catch
     call s:ShowErroAndFinish("EasyCompletion unavailable: Can not start a necessary communication server of python.")
   endtry
+"}}}
+endfunction
+
+function! s:StartClient(msg) abort
+"{{{
+  call s:PythonEval("ECY_Client_.socket_connection.ConnectSocket()")
 "}}}
 endfunction
 

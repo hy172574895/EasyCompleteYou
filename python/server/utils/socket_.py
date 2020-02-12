@@ -74,18 +74,32 @@ class Server(object):
                 tcpCliSock.close()
         self.tcpSerSock.close()
 
+    def _calculate_key2(self, dicts):
+        """ return bytes
+        """
+        dicts_byte = bytes(str(dicts), encoding='utf-8')
+        # we are using MD5, it's safe enough for us, because the key is
+        # too complicated.
+        # And for compatibility, we must specify 'digestmod'
+        HMAC_abstract2 = hmac.new(
+            self._HMAC_KEY, dicts_byte, digestmod=hashlib.md5).digest()
+        return HMAC_abstract2
+
+    def _calculate_key1(self, key_str):
+        """ return bytes
+        """
+        HMAC_abstract1 = bytes(key_str, encoding='utf-8')
+        HMAC_abstract1 = b64decode(HMAC_abstract1)
+        return HMAC_abstract1
+    
+    def _compare_key(self, key1, key2):
+        return hmac.compare_digest(key1, key2) 
+
     def HandData(self, data_dict):
         if data_dict['Method'] == 'receive_all_msg':
-            # requires id, msg, and key
-            _msg_byte = bytes(str(data_dict['Msg']), encoding='utf-8')
-            HMAC_abstract2 = data_dict['Key']
-            HMAC_abstract2 = b64decode(HMAC_abstract2)
-            # we are using MD5, it's safe enough for us, because the key is
-            # too complicated.
-            # And for compatibility, we must specify 'digestmod'
-            HMAC_abstract1 = hmac.new(
-                self._HMAC_KEY, _msg_byte, digestmod=hashlib.md5).digest()
-            if hmac.compare_digest(HMAC_abstract1, HMAC_abstract2):
+            key1 = self._calculate_key1(data_dict['Key'])
+            key2 = self._calculate_key2(data_dict['Msg'])
+            if self._compare_key(key1, key2):
                 data_dict = {'Msg': data_dict['Msg']}
                 self._results_queue.put(data_dict)
             else:
