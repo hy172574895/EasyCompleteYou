@@ -92,8 +92,10 @@ class Server(object):
         HMAC_abstract1 = b64decode(HMAC_abstract1)
         return HMAC_abstract1
     
-    def _compare_key(self, key1, key2):
-        return hmac.compare_digest(key1, key2) 
+    def _compare_key(self, key1_bytes, key2_bytes):
+        g_logger.debug(key1_bytes)
+        g_logger.debug(key2_bytes)
+        return hmac.compare_digest(key1_bytes, key2_bytes) 
 
     def HandData(self, data_dict):
         if data_dict['Method'] == 'receive_all_msg':
