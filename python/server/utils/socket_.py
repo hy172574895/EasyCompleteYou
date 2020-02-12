@@ -62,7 +62,7 @@ class Server(object):
                     data_bytes = part_bytes[the_last_one]
                     i = 0
                     while i < the_last_one:
-                        data_dict = json.loads(part_bytes[i])
+                        data_dict = json.loads(bytes.decode(part_bytes[i]))
                         i += 1
                         self.HandData(data_dict)
             except Exception as e:
@@ -78,7 +78,7 @@ class Server(object):
         if data_dict['Method'] == 'receive_all_msg':
             # requires id, msg, and key
             _msg_byte = bytes(str(data_dict['Msg']), encoding='utf-8')
-            HMAC_abstract2 = bytes(data_dict['Key'], encoding='utf-8')
+            HMAC_abstract2 = data_dict['Key']
             HMAC_abstract2 = b64decode(HMAC_abstract2)
             # we are using MD5, it's safe enough for us, because the key is
             # too complicated.
