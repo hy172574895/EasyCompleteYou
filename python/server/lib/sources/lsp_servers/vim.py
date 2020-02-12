@@ -70,7 +70,8 @@ class Operate(scope_.Source_interface):
             self.is_server_start = 'started_error'
             g_logger.exception('vim_lsp: can not start Sever.' )
 
-    def _did_open_or_change(self, uri, text, DocumentVersionID):
+    def _did_open_or_change(self, uri, text, DocumentVersionID,
+            is_return_diagnoiss=True):
         # {{{
         # LSP require the edit-version
         if uri not in self._did_open_list:
@@ -81,7 +82,8 @@ class Operate(scope_.Source_interface):
             self._did_open_list[uri]['change_version'] += 1
             return_id = self._lsp.didchange(
                 uri, text, version=self._did_open_list[uri]['change_version'])
-        self.DocumentVersionID = DocumentVersionID
+        if is_return_diagnoiss:
+            self.DocumentVersionID = DocumentVersionID
         return return_id
         # }}}
 
@@ -113,7 +115,8 @@ class Operate(scope_.Source_interface):
         current_start_postion = \
             {'line': version['StartPosition']['Line'],
              'character': version['StartPosition']['Colum']}
-        self._did_open_or_change(uri_, line_text, version['DocumentVersionID'])
+        self._did_open_or_change(uri_, line_text,
+                version['DocumentVersionID'], version['ReturnDiagnosis'])
         temp = self._lsp.completion(uri_, current_start_postion)
 
         # we can set this raising a erro when it is timeout.
