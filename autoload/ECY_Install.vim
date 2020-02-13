@@ -1,8 +1,23 @@
 " Author: Jimmy Huang (1902161621@qq.com)
 " License: WTFPL
 
-" python, label and path are buildin.
-let g:ECY_available_sources_lists = ['HTML_LSP', 'Snippets', 'YCM', 'Pygment']
+function! ECY_Install#Init() abort
+"{{{ must be called before setupPython()
+   " put buildin engine name into Client
+   " when Client finding no Clent event will omit it to genernal
+   let s:ECY_buildin_engine = {'html_lsp': 'lib.event.html_lsp','snippets': 'lib.event.snippets','vim_lsp': 'lib.event.vim'}
+  for [key,lib] in items(s:ECY_buildin_engine)
+    call ECY_Install#RegisterClient(key, lib)
+  endfor
+"}}}
+endfunction
+
+function! ECY_Install#RegisterClient(engine_name, client_lib)
+  if !exists('g:ECY_available_sources_lists')
+    let g:ECY_available_sources_lists = {}
+  endif
+  let g:ECY_available_sources_lists[a:engine_name] = a:client_lib
+endfunction
 
 function! ECY_Install#HTML_LSP()
 "{{{

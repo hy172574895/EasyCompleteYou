@@ -6,6 +6,7 @@ import threading
 import logging
 import sys
 import os
+import importlib
 from socket import *  # noqa
 
 # local lib
@@ -31,14 +32,13 @@ if g_is_debug:
 
 class _do(object):
     def __init__(self):
+        self.available_engine_name_dict = vim_lib.GetVariableValue(
+                'g:ECY_available_sources_lists')
         import lib.event.genernal as genernal
-        import lib.event.html_lsp as html_lsp
-        import lib.event.snippets as snippets
-        import lib.event.vim      as vim_lsp
-        self.event_obj = {'genernal': genernal.GenernalEvent('genernal'),
-                          'html_lsp': html_lsp.HtmlLSPEvent('html_lsp'),
-                          'vim_lsp': vim_lsp.VimEvent('vim_lsp'),
-                          'snippets': snippets.SnippetsEvent('snippets')}
+        # import lib.event.html_lsp as html_lsp
+        # import lib.event.snippets as snippets
+        # import lib.event.vim      as vim_lsp
+        self.event_obj = {'genernal': genernal.GenernalEvent('genernal')}
 
     def GetCurrentSource(self):
         using_source = vim_lib.CallEval('ECY_main#GetCurrentUsingSourceName()')
@@ -135,13 +135,31 @@ class ECY_Client(_do):
         document_version_id = self.GetDocumentVersionID_NotChanging()
         self._go(event, version_id, document_version_id)
 
+    def _import_client_event(self, server_name, client_lib, event):
+        try:
+            module_temp = importlib.import_module(client_lib)
+            obj_temp = module_temp.Operate(server_name)
+            self.event_obj[server_name] = obj_temp
+            g_logger.debug("imported a Client lib: " + server_name)
+            return getattr(obj_temp, event, None)
+        except:
+            g_logger.exception("Failed to load Client's lib")
+            return None
+
     def _get(self, event):
         # do
-        source_name = self.GetCurrentSource()
-        if source_name in self.event_obj.keys():
-            method = getattr(self.event_obj[source_name], event, None)
-        else:
-            self.event_obj['genernal'].ChangeSourceName(source_name)
+        engine_name = self.GetCurrentSource()
+        method = None
+        if engine_name in self.available_engine_name_dict.keys():
+            if engine_name not in self.event_obj.keys():
+                client_lib = self.available_engine_name_dict[engine_name]
+                # when import raise erro, temp == None
+                method = self._import_client_event(engine_name, client_lib, event)
+            else:
+                method = getattr(self.event_obj[engine_name], event, None)
+
+        if method is None:
+            self.event_obj['genernal'].ChangeSourceName(engine_name)
             method = getattr(self.event_obj['genernal'], event, None)
         # return a dict
         return method()
@@ -155,8 +173,8 @@ class ECY_Client(_do):
             if self.isdebug:
                 self._debug_server.AddTodo(todo)
             self.socket_connection.AddTodo(todo)
-        except Exception as e:
-            raise e
+        except:
+            g_logger.exception("Failed to trigger a Client event.")
 
     def Exe(self, do):
         self._add(do)

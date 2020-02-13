@@ -5,7 +5,7 @@ import lib.scope as scope_
 import lib.vim_or_neovim_support as vim_lib
 
 
-class SnippetsEvent(scope_.Event):
+class Operate(scope_.Event):
     def __init__(self, source_name):
         scope_.Event.__init__(self, source_name)
 
