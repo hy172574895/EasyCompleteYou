@@ -32,11 +32,20 @@ class Operate(scope_.Source_interface):
             return True
         return False
 
+    def _build_erro_msg(self, code, msg):
+        """and and send it
+        """
+        temp = {'ID': -1, 'Results': 'ok', 'ErroCode': code,
+                'Event': 'erro_code',
+                'Description':msg}
+        if self._deamon_queue is not None:
+            self._deamon_queue.put(temp)
+        return temp
+
     def _start_server(self, starting_cmd, vimruntime="", runtimepath=""):
         try:
             if self.is_server_start == 'not_started':
                 # such as : node C:/Windows/SysWOW64/node_modules/vim-language-server/bin/index.js --stdio
-                starting_cmd = "node C:/Windows/SysWOW64/node_modules/vim-language-server/bin/index.js --stdio"
                 self._lsp.StartJob(starting_cmd)
                 init_opts = {
                     "iskeyword": "@,48-57,_,192-255,-#",
@@ -69,6 +78,8 @@ class Operate(scope_.Source_interface):
         except: # noqa
             self.is_server_start = 'started_error'
             g_logger.exception('vim_lsp: can not start Sever.' )
+            self._build_erro_msg(2,
+                    'Failed to start LSP server. Check Log file of server to get more details.')
 
     def _did_open_or_change(self, uri, text, DocumentVersionID,
             is_return_diagnoiss=True):

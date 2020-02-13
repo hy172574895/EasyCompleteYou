@@ -57,9 +57,13 @@ class Operate(scope_.Source_interface):
         return False
 
     def _build_erro_msg(self, code, msg):
+        """and and send it
+        """
         temp = {'ID': -1, 'Results': 'ok', 'ErroCode': code,
                 'Event': 'erro_code',
                 'Description':msg}
+        if self._deamon_queue is not None:
+            self._deamon_queue.put(temp)
         return temp
 
     def _start_lsp_server(self):
@@ -82,10 +86,8 @@ class Operate(scope_.Source_interface):
         except:
             g_logger.exception(self._starting_server_cmd)
             self.is_server_start = 'failed to start'
-            if self._deamon_queue is not None:
-                temp = self._build_erro_msg(2,
-                        'Failed to start LSP server. Check Log file of server to get more details.')
-                self._deamon_queue.put(temp)
+            self._build_erro_msg(2,
+                    'Failed to start LSP server. Check Log file of server to get more details.')
 
     def _did_open_or_change(self, uri, text):
         '''update text to server
@@ -219,8 +221,7 @@ class Operate(scope_.Source_interface):
             self._diagnosis_queue.put(version)
         elif self._diagnosis.is_available == 2:
             self._diagnosis.is_available = 3
-            temp = self._build_erro_msg(4, "Failed to call HtmlHint.")
-            self._deamon_queue.put(temp)
+            self._build_erro_msg(4, "Failed to call HtmlHint.")
         return None
 
     def _diagnosis_notification(self):
