@@ -870,7 +870,7 @@ function! s:StartCommunication() abort
         \ })
     if !s:is_using_stdio
       call s:PythonEval("ECY_Client_.ConnectSocketServer()")
-      call timer_start(1000, function('s:StartClient'))
+      call s:StartClient('')
       " if g:ECY_debug
       "   " this is a another socket server that inputed with socket
       "   call s:PythonEval("ECY_Client_.StartDebugServer()")
@@ -882,9 +882,22 @@ function! s:StartCommunication() abort
 "}}}
 endfunction
 
-function! s:StartClient(msg) abort
+function! s:StartClient(timer_id) abort
 "{{{
-  call s:PythonEval("ECY_Client_.socket_connection.ConnectSocket()")
+  if !exists('s:is_connected')
+    let s:is_connected = 0
+    call timer_start(1000, function('s:StartClient'))
+  else
+    if s:PythonEval('ECY_Client_.socket_connection.is_connected')
+      return
+    elseif s:is_connected == 3
+      call utility#ShowMsg("can't connect a Server. Maybe this a bug.")
+      return
+    endif
+    let s:is_connected += 1
+    call s:PythonEval("ECY_Client_.socket_connection.ConnectSocket()")
+    call timer_start(1000, function('s:StartClient'))
+  endif
 "}}}
 endfunction
 

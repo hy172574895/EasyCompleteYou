@@ -19,7 +19,7 @@ class Socket_(object):
         self.ADDR = (gethostname(), PORT)
         self._id = 0
         self._HMAC_KEY = HMAC_KEY_str
-        self._isconnected = False
+        self.is_connected = False
         self.callback_queue = queue.Queue()
         # threading.Thread(target=self.Loop, daemon=True).start()
 
@@ -28,16 +28,16 @@ class Socket_(object):
         # self.callback_queue.put(todo)
 
     def _connect_socket(self):
-        if self._isconnected:
+        if self.is_connected:
             return
         try:
             self.tcpCliSock = socket()  # noqa
             self.tcpCliSock.connect(self.ADDR)
             self._HMAC_KEY = bytes(str(self._HMAC_KEY), encoding='utf-8')
-            self._isconnected = True
+            self.is_connected = True
             g_logger.debug("connect successfully:")
         except:  # noqa
-            self._isconnected = False
+            self.is_connected = False
             g_logger.exception("connect failed:")
 
     def ConnectSocket(self):
@@ -71,7 +71,7 @@ class Socket_(object):
 
     def Send(self, msg):
         try:
-            if not self._isconnected:
+            if not self.is_connected:
                 g_logger.debug('todo abandom')
                 return
             self.BuildMsg(msg)
@@ -83,13 +83,13 @@ class Socket_(object):
         try:
             while 1:
                 todo = self.callback_queue.get()
-                if not self._isconnected:
+                if not self.is_connected:
                     # todo abandom
                     continue
                 self.BuildMsg(todo)
         except:  # noqa
             pass
         finally:
-            if self._isconnected:
-                self._isconnected = False
+            if self.is_connected:
+                self.is_connected = False
                 self.tcpCliSock.close()

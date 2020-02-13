@@ -71,6 +71,7 @@ class Handler(object):
     def _handler(self):
         """ is just a thread
         """
+        g_logger.debug('Handler started.')
         while 1:
             try:
                 todo_dict = self._request_queue.get()
@@ -86,6 +87,7 @@ class Handler(object):
         """ this should not be a thread; because some operating system will not
         ouput data to stdio, in a thread.
         """
+        g_logger.debug('pass thread started.')
         try:
             while 1:
                 temp = json.dumps(self._pass_results_queue.get())
@@ -103,3 +105,4 @@ class Handler(object):
 
 
 Handler(server.Server(g_args.port, g_args.hmac).GetResults())
+g_logger.debug('Server finished.')
