@@ -46,7 +46,7 @@ function! ECY_Install#Snippets()
   catch
     return {'status':'-1','description':"ECY failed to install it. You missing vim-snippets plugin. Please install that plugin, firstly. "}
   endtry
-  return {'status':'0','description':"ok",'name':'lib.sources.snippets.snippets'}
+  return {'status':'0','description':"ok",'lib': {'snippets':'lib.sources.snippets.snippets'}, 'name':'snippets'}
 "}}}
 endfunction
 
@@ -55,7 +55,7 @@ function! ECY_Install#YCM()
   if !utility#HasYCM()
     return {'status':'-1','description':"ECY failed to install it. You missing YCM. Please install that plugin, firstly. "}
   endif
-  return {'status':'0','description':"ok",'name':'lib.sources.youcompleteme.ycm'}
+  return {'status':'0','description':"ok",'lib': {'youcompleteme':'lib.sources.youcompleteme.ycm'}, 'name':'youcompleteme'}
 "}}}
 endfunction
 

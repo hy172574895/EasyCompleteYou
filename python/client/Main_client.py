@@ -153,7 +153,6 @@ class ECY_Client(_do):
         if engine_name in self.available_engine_name_dict.keys():
             if engine_name not in self.event_obj.keys():
                 client_lib = self.available_engine_name_dict[engine_name]
-                # when import raise erro, temp == None
                 method = self._import_client_event(engine_name, client_lib, event)
             else:
                 method = getattr(self.event_obj[engine_name], event, None)

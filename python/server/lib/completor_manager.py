@@ -3,6 +3,7 @@
 
 import importlib
 import os
+import sys
 import configparser
 import logging
 global g_logger
@@ -47,62 +48,94 @@ class Operate(object):
         if not os.path.exists(path_temp):
             # default config
             fp = open(path_temp, mode="w", encoding='utf-8')
-            installed_completor = \
-                {'lib.sources.label.Label': 'label',
-                 'lib.sources.path.path': 'path',
-                 'lib.sources.python.python': 'python_jedi'}
-            self.conf['installed_completor'] = installed_completor
+            installed_engine_lib = \
+                {'label': 'lib.sources.label.Label',
+                 'path': 'lib.sources.path.path',
+                 'python_jedi': 'lib.sources.python.python'}
+            installed_engine_path = \
+                {'label': '',
+                 'path': '',
+                 'python_jedi': ''}
+            self.conf['installed_engine_lib'] = installed_engine_lib
+            self.conf['installed_engine_path'] = installed_engine_path
             self.conf['filetype_using'] = {}
             self.conf.write(fp)
             fp.close()
         else:
             self.conf.read(path_temp)
-            installed_completor = self.conf['installed_completor']
-        return installed_completor
+            installed_engine_lib = self.conf['installed_engine_lib']
+            installed_engine_path = self.conf['installed_engine_path']
+        return installed_engine_lib, installed_engine_path
 
-    def _load_source(self, specify=None):
-        """ load the installed source list when specify is None
+    def _load_source(self, specify_lib=None, specify_path={}):
+        """ load the installed source list when specify_lib is None
         """
         try:
-            if specify is None:
-                loading_source_temp = self._load_config()
+            if specify_lib is None:
+                loading_source_lib, loading_source_path = self._load_config()
             else:
-                loading_source_temp = [specify]
+                g_logger.debug('installing a engine')
+                loading_source_lib = specify_lib
+                if not isinstance(specify_lib, dict):
+                    # return erro
+                    g_logger.debug('can not install an unkonw engine.')
+                    g_logger.debug(specify_lib)
+                    return None
+                loading_source_path = specify_path
 
-            for name_temp in loading_source_temp:
+            # loading_source_lib is a dict
+            for name, lib in loading_source_lib.items():
                 # e.g.
-                # name_temp = 'lib.sources.label.Label'
-                module_temp = importlib.import_module(name_temp)
-                obj_temp = module_temp.Operate()
-                module_temp = obj_temp.GetInfo()  # return a dict
-                module_temp['Object'] = obj_temp
-                completor_name = module_temp['Name']
-                self.sources_info[completor_name] = module_temp
+                # name = 'label'
+                # lib = 'lib.sources.label.Label'
+                try:
+                    if name in loading_source_path and \
+                            loading_source_path[name] != '':
+                        temp = loading_source_path[name]
+                        sys.path.append(temp)
+                        g_logger.debug('added a package:' + temp)
+                    module_temp = importlib.import_module(lib)
+                    obj_temp = module_temp.Operate()
+                    module_temp = obj_temp.GetInfo()  # return a dict
+                    module_temp['Object'] = obj_temp
+                    name = module_temp['Name']
+                    self.sources_info[name] = module_temp
+                    g_logger.debug('installed: ' + name + " from " + lib)
+                except:
+                    # return erro
+                    g_logger.exception("failed to load engine.")
             return module_temp
-        except Exception as e:
+        except:
             raise
 
-    def InstallSource(self, source_path):
+    def InstallSource(self, engine_lib, package_path=''):
         """this method will not check if it's runable.
         the source's depence must be checked in the vim side.
         """
+        # e.g.
+        # engine_lib = {'label': 'lib.sources.label.Label'}
         try:
             path_temp = self._get_cache_file()
-            info_ = self._load_source(specify=source_path)
+            info_ = self._load_source(specify_lib=engine_lib,\
+                    specify_path=package_path)
+            if info_ is None:
+                raise
             self.conf.read(path_temp)
-            self.conf['installed_completor'][source_path] = info_['Name']
+            engine_name = info_['Name']
+            self.conf['installed_engine_lib'][engine_name] = engine_lib[engine_name]
+            self.conf['installed_engine_path'][engine_name] = package_path
             fp = open(path_temp, mode="w", encoding='utf-8')
             self.conf.write(fp)
             fp.close()
             return {'Event': 'install_source',
                     'Status': 0,
-                    'Name': source_path,
+                    'Name': engine_lib,
                     'Description': 'Installation succeed.'}
-        except:  # noqa
-            # TODO
+        except:
+            g_logger.exception("failed to install a new engine.")
             return {'Event': 'install_source',
                     'Status': 1,
-                    'Name': source_path,
+                    'Name': engine_lib,
                     'Description': 'failed to load source, check out logging.'}
 
     def GetAvailableSourceForFiletype(self, file_type):

@@ -735,7 +735,7 @@ function! s:EventSort(id, data, event) abort
       elseif l:Event == 'integration'
         call s:Integration_cb(l:data_dict)
       elseif l:Event == 'install_source'
-        call utility#ShowMsg('[ECY] [' . l:data_dict['Name'] .'] '.l:data_dict['Description'], 2)
+        call utility#ShowMsg('[ECY]' . string(l:data_dict['Name']) . l:data_dict['Description'], 2)
       elseif l:Event == 'diagnosis'
         call diagnosis#PlaceSign(l:data_dict)
       elseif l:Event == 'goto'
@@ -891,7 +891,7 @@ function! s:StartClient(timer_id) abort
     if s:PythonEval('ECY_Client_.socket_connection.is_connected')
       return
     elseif s:is_connected == 3
-      call utility#ShowMsg("can't connect a Server. Maybe this a bug.")
+      call utility#ShowMsg("can't connect a Server. Maybe this a bug.", 2)
       return
     endif
     let s:is_connected += 1
@@ -940,7 +940,7 @@ function! ECY_main#Install(name) abort
     call utility#ShowMsg(l:install_return['description'], 3)
     return
   endif
-  let g:ecy_source_name_2_install = l:install_return['name']
+  let g:ecy_source_name_2_install = l:install_return['lib']
   call ECY_main#Do("InstallSource", v:true)
   call utility#ShowMsg('[ECY] installing "'.l:install_return['name'].'".', 3)
 "}}}

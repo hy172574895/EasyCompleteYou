@@ -72,7 +72,7 @@ class Socket_(object):
     def Send(self, msg):
         try:
             if not self.is_connected:
-                g_logger.debug('todo abandom')
+                g_logger.debug('msg abandomed.')
                 return
             self.BuildMsg(msg)
         except Exception as e:
