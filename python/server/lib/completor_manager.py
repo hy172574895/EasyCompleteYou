@@ -154,16 +154,17 @@ class Operate(object):
 
         if 'using_source' not in self.file_type_available_source[file_type]:
             path_temp = self._get_cache_file()
-            current_using_source = 'nothing'
+            current_using_source = 'label'
             self.conf.read(path_temp)
             if file_type not in self.conf['filetype_using']:
-                current_using_source = 'label'
                 self.conf['filetype_using'][file_type] = current_using_source
                 fp = open(path_temp, mode="w", encoding='utf-8')
                 self.conf.write(fp)
                 fp.close()
             else:
-                current_using_source = self.conf['filetype_using'][file_type]
+                history_using = self.conf['filetype_using'][file_type]
+                if history_using in temp:
+                    current_using_source = history_using
             self.file_type_available_source[file_type]['using_source'] = \
                 current_using_source
         return {'Event': 'set_file_type_available_source',
