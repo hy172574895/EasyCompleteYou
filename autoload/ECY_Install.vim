@@ -34,7 +34,7 @@ function! ECY_Install#HTML_LSP()
   catch
     echo "[Suggestion] We hightly recommend you to install UltiSnips plugin for better experience of HTML's source."
   endtry
-  return {'status':'0','description':"ok",'name':'lib.sources.lsp_servers.html'}
+  return {'status':'0','description':"ok",'lib': {'html_lsp':'lib.sources.lsp_servers.html'}, 'name':'html_lsp'}
 "}}}
 endfunction
 
@@ -66,7 +66,7 @@ function! ECY_Install#Pygment()
   catch
     return {'status':'-1','description':"ECY failed to install it. You missing Pygment. Please install that plugin, firstly. "}
   endtry
-  return {'status':'0','description':"ok",'name':'lib.sources.pygment.pygment'}
+  return {'status':'0','description':"ok",'lib': {'pygment':'lib.sources.pygment.pygment'}, 'name':'pygment'}
 "}}}
 endfunction
 
