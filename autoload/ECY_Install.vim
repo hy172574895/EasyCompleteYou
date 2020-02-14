@@ -70,6 +70,26 @@ function! ECY_Install#Pygment()
 "}}}
 endfunction
 
+function! ECY_Install#Install_cb(dict) abort
+"{{{
+  if a:dict['Status'] == 0
+    " succeed
+    for item in a:dict['FileType']
+      if item == 'all'
+        let g:ECY_file_type_info = {}
+        break
+      endif
+      if exists("g:ECY_file_type_info[item]")
+        unlet g:ECY_file_type_info[item]
+      endif
+    endfor
+    " trigger events again
+    call ECY_main#AfterUserChooseASource()
+  endif
+  call utility#ShowMsg('[ECY]' . string(a:dict['Name']) . a:dict['Description'], 2)
+"}}}
+endfunction
+
 function! s:ExeCMD(cmd) abort
   " synchronous in vim
    execute "normal! :!" . a:cmd . "\<cr>" 

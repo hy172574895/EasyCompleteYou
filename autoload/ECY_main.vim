@@ -735,7 +735,7 @@ function! s:EventSort(id, data, event) abort
       elseif l:Event == 'integration'
         call s:Integration_cb(l:data_dict)
       elseif l:Event == 'install_source'
-        call utility#ShowMsg('[ECY]' . string(l:data_dict['Name']) . l:data_dict['Description'], 2)
+        call ECY_Install#Install_cb(l:data_dict)
       elseif l:Event == 'diagnosis'
         call diagnosis#PlaceSign(l:data_dict)
       elseif l:Event == 'goto'

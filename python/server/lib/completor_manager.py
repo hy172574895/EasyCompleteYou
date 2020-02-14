@@ -130,6 +130,7 @@ class Operate(object):
             return {'Event': 'install_source',
                     'Status': 0,
                     'Name': engine_lib,
+                    'FileType': info_['WhiteList'],
                     'Description': 'Installation succeed.'}
         except:
             g_logger.exception("failed to install a new engine.")
