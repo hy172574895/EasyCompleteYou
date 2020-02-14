@@ -70,8 +70,7 @@ there only three buildin engine which is `label`,`python` and `path` after you i
 **Importance**: There are might dependence while you installing a engine of ECY
 So check out the following lists carefully and install the dependence before you install it.
 
-**Notes: you can not use `snippets-expanding` without `Ultisnips`,  can not use`goto-definition`, `goto-declaration`, `find-symbols`, `find-reference` without
-`LeaderF`.**  
+**Notes: you can not use `snippets-expanding` without `Ultisnips`,  can not use`goto-definition`, `goto-declaration`, `find-symbols`, `find-reference` without `LeaderF`.**  
 Here the full lists of engine that ECY supports. 
 
 name|language|abilities|dependence|doc link

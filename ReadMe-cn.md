@@ -73,7 +73,18 @@
 **重要提示**: 当前启用一个新的引擎的使用，请确保 对应新引擎的依赖环境已经准备好了。
 所以，在你安装一个新的引擎之前，请仔细阅读对应文档.
 
-下列是在ECY完整的，目前可使用的引擎 . 
+**注意: 没有安装 `Ultisnips` 就不能使用 `snippets-expanding` ,  没有安装 `LeaderF` 就不能使用`goto-definition`, `goto-declaration`, `find-symbols`, `find-reference`。**
+
+下列是在ECY完整的，目前可使用的引擎 ：
+
+名字|编程语言|可用特性|运行依赖|详细文档
+--|:--:|--:|--:|--:
+label|all|completion|-|
+snippet|all|completion<br>snippets-expanding|-|
+path|all|completion|-|
+python_jedi|python|completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding|[jedi](https://pypi.org/project/jedi/)<br>[pyflakes](https://pypi.org/project/pyflakes/)|
+html_lsp|html, xhtml|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[html-LSP](https://www.npmjs.com/package/vscode-html-languageservice) <br> [HTMLHint](https://www.npmjs.com/package/htmlhint)|
+vim_lsp|vimL|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
 
 ## 配合 [Ultisnips](https://github.com/SirVer/ultisnips) 使用
 `Ultisnips` 是一个单独开发和维护的插件，所以你必须要单独地安装它.  
