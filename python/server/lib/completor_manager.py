@@ -38,7 +38,7 @@ class Operate(object):
             if not os.path.exists(path_temp):
                 # if there are no user_cache dir then make one
                 os.mkdir(path_temp)
-            self._cache_file_name = path_temp + '/ECY_config.ini'
+            self._cache_file_name = path_temp + '/ECY_server_config.ini'
         return self._cache_file_name
 
     def _load_config(self):

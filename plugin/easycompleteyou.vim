@@ -12,7 +12,7 @@ function! s:restore_cpo()
   unlet s:save_cpo
 endfunction
 
-let g:ECY_version = {'version': 10, 'tags': '1.0'}
+let g:ECY_version = {'version': 11, 'tags': '1.1'}
 let g:is_vim = !has('nvim')
 
 if exists( "g:loaded_easycomplete" )
@@ -57,7 +57,7 @@ if !g:is_vim && exists('*nvim_win_set_config')
   let g:has_floating_windows_support = 'nvim'
   " TODO:
   let g:has_floating_windows_support = 'has_no'
-elseif has('textprop') || has('popupwin')
+elseif has('textprop') && has('popupwin')
   let g:has_floating_windows_support = 'vim'
 else
   let g:has_floating_windows_support = 'has_no'
@@ -71,6 +71,7 @@ call diagnosis#Init()
 call completion_preview_windows#Init()
 call color_completion#Init()
 call goto#Init()
+call ECY_Install#Init()
 call ECY_main#Start()
 
 let g:ECY_endtime = reltimefloat(reltime())
