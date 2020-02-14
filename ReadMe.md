@@ -36,9 +36,9 @@ strongly suggest to use the newest one(Vim 8.2).
 ### Install  
 
 #### Options 1:
-Using some Plugin-manager like Plug-vim or Vunble:  
+Using some Plugin-manager like vim-plug or Vunble:  
 Put the line into your vimrc, then install it.  
-> hy172574895/EasyCompleteYou
+> Plug 'hy172574895/EasyCompleteYou'
 
 #### Options 2:  
 Download the whole repository and put it into vim's `runtimepath`.  
@@ -66,10 +66,22 @@ All of them are variables of vimL, so you can put a code such as
 ## Enable more.
 
 there only three buildin engine which is `label`,`python` and `path` after you installed ECY. If you want ECY work on `HTML`, you can activate that engine by: `:call ECY_Installer('HTML_LSP')` in vim.  
+
 **Importance**: There are might dependence while you installing a engine of ECY
 So check out the following lists carefully and install the dependence before you install it.
 
+**Notes: you can not use `snippets-expanding` without `Ultisnips`,  can not use`goto-definition`, `goto-declaration`, `find-symbols`, `find-reference` without
+`LeaderF`.**  
 Here the full lists of engine that ECY supports. 
+
+name|language|abilities|dependence|doc link
+--|:--:|--:|--:|--:
+label|all|completion|-|
+snippet|all|completion<br>snippets-expanding|-|
+path|all|completion|-|
+python_jedi|python|completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding|[jedi](https://pypi.org/project/jedi/)<br>[pyflakes](https://pypi.org/project/pyflakes/)|
+html_lsp|html, xhtml|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[html-LSP](https://www.npmjs.com/package/vscode-html-languageservice) <br> [HTMLHint](https://www.npmjs.com/package/htmlhint)|
+vim_lsp|vimL|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
 
 ## Cooperate with [Ultisnips](https://github.com/SirVer/ultisnips)
 `Ultisnips` is a separate plugin, so you have to install it separately.
