@@ -15,6 +15,8 @@
               EASILY COMPLETE YOU.
 ---
 ---
+[中文版文档](https://gitee.com/Jimmy_Huang/EasyCompleteYou) | **English(currently)**
+
 # Brief Introduction
 1. Automatically compatible with [YCM](https://github.com/ycm-core/YouCompleteMe), can be a extension for YCM.
 2. Fluent completion.

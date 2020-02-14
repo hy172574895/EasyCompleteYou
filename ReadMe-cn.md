@@ -16,6 +16,8 @@
               EASILY COMPLETE YOU.
 ---
 ---
+[English](https://github.com/hy172574895/EasyCompleteYou) | **中文版文档(当前)**
+
 # 介绍
 1. 自动兼容 [YCM](https://github.com/ycm-core/YouCompleteMe), 可以作为YCM的补充。
 2. 流畅的补全.
