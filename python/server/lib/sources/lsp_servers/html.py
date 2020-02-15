@@ -81,7 +81,8 @@ class Operate(scope_.Source_interface):
                 # capabilities_dict['completion']['dynamicRegistration'] = True
                 init_msg = self._lsp.initialize(
                     initializationOptions=None, rootUri=None)
-                self._lsp.GetResponse(init_msg['Method'])
+                temp = self._lsp.GetResponse(init_msg['Method'])
+                g_logger.debug(temp)
                 self.is_server_start = 'started'
         except:
             g_logger.exception(self._starting_server_cmd)
@@ -246,6 +247,16 @@ class Operate(scope_.Source_interface):
                 # continue
                 return None
             self._deamon_queue.put(return_)
+
+    # TODO:
+    # def Goto(self, version):
+    #     if not self._check(version):
+    #         return None
+    #     # return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+    #     temp = self._lsp.symbos('h')
+    #     temp = self._lsp.GetResponse(temp['Method'])
+    #     g_logger.debug(temp)
+    #     return None
 
 
 class HtmlHint:

@@ -124,6 +124,7 @@ class LSP(conec.Operate):
         return {'ID': self._id, 'Method': method}
 
     def BuildCapabilities(self):
+# {{{
         WorkspaceClientCapabilities = {
                 "applyEdit": True,
                 "workspaceEdit": {
@@ -144,7 +145,8 @@ class LSP(conec.Operate):
                     },
                 "workspaceFolders": False,
                 "configuration": False
-                }  # noqa
+                }
+
         TextDocumentClientCapabilities = {
                 "synchronization": {
                     "dynamicRegistration": False,
@@ -240,11 +242,13 @@ class LSP(conec.Operate):
                         "rangeLimit": False,
                         "lineFoldingOnly": False
                         }
-                }  # noqa
+                }
+
         Capabilities = {'workspace': WorkspaceClientCapabilities,
                         'textDocument': TextDocumentClientCapabilities,
                         'experimental': None}
         return Capabilities
+# }}}
 
     def initialize(self, processId=None, rootUri=None,
                    initializationOptions=None,
@@ -298,6 +302,10 @@ class LSP(conec.Operate):
                   'position':     position}
         return self._build_request(params, 'textDocument/completion')
 
+    def symbos(self, query=""):
+        params = {'query': query}
+        return self._build_request(params, 'workspace/symbol')
+
     def PathToUri(self, file_path):
         return urljoin('file:', pathname2url(file_path))
 
@@ -329,7 +337,7 @@ class LSP(conec.Operate):
 # }}}
 
     def GetKindNameByNumber(self, kindNr):
-        # {{{
+        # {{{ completion kind
         if kindNr == 1:
             return 'Text'
         if kindNr == 2:
@@ -381,6 +389,62 @@ class LSP(conec.Operate):
         if kindNr == 25:
             return 'TypeParameter'
         return 'Unkonw'  # }}}
+
+    def GetSymbolsKindByNumber(self, kindNr):
+# {{{
+        if kindNr == 1:
+            return "File"
+        if kindNr == 2:
+            return "Module"
+        if kindNr == 3:
+            return "NameSpace"
+        if kindNr == 4:
+            return "Package"
+        if kindNr == 5:
+            return "Class"
+        if kindNr == 6:
+            return "Method"
+        if kindNr == 7:
+            return "Property"
+        if kindNr == 7:
+            return "Field"
+        if kindNr == 9:
+            return "Constructor"
+        if kindNr == 10:
+            return "Enum"
+        if kindNr == 11:
+            return "Interface"
+        if kindNr == 12:
+            return "Function"
+        if kindNr == 13:
+            return "Variable"
+        if kindNr == 14:
+            return "Constant"
+        if kindNr == 15:
+            return "String"
+        if kindNr == 16:
+            return "Number"
+        if kindNr == 17:
+            return "Boolean"
+        if kindNr == 18:
+            return "Array"
+        if kindNr == 19:
+            return "Object"
+        if kindNr == 20:
+            return "Key"
+        if kindNr == 21:
+            return "Null"
+        if kindNr == 22:
+            return "EnumMember"
+        if kindNr == 23:
+            return "Struct"
+        if kindNr == 24:
+            return "Event"
+        if kindNr == 25:
+            return "Operator"
+        if kindNr == 26:
+            return "TypeParameter"
+# }}}
 
     def _current_system(self):
         temp = sys.platform
