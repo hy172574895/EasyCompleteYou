@@ -135,3 +135,6 @@ A: Ale use job(channel) feature to send data to linter, but ECY use python3 inst
 And every completion that ECY do will send data of current buffer to Server, on
 the same time, ECY can return diagnosis; that will be send only once. Using Ale
 will do it twice, sending to linter and ECY's Server.
+
+### Q: Why use go-langserver to be Server for golang, why not gopls?
+A: At the very first time, I tested gopls and want to make an engine to ECY, but it just keeps failing on MS-windows on gvim, and also happens to some Client such as coc.nvim or vim-lsp. I have no idea of how to make gopls work, if you have some idea or good at gopls, pleas let me konw. The funny thing is I just take a few minutes to make an engine for go-langserver, and it works well at golang.
