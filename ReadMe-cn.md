@@ -87,6 +87,7 @@ path|all|completion|-|
 python_jedi|python|completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding|[jedi](https://pypi.org/project/jedi/)<br>[pyflakes](https://pypi.org/project/pyflakes/)|
 html_lsp|html, xhtml|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[html-LSP](https://www.npmjs.com/package/vscode-html-languageservice) <br> [HTMLHint](https://www.npmjs.com/package/htmlhint)|
 vim_lsp|vimL|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
+go_langserver|golang|completion<br>|[go-langserver](https://github.com/sourcegraph/go-langserver)|
 
 ## 配合 [Ultisnips](https://github.com/SirVer/ultisnips) 使用
 `Ultisnips` 是一个单独开发和维护的插件，所以你必须要单独地安装它.  
