@@ -67,7 +67,6 @@ class Socket_(object):
         send_data = bytes(json.dumps(send_data), encoding='utf-8')
         # there are no '\n' in json's string, so we use that to split the text.
         self.tcpCliSock.sendall(send_data+b'\n')
-        g_logger.debug('sended a msg.')
 
     def Send(self, msg):
         try:
