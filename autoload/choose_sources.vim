@@ -89,10 +89,12 @@ endfunction
 
 function! choose_sources#Start() abort
 "{{{
+  call ECY_main#Log('user start a windows of selecting source')
   if exists("g:ECY_file_type_info[".string(&filetype)."]")
     if g:has_floating_windows_support == 'has_no'
       call s:ChooseSource_Echoing()
     elseif g:has_floating_windows_support == 'vim'
+      call ECY_main#Log('using vim')
       call s:ChooseSource_vim()
     else
       call s:ChooseSource_neovim()
@@ -105,6 +107,7 @@ function! choose_sources#Start() abort
   else
     let l:show_text = l:line_1."  Maybe you set this FileType making ECY not to work."
   endif
+  call ECY_main#Log(l:show_text)
   echo l:show_text
   "}}}
   endif

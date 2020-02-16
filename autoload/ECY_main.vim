@@ -366,7 +366,6 @@ function! s:SetUpPython() abort
 "}}}
 endfunction
 
-
 function! ECY_main#CompleteFunc( findstart, base ) abort
 "{{{
   if a:findstart
@@ -561,7 +560,7 @@ function! ECY_main#AfterUserChooseASource() abort
         unlet g:ycm_filetype_blacklist[l:filetype]
       endif
       call s:YCMCompatible(v:true)
-      do BufEnter youcompleteme
+      doautocmd <nomodeline> youcompleteme BufEnter
       " will not call ECY's Event
       return
     endif
@@ -571,7 +570,8 @@ function! ECY_main#AfterUserChooseASource() abort
       " available at current buffer, so we don't return
     endif
   endif
-  do BufEnter EasyCompleteYou
+  " exe "do BufEnter EasyCompleteYou"
+  doautocmd <nomodeline> EasyCompleteYou BufEnter
 "}}}
 endfunction
 
@@ -716,6 +716,7 @@ function! s:EventSort(id, data, event) abort
   "{{{ classify events.
   " a:data is a list that every item was divided into a decodable json
   " try
+    call ECY_main#Log("<---" . string(a:data))
     for item in a:data
       if item == ''
         " an additional part when splitting line with '\n'
@@ -914,10 +915,15 @@ endfunction
 function! ECY_main#Log(msg) abort
 "{{{
   try
-    let g:ECY_log_msg = a:msg
+    let g:ECY_log_msg = string(a:msg)
     call s:PythonEval("ECY_Client_.Log()")
   catch 
   endtry
+"}}}
+endfunction
+
+function! ECY_main#Uninstall(name) abort
+"{{{ TODO
 "}}}
 endfunction
 
