@@ -38,6 +38,15 @@ function! ECY_Install#HTML_LSP()
 "}}}
 endfunction
 
+function! ECY_Install#Go_langserver()
+"{{{
+  if !executable('go-langserver')
+    return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
+  endif
+  return {'status':'0','description':"ok",'lib': {'go_langserver':'lib.sources.lsp_servers.go_langserver'}, 'name':'go_langserver'}
+"}}}
+endfunction
+
 function! ECY_Install#Snippets()
 "{{{
   " requeirs: 1. plugin of UltiSnips
