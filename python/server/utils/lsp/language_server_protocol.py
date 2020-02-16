@@ -128,14 +128,16 @@ class LSP(conec.Operate):
         WorkspaceClientCapabilities = {
                 "applyEdit": True,
                 "workspaceEdit": {
-                    "documentChanges": True,
+                    "documentChanges": False,
                     "resourceOperations": ["Create", "Rename", "Delete"],
-                    "failureHandling": ["Abort"]
+                    "failureHandling": "Abort"
                     },
                 "didChangeConfiguration": {
                     "dynamicRegistration": False
                     },
-                "didChangeWatchedFiles": False,
+                "didChangeWatchedFiles": {
+                    "dynamicRegistration":False
+                    },
                 "symbol": {
                     "dynamicRegistration": True,
                     "symbolKind": {"valueSet": []}
@@ -239,7 +241,7 @@ class LSP(conec.Operate):
                         },
                 "foldingRange": {
                         "dynamicRegistration": False,
-                        "rangeLimit": False,
+                        "rangeLimit": 100,
                         "lineFoldingOnly": False
                         }
                 }
