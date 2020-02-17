@@ -13,6 +13,8 @@ function! ECY_Install#Init() abort
          \'html_lsp': function('ECY_Install#HTML_LSP'),
          \'snippets': function('ECY_Install#Snippets'),
          \'ycm': function('ECY_Install#YCM'),
+         \'go_langserver': function('ECY_Install#Go_langserver'),
+         \'go_gopls': function('ECY_Install#Go_gopls'),
          \'vim_lsp': function('ECY_Install#HTML_LSP')
          \}
   for [key,lib] in items(s:ECY_buildin_engine)
@@ -53,6 +55,15 @@ function! ECY_Install#HTML_LSP()
     echo "[Suggestion] We hightly recommend you to install UltiSnips plugin for better experience of HTML's source."
   endtry
   return {'status':'0','description':"ok",'lib': {'html_lsp':'lib.sources.lsp_servers.html'}, 'name':'html_lsp'}
+"}}}
+endfunction
+
+function! ECY_Install#Go_gopls()
+"{{{
+  if !executable('gopls')
+    return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
+  endif
+  return {'status':'0','description':"ok",'lib': {'go_langserver':'lib.sources.lsp_servers.go_gopls'}, 'name':'go_gopls'}
 "}}}
 endfunction
 
