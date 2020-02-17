@@ -5,11 +5,14 @@ import json
 import sys
 import threading
 import queue
-import pathlib
+import os
+import logging
 from urllib.parse import urljoin
 from urllib.request import pathname2url
 from urllib.parse import urlparse
 from urllib.request import url2pathname
+global g_logger
+g_logger = logging.getLogger('ECY_server')
 
 # local lib
 import utils.lsp.stand_IO_connection as conec
@@ -26,15 +29,17 @@ class LSP(conec.Operate):
         threading.Thread(target=self._classify_response, daemon=True).start()
         self._debug = False
 
-    def Debug(self):
+    def OuputToStd(self):
         self._debug = not self._debug
 
     def _classify_response(self):
         while 1:
             todo = self.GetTodo()
-            todo = json.loads(todo['data'])
+            debug = "<---" + todo['data']
             if self._debug:
-                print(todo)
+                print(debug)
+            g_logger.debug(debug)
+            todo = json.loads(todo['data'])
             if 'id' not in todo.keys():
                 # a notification send from server
                 self._add_queue(todo['method'], todo)
@@ -116,10 +121,14 @@ class LSP(conec.Operate):
             self._add_waitting(self._id, method)
         context = json.dumps(context)
         context_lenght = len(context)
+        debug = "--->" + context
         message = (
             "Content-Length: {}\r\n\r\n"
             "{}".format(context_lenght, context)
         )
+        if self._debug:
+            print(debug)
+        g_logger.debug(debug)
         self.SendData(self.server_id, message.encode(encoding="utf-8"))
         return {'ID': self._id, 'Method': method}
 
@@ -264,6 +273,8 @@ class LSP(conec.Operate):
             self.server_id = self.server_count
         if capabilities is None:
             capabilities = self.BuildCapabilities()
+        if processId is None:
+            processId = os.getpid()
         params = {'processId':           processId,
                   'rootUri':               rootUri,
                   'initializationOptions': initializationOptions,
@@ -271,6 +282,9 @@ class LSP(conec.Operate):
                   'capabilities':          capabilities,
                   'trace':                 trace}
         return self._build_request(params, 'initialize')
+
+    def initialized(self):
+        return self._build_request({}, 'initialized', isNotification=True)
 
     def didopen(self, uri, languageId, text, version=None):
         textDocument = {'uri': uri, 'languageId': languageId,
