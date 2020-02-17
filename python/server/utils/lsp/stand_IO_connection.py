@@ -2,11 +2,13 @@
 # License: WTFPL
 
 import subprocess
-import logging
 import shlex
 import queue
 import threading
 import re
+import logging
+global g_logger
+g_logger = logging.getLogger('ECY_server')
 
 
 class ThreadOfJob(object):
@@ -20,7 +22,6 @@ class ThreadOfJob(object):
         """
         self.server_id = thread_id
         self._sub_object = sub_object
-        self._log = logging.getLogger('ecy')
         self.__queue = queue_
 
     def Start(self):
@@ -52,8 +53,9 @@ class ThreadOfJob(object):
                     # get all of buffer, waitting for next response
                     self._content_size = -1
                 self._data = ""
-            except:  # noqa
-                self._log.exception("something wrong with Start()")
+            except:
+                g_logger.debug('')
+                pass
                 # break
 
         # child process had been terminated
@@ -95,14 +97,12 @@ class Operate:
     def __init__(self):
         self.server_info = {}
         self.server_count = 0
-        self._log = logging.getLogger('ecy')
         self._queue = queue.Queue()
 
     def StartJob(self, shell_cmd):
         # can not redect stderr to subprocess.PIPE
         try:
             cmd = shlex.split(shell_cmd)
-            self._log.debug(str(cmd))
             CREATE_NO_WINDOW = 0x08000000
             self._p = subprocess.Popen(cmd,
                                        shell=True,
@@ -124,8 +124,8 @@ class Operate:
             self.server_info[self.server_count]['cmd'] = cmd
             self.server_info[self.server_count]['proc_object'] = self._p
             self.server_info[self.server_count]['thread_object'] = self._job
-        except:  # noqa
-            self._log.exception("something wrong with startjob.")
+        except:
+            g_logger.exception("something wrong")
             return 0
         return 1
 
@@ -151,7 +151,7 @@ class Operate:
         try:
             # return None if server have not be terminated
             return self.server_info[self.server_count]['proc_object'].poll()
-        except:  # noqa
+        except:
             # -2 means unkonw erro
-            self._log.exception("something wrong with GetServerStatus.")
+            g_logger.exception('')
             return -2
