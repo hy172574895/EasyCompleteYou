@@ -108,7 +108,6 @@ class Operate:
                                        shell=True,
                                        stdout=subprocess.PIPE,
                                        stdin=subprocess.PIPE,
-                                       stderr=subprocess.STDOUT,
                                        creationflags=CREATE_NO_WINDOW)
             # stderr = subprocess.STDOUT)
 
