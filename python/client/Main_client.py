@@ -33,7 +33,7 @@ if g_is_debug:
 class _do(object):
     def __init__(self):
         self.available_engine_name_dict = vim_lib.GetVariableValue(
-                'g:ECY_available_sources_lists')
+                'g:ECY_available_engine_lists')
         import lib.event.genernal as genernal
         # import lib.event.html_lsp as html_lsp
         # import lib.event.snippets as snippets

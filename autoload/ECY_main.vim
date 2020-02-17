@@ -435,7 +435,7 @@ function! s:DefaultSourcesCheck(current_sources_list) abort
     endfor
     if l:is_has == v:false
       " only install once
-      call ECY_main#Install('Snippets')
+      call ECY_main#Install('snippets')
     endif
     " only check once
     let g:ECY_is_installed_snippets = v:true
@@ -451,7 +451,7 @@ function! s:DefaultSourcesCheck(current_sources_list) abort
     endfor
     if l:is_has == v:false
       " only install once
-      call ECY_main#Install('YCM')
+      call ECY_main#Install('ycm')
     endif
     " only check once
     let g:ECY_is_working_with_YCM = v:true
@@ -930,13 +930,12 @@ endfunction
 function! ECY_main#Install(name) abort
 "{{{
 "check source's requires
-  let l:name = 'ECY_Install#'.a:name
-  try
-    let l:install_return = function(l:name)()
-  catch
+  if !exists("g:ECY_available_engine_installer[a:name]")
     call utility#ShowMsg('[ECY] have no "'.a:name.'" supported.', 3)
-    return 
-  endtry
+    return
+  endif
+  let l:Fuc = g:ECY_available_engine_installer[a:name]
+  let l:install_return = l:Fuc()
   if l:install_return['status'] == 0
     " refleshing all the running completor to make new completor work at every
     " where.
