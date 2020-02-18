@@ -136,19 +136,6 @@ class Operate(scope_.Source_interface):
         self.Diagnosis(version)
         return None
 
-    def _return_label(self, all_text_list):
-        items_list = list(set(re.findall(r'[\w\-]+', all_text_list)))
-        results_list = []
-        for item in items_list:
-            # the results_format must at least contain the following keys.
-            results_format = {'abbr': '', 'word': '', 'kind': '',
-                    'menu': '', 'info': '','user_data':''}
-            results_format['abbr'] = item
-            results_format['word'] = item
-            results_format['kind'] = '[ID]'
-            results_list.append(results_format)
-        return results_list
-
     def DoCompletion(self, version):
 # {{{
         if version['ReturnDiagnosis']:
@@ -190,8 +177,10 @@ class Operate(scope_.Source_interface):
                     results_format['kind'] = '[Snippet]'
                     results_format['menu'] = snippet['description']
                     results_list.append(results_format)
+                    # return snippets
             else:
-                results_list = self._return_label(line_text)
+                # return ID(buffers)
+                results_list = []
         else:
             for item in items_list:
                 results_format = {'abbr': '', 'word': '', 'kind': '',

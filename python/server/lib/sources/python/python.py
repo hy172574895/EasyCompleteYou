@@ -154,19 +154,6 @@ class Operate(scope_.Source_interface):
         return snippet
     # }}}
 
-    def _return_label(self, all_text_list):
-        items_list = list(set(re.findall(r'\w+', all_text_list)))
-        results_list = []
-        for item in items_list:
-            # the results_format must at least contain the following keys.
-            results_format = {'abbr': '', 'word': '', 'kind': '',
-                              'menu': '', 'info': '', 'user_data': ''}
-            results_format['abbr'] = item
-            results_format['word'] = item
-            results_format['kind'] = '[ID]'
-            results_list.append(results_format)
-        return results_list
-
     def _is_comment(self, current_line, column):
         i = 0
         for word in current_line[:column]:
@@ -187,7 +174,7 @@ class Operate(scope_.Source_interface):
         current_line = version['CurrentLineText']
         if self.IsInsideQuotation(current_line, current_colum)\
                 or self._is_comment(current_line, current_colum):
-            return_['Lists'] = self._return_label(version['AllTextList'])
+            return_['Lists'] = []
             return return_
 
         try:
@@ -197,7 +184,7 @@ class Operate(scope_.Source_interface):
             g_logger.exception("jedi bug:")
             temp = []
         if len(temp) == 0:
-            return_['Lists'] = self._return_label(version['AllTextList'])
+            return_['Lists'] = []
             return return_
 
         results_list = []
