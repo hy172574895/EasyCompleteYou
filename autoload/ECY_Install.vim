@@ -7,8 +7,11 @@ function! ECY_Install#Init() abort
    " when Client finding no Clent event will omit it to genernal
    let s:ECY_buildin_engine = {
          \'html_lsp': 'lib.event.html_lsp',
+         \'go_langserver': 'lib.event.go_langserver',
+         \'go_gopls': 'lib.event.go_gopls',
          \'snippets': 'lib.event.snippets',
          \'vim_lsp': 'lib.event.vim'}
+
    let s:ECY_buildin_engine_installer = {
          \'html_lsp': function('ECY_Install#HTML_LSP'),
          \'snippets': function('ECY_Install#Snippets'),

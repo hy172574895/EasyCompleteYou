@@ -25,9 +25,7 @@ class Operate(scope_.Source_interface):
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']
-        # self._start_server(version['StartingCMD'],
-        #         version['Vimruntime'], version['Runtimepath'])
-        self._start_server()
+        self._start_server(starting_cmd=version['StartingCMD'])
         if self.is_server_start == 'started':
             return True
         return False
@@ -42,13 +40,13 @@ class Operate(scope_.Source_interface):
             self._deamon_queue.put(temp)
         return temp
 
-    def _start_server(self, starting_cmd="", vimruntime="", runtimepath=""):
+    def _start_server(self, starting_cmd=""):
         try:
             if self.is_server_start == 'not_started':
                 if starting_cmd == "":
                     starting_cmd = 'go-langserver'
                 self._lsp.StartJob(starting_cmd)
-                init_opts = {'gocodeCompletionEnabled':True}
+                init_opts = { 'gocodeCompletionEnabled': True }
                 g_logger.debug(init_opts)
                 temp = self._lsp.initialize(
                     initializationOptions=init_opts)
@@ -99,7 +97,8 @@ class Operate(scope_.Source_interface):
             # so we return nothing
             uri_ = self._lsp.PathToUri(version['FilePath'])
             line_text = version['AllTextList']
-            self._did_open_or_change(uri_, line_text, version['DocumentVersionID'])
+            self._did_open_or_change(uri_, line_text,
+                    version['DocumentVersionID'])
         # every event must return something. 'None' means send nothing to client
         return None
 

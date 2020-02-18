@@ -14,7 +14,7 @@ class Operate(scope_.Source_interface):
     def __init__(self):
         """ notes: 
         """
-        self._name = 'go_langserver'
+        self._name = 'go_gopls'
         self._did_open_list = {}
         self._lsp = lsp.LSP()
         self.is_server_start = 'not_started'
@@ -30,7 +30,8 @@ class Operate(scope_.Source_interface):
         self._deamon_queue = version['DeamonQueue']
         # self._start_server(version['StartingCMD'],
         #         version['Vimruntime'], version['Runtimepath'])
-        self._start_server(workspace=version['WorkSpace'])
+        self._start_server(workspace=version['WorkSpace'],
+                starting_cmd=version['StartingCMD'])
         if self.is_server_start == 'started':
             return True
         return False
@@ -55,7 +56,8 @@ class Operate(scope_.Source_interface):
                 # g_logger.debug(init_opts)
                 rooturi = self._lsp.PathToUri(workspace)
                 workspace = {'uri': workspace, 'name':'init'}
-                temp = self._lsp.initialize(workspaceFolders=[workspace], rootUri=rooturi)
+                temp = self._lsp.initialize(workspaceFolders=[workspace],
+                        rootUri=rooturi)
                 # if time out will raise, meanning can not start a job.
                 self._lsp.GetResponse(temp['Method'])
                 self.is_server_start = 'started'
