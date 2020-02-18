@@ -55,6 +55,7 @@ class Operate(scope_.Source_interface):
                 # init_opts = {'gocodeCompletionEnabled':True}
                 # g_logger.debug(init_opts)
                 rooturi = self._lsp.PathToUri(workspace)
+                workspace = self._lsp.PathToUri(workspace)
                 workspace = {'uri': workspace, 'name':'init'}
                 temp = self._lsp.initialize(workspaceFolders=[workspace],
                         rootUri=rooturi)
@@ -62,12 +63,33 @@ class Operate(scope_.Source_interface):
                 self._lsp.GetResponse(temp['Method'])
                 self.is_server_start = 'started'
                 threading.Thread(target=self._get_diagnosis, daemon=True).start()
+                # threading.Thread(target=self._handle_configuration, daemon=True).start()
                 self._lsp.initialized()
-        except: # noqa
+        except:
             self.is_server_start = 'started_error'
             g_logger.exception(': can not start Sever.' )
             self._build_erro_msg(2,
                     'Failed to start LSP server. Check Log file of server to get more details.')
+
+    def _handle_configuration(self):
+        while 1:
+            try:
+                response = self._lsp.GetResponse('workspace/configuration',
+                        timeout_=-1)
+
+                config = {
+                        'hoverKind': 'NoDocumentation',
+                        'completeUnimported': True,
+                        'staticcheck': True,
+                        'usePlaceholders': True,
+                        'deepCompletion': True}
+                results = []
+                for item in response['params']['items']:
+                    results.append(config)
+                self._lsp.configuration(response['id'], results=results)
+            except:
+                g_logger.exception('')
+            
 
     def _did_open_or_change(self, uri, text, DocumentVersionID,
             is_return_diagnoiss=True):

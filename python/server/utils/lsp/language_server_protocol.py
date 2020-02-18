@@ -122,22 +122,41 @@ class LSP(conec.Operate):
         context = json.dumps(context)
         context_lenght = len(context)
         debug = "--->" + context
+        if self._debug:
+            print(debug)
+        g_logger.debug(debug)
         message = (
             "Content-Length: {}\r\n\r\n"
             "{}".format(context_lenght, context)
         )
+        self.SendData(self.server_id, message.encode(encoding="utf-8"))
+        return {'ID': self._id, 'Method': method}
+
+    def _build_response(self, results, ids):
+        if self.server_id <= 0:
+            # raise an erro:
+            # return 'E002: you have to send a initialize request first.'
+            return None
+        context = {'jsonrpc': '2.0', 'result': results, 'id': ids}
+        context = json.dumps(context)
+        context_lenght = len(context)
+        debug = "--->" + context
         if self._debug:
             print(debug)
         g_logger.debug(debug)
+        message = (
+            "Content-Length: {}\r\n\r\n"
+            "{}".format(context_lenght, context)
+        )
         self.SendData(self.server_id, message.encode(encoding="utf-8"))
-        return {'ID': self._id, 'Method': method}
+        return True
 
     def BuildCapabilities(self):
 # {{{
         WorkspaceClientCapabilities = {
                 "applyEdit": True,
                 "workspaceEdit": {
-                    "documentChanges": False,
+                    "documentChanges": True,
                     "resourceOperations": ["Create", "Rename", "Delete"],
                     "failureHandling": "Abort"
                     },
@@ -148,81 +167,81 @@ class LSP(conec.Operate):
                     "dynamicRegistration":False
                     },
                 "symbol": {
-                    "dynamicRegistration": True,
+                    "dynamicRegistration": False,
                     "symbolKind": {"valueSet": []}
                     },
                 "executeCommand": {
                     "dynamicRegistration": False
                     },
-                "workspaceFolders": False,
+                "workspaceFolders": True,
                 "configuration": False
                 }
 
         TextDocumentClientCapabilities = {
                 "synchronization": {
                     "dynamicRegistration": False,
-                    "willSave": False,
-                    "willSaveWaitUntil": False,
+                    "willSave": True,
+                    "willSaveWaitUntil": True,
                     "didSave": True
                     },
                 "completion": {
-                    "dynamicRegistration": True,
+                    "dynamicRegistration": False,
                     "completionItem": {
                         "snippetSupport": True,
-                        "commitCharactersSupport": False,
+                        "commitCharactersSupport": True,
                         "documentationFormat": [],
-                        "deprecatedSupport": False,
-                        "preselectSupport": False
+                        "deprecatedSupport": True,
+                        "preselectSupport": True
                         },
                     "completionItemKind": {"valueSet": []},
                     "contextSupport": True
                     },
                 "hover": {
-                    "dynamicRegistration": True,
+                    "dynamicRegistration": False,
                     "contentFormat": []
                     },
                 "signatrueHelp": {
-                    "dynamicRegistration": True,
+                    "dynamicRegistration": False,
                     "signatrueInformation": {
                         "documentationFormat": [],
                         "parameterInformation": {"labelOffsetSupport": True}
                         }
                     },
                 "references": {
-                    "dynamicRegistration": True
+                    "dynamicRegistration": False
                     },
                 "documentHighlight": {
-                    "dynamicRegistration": True
+                    "dynamicRegistration": False
                     },
                 "documentSymbol": {
-                    "dynamicRegistration": True,
+                    "dynamicRegistration": False,
                     "symbolKind": {"valueSet": []},
-                    "hierarchicalDocumentSymbolSupport": False
+                    "hierarchicalDocumentSymbolSupport": True
                     },
                 "formatting": {
                     "dynamicRegistration": False
                     },
                 "rangeFormatting": {
-                    "dynamicRegistration": True
+                    "dynamicRegistration": False
                     },
                 "onTypeFormatting": {
                     "dynamicRegistration": False
                     },
                 "declaration": {
-                        "dynamicRegistration": True,
+                        "dynamicRegistration": False,
                         "linkSupport": True
                         },
                 "definition": {
-                        "dynamicRegistration": True,
+                        "dynamicRegistration": False,
                         "linkSupport": True
                         },
                 "typeDefinition": {
-                        "dynamicRegistration": True,
+                        "dynamicRegistration": False,
                         "linkSupport": True
                         },
                 "implementation": {
                         "dynamicRegistration": False,
-                        "linkSupport": False
+                        "linkSupport": True
                         },
                 "codeAction": {
                         "dynamicRegistration": False,
@@ -236,13 +255,13 @@ class LSP(conec.Operate):
                         "dynamicRegistration": False
                         },
                 "documentLink": {
-                        "dynamicRegistration": True
+                        "dynamicRegistration": False
                         },
                 "colorProvider": {
                         "dynamicRegistration": False
                         },
                 "rename": {
-                        "dynamicRegistration": True,
+                        "dynamicRegistration": False,
                         "prepareSupport": True
                         },
                 "publishDiagnostics": {
@@ -251,7 +270,7 @@ class LSP(conec.Operate):
                 "foldingRange": {
                         "dynamicRegistration": False,
                         "rangeLimit": 100,
-                        "lineFoldingOnly": False
+                        "lineFoldingOnly": True
                         }
                 }
 
@@ -285,6 +304,11 @@ class LSP(conec.Operate):
 
     def initialized(self):
         return self._build_request({}, 'initialized', isNotification=True)
+
+    def configuration(self, ids, results=[]):
+        """ workspace/configuration, a response send to Server.
+        """ 
+        return self._build_response(results, ids)
 
     def didopen(self, uri, languageId, text, version=None):
         textDocument = {'uri': uri, 'languageId': languageId,

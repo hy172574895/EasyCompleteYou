@@ -66,7 +66,7 @@ function! ECY_Install#Go_gopls()
   if !executable('gopls')
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
   endif
-  return {'status':'0','description':"ok",'lib': {'go_langserver':'lib.sources.lsp_servers.go_gopls'}, 'name':'go_gopls'}
+  return {'status':'0','description':"ok",'lib': {'go_gopls':'lib.sources.lsp_servers.go_gopls'}, 'name':'go_gopls'}
 "}}}
 endfunction
 
