@@ -2,7 +2,6 @@
 # License: WTFPL
 
 # for basic
-import re
 import logging
 global g_logger
 g_logger = logging.getLogger('ECY_server')

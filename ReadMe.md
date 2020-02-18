@@ -137,4 +137,4 @@ the same time, ECY can return diagnosis; that will be send only once. Using Ale
 will do it twice, sending to linter and ECY's Server.
 
 ### Q: Why use go-langserver to be Server for golang, why not gopls?
-A: At the very first time, I tested gopls and want to make an engine to ECY, but it just keeps failing on MS-windows on gvim, and also happens to some Client such as coc.nvim or vim-lsp. I have no idea of how to make gopls work, if you have some idea or good at gopls, pleas let me konw. The funny thing is I just take a few minutes to make an engine for go-langserver, and it works well at golang.
+A: Gopls has a lot of issuses, such as you can't get completion's items util it's build done, you can only make a gopls work at one project that means you must open two gopls when you editting two golang file that belong to two different golang project and after tring to import a new package gopls won't work again.
