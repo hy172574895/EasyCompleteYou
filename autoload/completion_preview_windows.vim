@@ -13,12 +13,12 @@ function! completion_preview_windows#Init() abort
 "}}}
 endfunction
 
-function! completion_preview_windows#Show(msg, using_filetype) abort
+function! completion_preview_windows#Show(msg, using_highlight) abort
 "{{{ won't be triggered when there are no floating windows features.
   if g:has_floating_windows_support == 'vim'
-    let s:preview_windows_nr = s:PreviewWindows_vim(a:msg,a:using_filetype)
+    let s:preview_windows_nr = s:PreviewWindows_vim(a:msg,a:using_highlight)
   else
-    let s:preview_windows_nr = s:PreviewWindows_neovim(a:msg,a:using_filetype)
+    let s:preview_windows_nr = s:PreviewWindows_neovim(a:msg,a:using_highlight)
   endif
 "}}}
 endfunction
@@ -81,11 +81,11 @@ function! completion_preview_windows#Roll(up_or_down) abort
 "}}}
 endfunction
 
-function s:PreviewWindows_neovim(items,using_filetype) abort
+function s:PreviewWindows_neovim(items,using_highlight) abort
 " TODO
 endfunction
 
-function s:PreviewWindows_vim(msg, using_filetype) abort
+function s:PreviewWindows_vim(msg, using_highlight) abort
 "{{{ return a floating_win_nr
 
 "{{{ this two keys will be contained in the formmat whether it's None or not.
@@ -137,7 +137,7 @@ function s:PreviewWindows_vim(msg, using_filetype) abort
   endif
 
   let l:nr = popup_create(l:toShow_list,l:opts)
-  call setbufvar(winbufnr(l:nr), '&filetype',a:using_filetype)
+  call setbufvar(winbufnr(l:nr), '&syntax', a:using_highlight)
   return l:nr
 "}}}
 endfunction
