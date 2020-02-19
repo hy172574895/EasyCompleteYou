@@ -103,8 +103,9 @@ class LSP(conec.Operate):
         finally:
             self._lock.release()
 
-    def _build_request(self, params, method, isNotification=False):
-        """build request format and send it to server as request or notification.
+    def _build_send(self, params, method, isNotification=False):
+        """build request format and send it to server as request
+           or notification.
         """
         if self.server_id <= 0:
             # raise an erro:
@@ -300,10 +301,15 @@ class LSP(conec.Operate):
                   'workspaceFolders':      workspaceFolders,
                   'capabilities':          capabilities,
                   'trace':                 trace}
-        return self._build_request(params, 'initialize')
+        return self._build_send(params, 'initialize')
+
+    def didChangeWorkspaceFolders(self, add_workspace=[], remove_workspace=[]):
+        params = {'event':{'added': add_workspace, 'removed': remove_workspace}}
+        return self._build_send(params,
+                'workspace/didChangeWorkspaceFolders', isNotification=True)
 
     def initialized(self):
-        return self._build_request({}, 'initialized', isNotification=True)
+        return self._build_send({}, 'initialized', isNotification=True)
 
     def configuration(self, ids, results=[]):
         """ workspace/configuration, a response send to Server.
@@ -314,7 +320,8 @@ class LSP(conec.Operate):
         textDocument = {'uri': uri, 'languageId': languageId,
                         'text': text, 'version': version}
         params = {'textDocument': textDocument}
-        return self._build_request(params, 'textDocument/didOpen', isNotification=True)
+        return self._build_send(params, 'textDocument/didOpen',
+                isNotification=True)
 
     def didchange(self, uri, text, version=None, range_=None, rangLength=None):
         textDocument = {'version': version, 'uri': uri}
@@ -327,7 +334,8 @@ class LSP(conec.Operate):
             TextDocumentContentChangeEvent = {'text': text}
         params = {'textDocument': textDocument,
                   'contentChanges': [TextDocumentContentChangeEvent]}
-        return self._build_request(params, 'textDocument/didChange', isNotification=True)
+        return self._build_send(params, 'textDocument/didChange',
+                isNotification=True)
 
     def completion(self, uri, position,
                    triggerKind=1,
@@ -340,11 +348,11 @@ class LSP(conec.Operate):
         params = {'context':    CompletionContext,
                   'textDocument': TextDocumentIdentifier,
                   'position':     position}
-        return self._build_request(params, 'textDocument/completion')
+        return self._build_send(params, 'textDocument/completion')
 
     def symbos(self, query=""):
         params = {'query': query}
-        return self._build_request(params, 'workspace/symbol')
+        return self._build_send(params, 'workspace/symbol')
 
     def PathToUri(self, file_path):
         return urljoin('file:', pathname2url(file_path))
