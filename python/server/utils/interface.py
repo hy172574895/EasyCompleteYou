@@ -5,6 +5,8 @@ import re
 
 
 class Source_interface(object):
+    def __init__(self):
+        self._name = 'nothing'
 
     def _return(self, _id, is_slience=True, content='not implemented'):
         if is_slience:
@@ -16,7 +18,9 @@ class Source_interface(object):
             erro_code = 2
 
         return {'ID': _id, 'Results': 'ok', 'ErroCode': erro_code,
-                'Event': 'erro_code', 'Description': content}
+                'Event': 'erro_code',
+                'Server_name': self._name,
+                'Description': content}
 
     def GetInfo(self):
         return {'Name': 'nothing', 'WhiteList': ['nothing']}
