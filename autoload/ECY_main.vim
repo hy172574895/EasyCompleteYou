@@ -579,12 +579,17 @@ endfunction
 
 function! s:ErroCode_cb(msg) abort
 "{{{
-  try
-    if a:msg['ErroCode'] != 1
-      call utility#ShowMsg('[ECY] [' . ECY_main#GetCurrentUsingSourceName() . ' - ' . a:msg['ErroCode'] ."] " . ' ' .a:msg['Description'], 2)
+  if a:msg['ErroCode'] != 1
+    let l:engine_name = a:msg['Server_name']
+    let l:temp = ['[ECY] [' . l:engine_name . ' - ' . a:msg['ErroCode'] ."]"]
+    if type(a:msg['Description']) == 3
+      " is a list
+      call extend(l:temp, a:msg['Description'])
+    else
+      call add(l:temp, a:msg['Description'])
     endif
-  catch
-  endtry
+    call utility#ShowMsg(l:temp, 2)
+  endif
 "}}}
 endfunction
 
