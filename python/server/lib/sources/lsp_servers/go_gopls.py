@@ -37,7 +37,8 @@ class Operate(scope_.Source_interface):
         return False
 
     def _output_queue(self, msg):
-        if self._deamon_queue is not None:
+        if self._deamon_queue is not None and msg is not None:
+            msg['EngineName'] = self._name
             self._deamon_queue.put(msg)
 
     def _build_erro_msg(self, code, msg):
@@ -121,10 +122,12 @@ class Operate(scope_.Source_interface):
             except:
                 g_logger.exception('')
 
-    def _did_open_or_change(self, uri, text, DocumentVersionID,
+    def _did_open_or_change(self, uri, text, document_id,
                             is_return_diagnoiss=True):
+        """ will ask diagnostics.
+        """
         # {{{
-        # LSP require the edit-version
+        # LSP requires the edit-version
         if uri not in self._did_open_list:
             return_id = self._lsp.didopen(uri, 'go', text, version=0)
             self._did_open_list[uri] = {}
@@ -133,8 +136,12 @@ class Operate(scope_.Source_interface):
             self._did_open_list[uri]['change_version'] += 1
             return_id = self._lsp.didchange(
                 uri, text, version=self._did_open_list[uri]['change_version'])
-        if is_return_diagnoiss:
-            self.DocumentVersionID = DocumentVersionID
+        # if is_return_diagnoiss:
+        #     # ask new diagnostics while user typing.
+        #     self.DocumentVersionID = document_id
+        # else:
+        #     # return old diagnostics while use typing.
+        #     self._output_queue(self._diagnosis_cache)
         return return_id
         # }}}
 
@@ -155,9 +162,50 @@ class Operate(scope_.Source_interface):
         # }}}
 
     def _get_diagnosis(self):
+        return_ = {'Event': 'diagnosis'}
         while 1:
-            temp = self._lsp.GetResponse('textDocument/publishDiagnostics',
-                                         timeout_=-1)
+            try:
+                temp = self._lsp.GetResponse('textDocument/publishDiagnostics', timeout_=-1)
+                return_['DocumentID'] = self.DocumentVersionID
+                return_['Lists'] = self._diagnosis_analysis(temp['params'])
+                self._output_queue(return_)
+            except:
+                g_logger.exception('')
+
+
+    def _diagnosis_analysis(self, params):
+        results_list = []
+        file_path = self._lsp.UriToPath(params['uri'])
+        if file_path == '':
+            return results_list
+        for item in params['diagnostics']:
+            ranges = item['range']
+            start_line = ranges['start']['line'] + 1
+            start_colum = ranges['start']['character']
+            end_line = ranges['end']['line'] + 1
+            end_colum = ranges['end']['character']
+            pos_string = '[' + str(start_line) + ', ' + str(start_colum)+']'
+            position = {'line': start_line, 'range': {
+                'start': {'line': start_line, 'colum': start_colum},
+                'end': {'line': end_line, 'colum': end_colum}}}
+            diagnosis = item['message']
+            if item['severity'] == 1:
+                kind = 1
+            else:
+                kind = 2
+            kind_name = self._lsp.GetDiagnosticSeverity(item['severity'])
+            temp = [{'name': '1', 'content': {'abbr': diagnosis}},
+                    {'name': '2', 'content': {'abbr': kind_name}},
+                    {'name': '3', 'content': {'abbr': file_path}},
+                    {'name': '4', 'content': {'abbr': pos_string}}]
+            temp = {'items': temp,
+                    'type': 'diagnosis',
+                    'file_path': file_path,
+                    'kind': kind,
+                    'diagnosis': diagnosis,
+                    'position': position}
+            results_list.append(temp)
+        return results_list
 
     def OnBufferEnter(self, version):
         if self._check(version):
@@ -171,12 +219,22 @@ class Operate(scope_.Source_interface):
                                   workspace}]
                 self._lsp.didChangeWorkspaceFolders(
                     add_workspace=add_workspace)
+                # current_start_postion = {'line': 0,'character': 0}
+                # self._lsp.completion(uri_, current_start_postion)
 
             line_text = version['AllTextList']
             self._did_open_or_change(uri_, line_text,
                                      version['DocumentVersionID'])
         # every event must return something. 'None' means send nothing to client
         return None
+
+    def OnBufferTextChanged(self, version):
+        if not self._check(version):
+            return None
+        uri_ = self._lsp.PathToUri(version['FilePath'])
+        line_text = version['AllTextList']
+        self._did_open_or_change(uri_, line_text,
+                                 version['DocumentVersionID'])
 
     def DoCompletion(self, version):
         if not self._check(version):
@@ -188,7 +246,8 @@ class Operate(scope_.Source_interface):
             {'line': version['StartPosition']['Line'],
              'character': version['StartPosition']['Colum']}
         self._did_open_or_change(uri_, line_text,
-                                 version['DocumentVersionID'], version['ReturnDiagnosis'])
+                                 version['DocumentVersionID'],
+                                 version['ReturnDiagnosis'])
         temp = self._lsp.completion(uri_, current_start_postion)
 
         _return_data = self._waitting_for_response(temp['Method'], temp['ID'])
