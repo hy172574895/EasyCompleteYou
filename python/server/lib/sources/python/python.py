@@ -166,6 +166,8 @@ class Operate(scope_.Source_interface):
 
     def DoCompletion(self, version):
         # {{{
+        # if version['ReturnDiagnosis']:
+        self._diagnosis(version)
         if not self._check(version):
             return None
 
@@ -208,7 +210,7 @@ class Operate(scope_.Source_interface):
                     snippet = self._build_func_snippet(item.name, params)
                     results_format['snippet'] = snippet
                     results_format['kind'] += '~'
-            except Exception:
+            except:
                 pass
             results_list.append(results_format)
         return_['Lists'] = results_list
@@ -227,6 +229,7 @@ class Operate(scope_.Source_interface):
                                          references=False, path=version['FilePath'])
         except:
             definitions = []
+            g_logger.exception('')
         lists = []
         for item in definitions:
             position = item._name.tree_name.get_definition()
@@ -246,6 +249,7 @@ class Operate(scope_.Source_interface):
         return return_
 
     def OnBufferEnter(self, version):
+        self._diagnosis(version)
         if self._check(version):
             return None
         return {'ID': version['VersionID'], 'Results': 'ok', 'ErroCode': 3,
@@ -270,9 +274,12 @@ class Operate(scope_.Source_interface):
                     result_lists = self._goto_reference(version, result_lists)
             except:
                 # will return []
-                pass
+                g_logger.exception('')
         return_['Results'] = result_lists
         return return_
+
+    def OnInsertModeLeave(self, version):
+        self._diagnosis(version)
 
     def _goto_definition(self, version, results):
         # can return mutiple definitions
@@ -313,7 +320,10 @@ class Operate(scope_.Source_interface):
             results.append(temp)
         return results
 
-    def Diagnosis(self, version):
+    def OnBufferTextChanged(self, version):
+        self._diagnosis(version)
+
+    def _diagnosis(self, version):
         if has_pyflake and self._deamon_queue is not None:
             self._diagnosis_queue.put(version)
         return None
@@ -335,6 +345,7 @@ class Operate(scope_.Source_interface):
                     reporter=reporter)
                 return_['Lists'] = reporter.GetDiagnosis()
                 self._deamon_queue.put(return_)
+                g_logger.debug(return_)
             except:
                 g_logger.exception('diagnosis of python_jedi')
 
