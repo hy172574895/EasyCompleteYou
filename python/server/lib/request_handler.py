@@ -60,6 +60,8 @@ class EventHandler(object):
         elif event_ == 'OnBufferEnter':
             temp = self.on_buffer.OnBufferEnter(object_, version_dict)
             self._update_buffer_cache(version_dict)
+        elif event_ == 'OnBufferTextChanged':
+            temp = self.on_buffer.OnBufferTextChanged(object_, version_dict)
         elif event_ == 'Diagnosis':
             temp = self.diagnosis.Diagnosis(object_, version_dict)
         elif event_ == 'Goto':

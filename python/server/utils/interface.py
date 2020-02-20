@@ -40,6 +40,9 @@ class Source_interface(object):
     def Diagnosis(self, version):
         return self._return(version['VersionID'])
 
+    def OnBufferTextChanged(self, version):
+        return self._return(version['VersionID'])
+
     def GetSymbol(self, version):
         return self._return(version['VersionID'],
                             is_slience=False,

@@ -48,6 +48,9 @@ class Event(object):
         self._workspace = self.GetCurrentWorkSpace()
         return self._pack({}, 'OnBufferEnter')
 
+    def OnBufferTextChanged(self):
+        return self._pack({}, 'OnBufferTextChanged')
+
     def Goto(self):
         msg = {}
         msg['GotoLists'] = vim_lib.GetVariableValue('g:ECY_goto_info')
