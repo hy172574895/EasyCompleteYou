@@ -30,7 +30,7 @@ class Operate(scope_.Source_interface):
         self._deamon_queue = None
         self._starting_server_cmd = None
         self._diagnosis_queue = queue.Queue(maxsize=10)
-        self._diagnosis = HtmlHint()
+        self._htmlHint = HtmlHint()
         self._is_http_server_started = None
         threading.Thread(target=self._diagnosis_notification).start()
 
@@ -55,15 +55,18 @@ class Operate(scope_.Source_interface):
             return True
         return False
 
+    def _output_queue(self, msg):
+        if self._deamon_queue is not None and msg is not None:
+            msg['EngineName'] = self._name
+            self._deamon_queue.put(msg)
+
     def _build_erro_msg(self, code, msg):
         """and and send it
         """
         temp = {'ID': -1, 'Results': 'ok', 'ErroCode': code,
                 'Event': 'erro_code',
                 'Description':msg}
-        if self._deamon_queue is not None:
-            self._deamon_queue.put(temp)
-        return temp
+        self._output_queue(temp)
 
     def _start_lsp_server(self):
         ''' will only start once
@@ -132,13 +135,15 @@ class Operate(scope_.Source_interface):
             line_text = version['AllTextList']
             self._did_open_or_change(uri_, line_text)
         # every event must return something. 'None' means send nothing to client
-        self.Diagnosis(version)
+        self._diagnosis(version)
         return None
+
+    def OnBufferTextChanged(self, version):
+        self._diagnosis(version)
 
     def DoCompletion(self, version):
 # {{{
-        if version['ReturnDiagnosis']:
-            self.Diagnosis(version)
+        self._diagnosis(version)
         if not self._check(version):
             return None
 
@@ -205,36 +210,39 @@ class Operate(scope_.Source_interface):
         return return_
 # }}}
 
-    def Diagnosis(self, version):
-        if self._diagnosis.is_available == 1:
+    def _diagnosis(self, version):
+        if self._htmlHint.is_available == 1:
             self._diagnosis_queue.put(version)
-        elif self._diagnosis.is_available == 2:
-            self._diagnosis.is_available = 3
+        elif self._htmlHint.is_available == 2:
+            self._htmlHint.is_available = 3
             self._build_erro_msg(4, "Failed to call HtmlHint.")
         return None
 
     def _diagnosis_notification(self):
-        address = ('localhost', self._diagnosis.GetUnusedLocalhostPort())
+        address = ('localhost', self._htmlHint.GetUnusedLocalhostPort())
         server = HTTPServer(address, Handler)
         threading.Thread(target=server.serve_forever).start()
+        return_ = {'Server_name': self._name, 'Event': 'diagnosis'}
         while 1:
-            version = self._diagnosis_queue.get()
-            return_ = {'ID': version['VersionID'], 'Server_name': self._name}
-            return_['Event'] = 'diagnosis'
-            return_['DocumentID'] = version['DocumentVersionID']
-            # workspace = version['WorkSpace']
-            # if workspace is not None:
-            #     cmd += '--config ' + workspace + '/.htmlhintrc'
-            diagnosis_lists = self._diagnosis.GetDiagnosis(
-                    version['HTMLHintCMD'],
-                    version['AllTextList'], version['FilePath'])
-            return_['Lists'] = diagnosis_lists
-            if diagnosis_lists is None:
-                # time out or something wrong
-                # and we do nothing
-                # continue
-                return None
-            self._deamon_queue.put(return_)
+            try:
+                version = self._diagnosis_queue.get()
+                return_['ID'] = version['VersionID']
+                return_['DocumentID'] = version['DocumentVersionID']
+                # workspace = version['WorkSpace']
+                # if workspace is not None:
+                #     cmd += '--config ' + workspace + '/.htmlhintrc'
+                diagnosis_lists = self._htmlHint.GetDiagnosis(
+                        version['HTMLHintCMD'],
+                        version['AllTextList'], version['FilePath'])
+                return_['Lists'] = diagnosis_lists
+                if diagnosis_lists is None:
+                    # time out or something wrong
+                    # and we do nothing
+                    # continue
+                    return None
+                self._output_queue(return_)
+            except:
+                g_logger.exception('')
 
     # TODO: not well 
     # def Goto(self, version):
