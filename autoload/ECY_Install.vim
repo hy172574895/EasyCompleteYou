@@ -15,15 +15,16 @@ function! ECY_Install#Init() abort
    let s:ECY_buildin_engine_installer = {
          \'html_lsp': function('ECY_Install#HTML_LSP'),
          \'snippets': function('ECY_Install#Snippets'),
-         \'ycm': function('ECY_Install#YCM'),
+         \'youcompleteme': function('ECY_Install#YCM'),
          \'go_langserver': function('ECY_Install#Go_langserver'),
          \'go_gopls': function('ECY_Install#Go_gopls'),
          \'vim_lsp': function('ECY_Install#HTML_LSP')
          \}
-  for [key,lib] in items(s:ECY_buildin_engine)
+  for [key, lib] in items(s:ECY_buildin_engine)
     call ECY_Install#RegisterClient(key, lib)
-    let l:Temp = s:ECY_buildin_engine_installer[key]
-    call ECY_Install#RegisterInstallFunction(key, l:Temp)
+  endfor
+  for [key, Fuc] in items(s:ECY_buildin_engine_installer)
+    call ECY_Install#RegisterInstallFunction(key, Fuc)
   endfor
 "}}}
 endfunction

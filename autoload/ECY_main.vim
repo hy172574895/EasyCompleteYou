@@ -424,7 +424,7 @@ function! s:DefaultSourcesCheck(current_sources_list) abort
     endfor
     if l:is_has == v:false
       " only install once
-      call ECY_main#Install('ycm')
+      call ECY_main#Install('youcompleteme')
     endif
     " only check once
     let g:ECY_is_working_with_YCM = v:true
