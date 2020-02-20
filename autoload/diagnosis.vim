@@ -30,6 +30,8 @@ function diagnosis#Init() abort
   " mode.
   let s:diagnosis_cache = []
   let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
+  let g:ECY_enable_diagnosis
+        \= get(g:,'ECY_enable_diagnosis', v:true)
 
   " can not use sign_define()
   execute 'sign define ECY_diagnosis_erro text=>> texthl=' . g:ECY_erro_sign_highlight
@@ -69,7 +71,7 @@ endfunction
 
 function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
 "{{{ show diagnosis msg in normal mode.
-  if g:ECY_disable_diagnosis || mode() != 'n'
+  if !g:ECY_enable_diagnosis || mode() != 'n'
     if !a:is_triggered_by_event
       call utility#ShowMsg("[ECY] Diagnosis had been turn off.", 2)
     endif
@@ -244,6 +246,9 @@ endfunction
 
 function! diagnosis#CleanAllSignHighlight() abort
 "{{{ should be called after text had been changed.
+  if !g:ECY_enable_diagnosis
+    return
+  endif
   for l:match in getmatches()
       if l:match['group'] =~# '^ECY_diagnosis'
           call matchdelete(l:match['id'])
@@ -317,6 +322,9 @@ endfunction
 
 function! diagnosis#OnInsertModeLeave() abort
 "{{{
+  if !g:ECY_enable_diagnosis
+    return
+  endif
   if s:need_to_update_diagnosis_after_user_leave_insert_mode
     let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
     for item in s:diagnosis_cache
@@ -329,11 +337,9 @@ endfunction
 
 function! diagnosis#PlaceSign(msg) abort
 "{{{Place a Sign and highlight it.
-  " if (exists("a:msg['DocumentID']") 
-  "       \ && ECY_main#GetDocumentVersionID() > a:msg['DocumentID'] )
-  "       \ || g:ECY_disable_diagnosis
-  "   return
-  " endif
+  if !g:ECY_enable_diagnosis
+    return
+  endif
   " order matters
   let l:engine_name = a:msg['EngineName']
   if g:ECY_update_diagnosis_mode == v:false && mode() == 'i'
@@ -368,12 +374,12 @@ endfunction
 
 function! diagnosis#Toggle() abort
 "{{{
-  let g:ECY_disable_diagnosis = (!g:ECY_disable_diagnosis)
-  if g:ECY_disable_diagnosis 
+  let g:ECY_enable_diagnosis = (!g:ECY_enable_diagnosis)
+  if !g:ECY_enable_diagnosis 
     call diagnosis#CleanAllSignHighlight()
     call diagnosis#UnPlaceAllSign()
   endif
-  if g:ECY_disable_diagnosis
+  if g:ECY_enable_diagnosis
     let l:status = 'Alive'
   else
     let l:status = 'Disabled'

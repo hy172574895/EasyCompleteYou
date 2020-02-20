@@ -53,6 +53,8 @@ class EventHandler(object):
         # all the event must return something, if returning None
         # means returning nothing that do not need to send back to vim's side.
         if event_ == 'DoCompletion':
+            version_dict['IsInsertMode'] = True
+            temp = self.on_buffer.OnBufferTextChanged(engine_obj, version_dict)
             temp = self.completion.DoCompletion(engine_obj,version_dict,
                     self.buffer_cache)
         elif event_ == 'OnBufferEnter':
@@ -61,6 +63,7 @@ class EventHandler(object):
         elif event_ == 'OnInsertModeLeave':
             temp = self.on_buffer.OnInsertModeLeave(engine_obj, version_dict)
         elif event_ == 'OnBufferTextChanged':
+            version_dict['IsInsertMode'] = False
             temp = self.on_buffer.OnBufferTextChanged(engine_obj, version_dict)
         elif event_ == 'Goto':
             temp = self.goto.Goto(engine_obj, version_dict)

@@ -70,7 +70,7 @@ function! s:OnTextChangedNormalMode() abort
     return
   endif
   call ECY_main#ChangeDocumentVersionID()
-  call s:CleanAllSignHighlight('OnTextChangedNormalMode')
+  call diagnosis#CleanAllSignHighlight()
   call ECY_main#Do("OnBufferTextChanged", v:true)
   "}}}
 endfunction
@@ -126,21 +126,12 @@ function! s:OnTextChangedInsertMode() abort
     return
   endif
   call ECY_main#ChangeDocumentVersionID()
-  call s:CleanAllSignHighlight('OnTextChangedNormalMode')
+  call diagnosis#CleanAllSignHighlight()
   call s:DoCompletion()
   "}}}
 endfunction
 
 " ==============================================================================
-function! s:CleanAllSignHighlight(event) abort 
-"{{{
-  if g:ECY_disable_diagnosis
-    return
-  endif
-  call diagnosis#CleanAllSignHighlight()
-"}}}
-endfunction
-
 function! s:SetUpCompleteopt() abort 
 "{{{
   " can't format here:
@@ -278,9 +269,6 @@ function! s:SetVariable() abort
 
   let g:ECY_rolling_key_of_floating_windows
         \= get(g:,'ECY_rolling_key_of_floating_windows',['<C-h>', '<C-l>'])
-
-  let g:ECY_disable_diagnosis
-        \= get(g:,'ECY_disable_diagnosis', v:false)
 
   let g:ECY_log_msg = []
 

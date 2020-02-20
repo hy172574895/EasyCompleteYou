@@ -16,8 +16,6 @@ class Event(object):
         self._trigger_len = vim_lib.GetVariableValue("g:ECY_triggering_length")
         self.has_ultisnippet_support = vim_lib.GetVariableValue(
             "g:has_ultisnips_support")
-        self._is_return_diagnosis = vim_lib.GetVariableValue(
-            "g:ECY_update_diagnosis_mode")
 
     def GetCurrentWorkSpace(self):
         temp = vim_lib.CallEval("rooter#GetCurrentBufferWorkSpace()")
@@ -32,7 +30,6 @@ class Event(object):
         msg = {}
         msg['TriggerLength'] = self._trigger_len
         msg['ReturnMatchPoint'] = self._is_return_match_point
-        msg['ReturnDiagnosis'] = self._is_return_diagnosis
         return self._pack(msg, 'DoCompletion')
 
     def InstallSource(self):
@@ -83,11 +80,15 @@ class Event(object):
                 results = {'HasSnippetSupport': False}
         return results
 
+    def _is_return_diagnosis(self):
+        return vim_lib.GetVariableValue("g:ECY_enable_diagnosis")
+
     def _basic(self, msg):
         msg['AllTextList'] = vim_lib.CurrenBufferText()
         msg['CurrentLineText'] = vim_lib.CurrentLineContents()
         msg['FileType'] = vim_lib.GetCurrentBufferType()
         msg['FilePath'] = vim_lib.GetCurrentBufferFilePath()
+        msg['ReturnDiagnosis'] = self._is_return_diagnosis()
         # vim_lib.CurrentColumn is 0-based, and also CurrenLineNr()
         start_position = {
             'Line': vim_lib.CurrenLineNr(), 'Colum': vim_lib.CurrentColumn()}
