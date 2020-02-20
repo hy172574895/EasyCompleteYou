@@ -261,7 +261,22 @@ function! diagnosis#UnPlaceAllSign() abort
 "}}}
 endfunction
 
-function! s:PlaceSign(position, diagnosis, items, style, path) abort
+function! diagnosis#UnPlaceAllSignByEngineName(engine_name) abort
+"{{{
+  let i = 0
+  while i < len(g:ECY_sign_lists)
+    let l:temp = g:ECY_sign_lists[i]
+    if l:temp['engine_name'] == a:engine_name
+      call sign_unplace('', {'buffer' : l:temp['buffer_name'], 'id': l:temp['id']})
+      unlet g:ECY_sign_lists[i]
+      continue
+    endif
+    let i += 1
+  endw
+"}}}
+endfunction
+
+function! s:PlaceSign(position, diagnosis, items, style, path, engine_name) abort
 "{{{ place a sign in current buffer.
   " a:position = {'line': 10, 'range': {'start': { 'line': 5, 'colum': 23 },'end' : { 'line': 6, 'colum': 0 } }}
   " a:diagnosis = {'item':{'1':'asdf', '2':'sdf'}}
@@ -278,6 +293,7 @@ function! s:PlaceSign(position, diagnosis, items, style, path) abort
         \'id': l:sign_id,
         \'items': a:items,
         \'buffer_name': a:path,
+        \'engine_name': a:engine_name,
         \'diagnosis': a:diagnosis,
         \'kind': l:style}
   call add(g:ECY_sign_lists, l:temp)
@@ -286,14 +302,15 @@ endfunction
 
 function! diagnosis#PlaceSign(msg) abort
 "{{{Place a Sign and highlight it.
-  if (exists("a:msg['DocumentID']") 
-        \ && ECY_main#GetDocumentVersionID() > a:msg['DocumentID'] )
-        \ || g:ECY_disable_diagnosis
-    return
-  endif
+  " if (exists("a:msg['DocumentID']") 
+  "       \ && ECY_main#GetDocumentVersionID() > a:msg['DocumentID'] )
+  "       \ || g:ECY_disable_diagnosis
+  "   return
+  " endif
   " order matters
   call diagnosis#CleanAllSignHighlight()
-  call diagnosis#UnPlaceAllSignInBufferName(utility#GetCurrentBufferPath())
+  call diagnosis#UnPlaceAllSignByEngineName(a:msg['EngineName'])
+  " call diagnosis#UnPlaceAllSignInBufferName(utility#GetCurrentBufferPath())
   let s:current_diagnosis = {}
   let l:items = a:msg['Lists']
   if len(l:items) > 500
@@ -309,7 +326,8 @@ function! diagnosis#PlaceSign(msg) abort
     call s:PlaceSign(item['position'], 
           \item['diagnosis'],
           \item['items'], item['kind'],
-          \item['file_path'])
+          \item['file_path'],
+          \a:msg['EngineName'])
   endfor
 "}}}
 endfunction
