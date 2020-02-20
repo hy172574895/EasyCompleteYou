@@ -71,6 +71,7 @@ function! s:OnTextChangedNormalMode() abort
   endif
   call ECY_main#ChangeDocumentVersionID()
   call s:AskDiagnosis('OnTextChangedNormalMode')
+  call ECY_main#Do("DoCompletion", v:true)
   "}}}
 endfunction
 
@@ -112,6 +113,7 @@ function! s:OnBufferEnter() abort
   call diagnosis#CleanAllSignHighlight()
   call s:SetUpCompleteopt()
   " OnBufferEnter will trigger Diagnosis
+  call ECY_main#Log("asked Diagnosis.")
   call ECY_main#Do("OnBufferEnter", v:true)
   "}}}
 endfunction
@@ -138,10 +140,11 @@ function! s:AskDiagnosis(event) abort
     let s:buffer_has_changed = 1
   endif
   if a:event == 'OnInsertModeLeave' && s:buffer_has_changed == 1
-    call diagnosis#UnPlaceAllSignInBufferName(utility#GetCurrentBufferPath())
+    " call diagnosis#UnPlaceAllSignInBufferName(utility#GetCurrentBufferPath())
     let s:buffer_has_changed = 0
   endif
   if a:event == 'OnInsertModeLeave' || a:event == 'OnTextChangedNormalMode'
+    call ECY_main#Log("asked Diagnosis.")
     call ECY_main#Do("Diagnosis", v:true)
   endif
 "}}}
@@ -166,7 +169,8 @@ function! s:SetUpCompleteopt() abort
 endfunction
 
 function! s:DoCompletion() abort
-"{{{
+"{{{ this will update buffer text too. so we don't trigger event of
+"'OnBufferTextChanged'
   if g:has_floating_windows_support == 'vim' && 
         \g:ECY_use_floating_windows_to_be_popup_windows == v:true
     if s:isSelecting

@@ -326,6 +326,7 @@ class Operate(scope_.Source_interface):
                 return_ = {'ID': version['VersionID'],
                            'Server_name': self._name}
                 return_['Event'] = 'diagnosis'
+                return_['EngineName'] = self._name
                 return_['DocumentID'] = version['DocumentVersionID']
                 reporter.SetContent(version['AllTextList'])
                 pyflakes_api.check(
