@@ -70,8 +70,8 @@ function! s:OnTextChangedNormalMode() abort
     return
   endif
   call ECY_main#ChangeDocumentVersionID()
-  call s:AskDiagnosis('OnTextChangedNormalMode')
-  call ECY_main#Do("DoCompletion", v:true)
+  call s:CleanAllSignHighlight('OnTextChangedNormalMode')
+  call ECY_main#Do("OnBufferTextChanged", v:true)
   "}}}
 endfunction
 
@@ -96,8 +96,11 @@ function! s:OnInsertModeLeave() abort
   endif
   " order matters
   call s:BackToLastSource(-1)
-  call s:AskDiagnosis('OnInsertModeLeave')
+  call diagnosis#OnInsertModeLeave()
   call completion_preview_windows#Close()
+  " we don't trigger this event to Server,
+  " because we frequently escape insert mode and this event is unless for most of engines.
+  " call ECY_main#Do("OnInsertModeLeave", v:true)
   "}}}
 endfunction
 
@@ -109,7 +112,6 @@ function! s:OnBufferEnter() abort
   let  s:indentexpr           = &indentexpr
   let  s:completeopt_temp     = &completeopt
   let  s:completeopt_fuc_temp = &completefunc
-  let  s:buffer_has_changed   = 0
   call diagnosis#CleanAllSignHighlight()
   call s:SetUpCompleteopt()
   " OnBufferEnter will trigger Diagnosis
@@ -124,29 +126,18 @@ function! s:OnTextChangedInsertMode() abort
     return
   endif
   call ECY_main#ChangeDocumentVersionID()
-  call s:AskDiagnosis('OnTextChangedInsertMode')
+  call s:CleanAllSignHighlight('OnTextChangedNormalMode')
   call s:DoCompletion()
   "}}}
 endfunction
 
 " ==============================================================================
-function! s:AskDiagnosis(event) abort 
+function! s:CleanAllSignHighlight(event) abort 
 "{{{
   if g:ECY_disable_diagnosis
     return
   endif
-  if a:event == 'OnTextChangedInsertMode' || a:event == 'OnTextChangedNormalMode'
-    call diagnosis#CleanAllSignHighlight()
-    let s:buffer_has_changed = 1
-  endif
-  if a:event == 'OnInsertModeLeave' && s:buffer_has_changed == 1
-    " call diagnosis#UnPlaceAllSignInBufferName(utility#GetCurrentBufferPath())
-    let s:buffer_has_changed = 0
-  endif
-  if a:event == 'OnInsertModeLeave' || a:event == 'OnTextChangedNormalMode'
-    call ECY_main#Log("asked Diagnosis.")
-    call ECY_main#Do("Diagnosis", v:true)
-  endif
+  call diagnosis#CleanAllSignHighlight()
 "}}}
 endfunction
 
@@ -212,7 +203,7 @@ function! s:GetCurrentPosition() abort
 "}}}
 endfunction
 
-function! s:UsingSpecicalSource(completor_name,invoke_key, is_replace) abort
+function! s:UsingSpecicalSource(completor_name, invoke_key, is_replace) abort
 "{{{
   if ECY_main#IsECYWorksAtCurrentBuffer()
     let l:curren_file_type = &filetype
@@ -283,16 +274,6 @@ function! s:SetVariable() abort
   else
     let g:ECY_disable_for_files_larger_than_kb
           \= get(g:,'ECY_disable_for_files_larger_than_kb',1000)
-  endif
-
-  " 1 means ask diagnosis when there are changes not including user in insert mode
-  " 2 means ask diagnosis when there are changes including user in insert mode
-  let g:ECY_update_diagnosis_mode
-        \= get(g:,'ECY_update_diagnosis_mode',2)
-  if g:ECY_update_diagnosis_mode == 2
-    let g:ECY_update_diagnosis_mode = v:true
-  else
-    let g:ECY_update_diagnosis_mode = v:false
   endif
 
   let g:ECY_rolling_key_of_floating_windows

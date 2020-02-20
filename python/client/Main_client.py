@@ -167,6 +167,8 @@ class ECY_Client(_do):
         try:
             # self._lock.acquire()
             todo = self._get(event)
+            if todo is None:
+                return
             todo['VersionID'] = version_id
             todo['DocumentVersionID'] = document_id
             if self.isdebug:

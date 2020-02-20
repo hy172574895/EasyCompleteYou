@@ -3,9 +3,12 @@
 
 
 class Operate(object):
+    """ most of these are notification
+    """
     def OnBufferEnter(self, engine_obj, version):
         results_ = engine_obj.OnBufferEnter(version)
-        engine_name = engine_obj['Name']
+        source_info = engine_obj.GetInfo()
+        engine_name = source_info['Name']
         if results_ is not None:
             results_['Event'] = version['Event']
             results_['Version_ID'] = version['VersionID']
@@ -14,7 +17,18 @@ class Operate(object):
 
     def OnBufferTextChanged(self, engine_obj, version):
         results_ = engine_obj.OnBufferTextChanged(version)
-        engine_name = engine_obj['Name']
+        source_info = engine_obj.GetInfo()
+        engine_name = source_info['Name']
+        if results_ is not None:
+            results_['Event'] = version['Event']
+            results_['Version_ID'] = version['VersionID']
+            results_['EngineName'] = engine_name
+        return results_
+
+    def OnInsertModeLeave(self, engine_obj, version):
+        results_ = engine_obj.OnInsertModeLeave(version)
+        source_info = engine_obj.GetInfo()
+        engine_name = source_info['Name']
         if results_ is not None:
             results_['Event'] = version['Event']
             results_['Version_ID'] = version['VersionID']

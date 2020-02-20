@@ -6,7 +6,8 @@ class Operate(object):
 
     def Diagnosis(self, engine_obj,  version):
         results = engine_obj.Diagnosis(version)
-        engine_name = engine_obj['Name']
+        source_info = engine_obj.GetInfo()
+        engine_name = source_info['Name']
         if results is not None and 'ErroCode' not in results:
             results['Event'] = 'diagnosis'
             results['EngineName'] = engine_name

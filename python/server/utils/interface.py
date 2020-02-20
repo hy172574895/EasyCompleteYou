@@ -37,10 +37,10 @@ class Source_interface(object):
     def OnBufferEnter(self, version):
         return self._return(version['VersionID'])
 
-    def Diagnosis(self, version):
+    def OnBufferTextChanged(self, version):
         return self._return(version['VersionID'])
 
-    def OnBufferTextChanged(self, version):
+    def OnInsertModeLeave(self, version):
         return self._return(version['VersionID'])
 
     def GetSymbol(self, version):

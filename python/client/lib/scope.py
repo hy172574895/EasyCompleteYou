@@ -35,9 +35,6 @@ class Event(object):
         msg['ReturnDiagnosis'] = self._is_return_diagnosis
         return self._pack(msg, 'DoCompletion')
 
-    def Diagnosis(self):
-        return self._pack({}, 'Diagnosis')
-
     def InstallSource(self):
         msg = {}
         msg['SourcePath'] = vim_lib.GetVariableValue(
@@ -50,6 +47,9 @@ class Event(object):
 
     def OnBufferTextChanged(self):
         return self._pack({}, 'OnBufferTextChanged')
+
+    def OnInsertModeLeave(self):
+        return self._pack({}, 'OnInsertModeLeave')
 
     def Goto(self):
         msg = {}

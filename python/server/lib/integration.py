@@ -12,7 +12,8 @@ class Operate(object):
     def HandleIntegration(self, engine_obj, version):
         event_ = version['Integration_event']
         return_ = None
-        engine_name = engine_obj['Name']
+        source_info = engine_obj.GetInfo()
+        engine_name = source_info['Name']
         # returning  None will send nothing to client
         if event_ == 'go_to_definition':
             return_ = engine_obj.GotoDefinition(version)

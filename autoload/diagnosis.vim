@@ -16,6 +16,21 @@ function diagnosis#Init() abort
     call prop_type_add('ECY_diagnosis_text', {'highlight': g:ECY_diagnosis_text})
   endif
 
+  " 1 means ask diagnosis when there are changes not including user in insert mode, trigger by DoCompletion()
+  " 2 means ask diagnosis when there are changes including user in insert mode, trigger by OnBufferTextChanged().
+  let g:ECY_update_diagnosis_mode
+        \= get(g:,'ECY_update_diagnosis_mode', 1)
+  if g:ECY_update_diagnosis_mode == 2
+    let g:ECY_update_diagnosis_mode = v:true
+  else
+    let g:ECY_update_diagnosis_mode = v:false
+  endif
+  " user don't want to update diagnosis in insert mode, but engine had
+  " returned diagnosis, so we cache it and update after user leave insert
+  " mode.
+  let s:diagnosis_cache = []
+  let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
+
   " can not use sign_define()
   execute 'sign define ECY_diagnosis_erro text=>> texthl=' . g:ECY_erro_sign_highlight
   execute 'sign define ECY_diagnosis_warn text=!! texthl=' . g:ECY_warn_sign_highlight
@@ -300,6 +315,18 @@ function! s:PlaceSign(position, diagnosis, items, style, path, engine_name) abor
 "}}}
 endfunction
 
+function! diagnosis#OnInsertModeLeave() abort
+"{{{
+  if s:need_to_update_diagnosis_after_user_leave_insert_mode
+    let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
+    for item in s:diagnosis_cache
+      call diagnosis#PlaceSign(item)
+    endfor
+    let s:diagnosis_cache = []
+  endif
+"}}}
+endfunction
+
 function! diagnosis#PlaceSign(msg) abort
 "{{{Place a Sign and highlight it.
   " if (exists("a:msg['DocumentID']") 
@@ -308,8 +335,15 @@ function! diagnosis#PlaceSign(msg) abort
   "   return
   " endif
   " order matters
+  let l:engine_name = a:msg['EngineName']
+  if g:ECY_update_diagnosis_mode == v:false && mode() == 'i'
+    " don't want to update diagnosis in insert mode
+    call add(s:diagnosis_cache, a:msg)
+    let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:true
+    return
+  endif
   call diagnosis#CleanAllSignHighlight()
-  call diagnosis#UnPlaceAllSignByEngineName(a:msg['EngineName'])
+  call diagnosis#UnPlaceAllSignByEngineName(l:engine_name)
   " call diagnosis#UnPlaceAllSignInBufferName(utility#GetCurrentBufferPath())
   let s:current_diagnosis = {}
   let l:items = a:msg['Lists']
@@ -327,7 +361,7 @@ function! diagnosis#PlaceSign(msg) abort
           \item['diagnosis'],
           \item['items'], item['kind'],
           \item['file_path'],
-          \a:msg['EngineName'])
+          \l:engine_name)
   endfor
 "}}}
 endfunction

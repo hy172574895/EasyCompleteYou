@@ -8,7 +8,6 @@ g_logger = logging.getLogger('ECY_server')
 
 # local lib
 import goto
-import diagnosis
 import integration
 import completor_manager
 import completion
@@ -24,7 +23,6 @@ class EventHandler(object):
             self.source_manager = completor_manager.Operate()
             self.on_buffer = on_buffer.Operate()
             self.integration = integration.Operate()
-            self.diagnosis = diagnosis.Operate()
             self.goto = goto.Operate()
         except:
             g_logger.exception("")
@@ -49,25 +47,25 @@ class EventHandler(object):
         # if the source's event will block for a while, the source can return
         # None, and then put the result into deamon_queue when it finished
         version_dict['DeamonQueue'] = self._pass_results_queue
-        object_ = self.source_manager.GetSourceObjByName(
+        engine_obj = self.source_manager.GetSourceObjByName(
             source_name, file_type)
 
         # all the event must return something, if returning None
         # means returning nothing that do not need to send back to vim's side.
         if event_ == 'DoCompletion':
-            temp = self.completion.DoCompletion(object_,version_dict,
+            temp = self.completion.DoCompletion(engine_obj,version_dict,
                     self.buffer_cache)
         elif event_ == 'OnBufferEnter':
-            temp = self.on_buffer.OnBufferEnter(object_, version_dict)
+            temp = self.on_buffer.OnBufferEnter(engine_obj, version_dict)
             self._update_buffer_cache(version_dict)
+        elif event_ == 'OnInsertModeLeave':
+            temp = self.on_buffer.OnInsertModeLeave(engine_obj, version_dict)
         elif event_ == 'OnBufferTextChanged':
-            temp = self.on_buffer.OnBufferTextChanged(object_, version_dict)
-        elif event_ == 'Diagnosis':
-            temp = self.diagnosis.Diagnosis(object_, version_dict)
+            temp = self.on_buffer.OnBufferTextChanged(engine_obj, version_dict)
         elif event_ == 'Goto':
-            temp = self.goto.Goto(object_, version_dict)
+            temp = self.goto.Goto(engine_obj, version_dict)
         elif event_ == 'integration':
-            temp = self.integration.HandleIntegration(object_, version_dict)
+            temp = self.integration.HandleIntegration(engine_obj, version_dict)
         elif event_ == 'InstallSource':
             temp = self.source_manager.InstallSource(
                 version_dict['SourcePath'])

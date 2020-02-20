@@ -15,9 +15,9 @@ class Operate(object):
         self.start_position = {}
         self.completion_items = {'Server_name': 'nothing', 'Lists': []}
 
-    def DoCompletion(self, source_obj, version, buffer_cache):
+    def DoCompletion(self, engine_obj, version, buffer_cache):
         # we get regex from instance
-        source_info = source_obj.GetInfo()
+        source_info = engine_obj.GetInfo()
 
         # get full items
         current_colum = version['StartPosition']['Colum']
@@ -38,7 +38,7 @@ class Operate(object):
         if current_start_postion != self.start_position[engine_name]\
                 or self.completion_items['Server_name'] != engine_name:
             # reflesh cache
-            return_ = source_obj.DoCompletion(version)
+            return_ = engine_obj.DoCompletion(version)
             if return_ is None or 'ErroCode' in return_:
                 if 'ErroCode' in return_:
                     return_['EngineName'] = engine_name
