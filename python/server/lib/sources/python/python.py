@@ -2,7 +2,6 @@
 # License: WTFPL
 
 import os
-import re
 import queue
 import threading
 import logging
@@ -53,7 +52,7 @@ class Operate(scope_.Source_interface):
         self._deamon_queue = None
         g_logger.debug('python_jedi has pyflakes:' + str(has_pyflake))
         if has_pyflake:
-            self._diagnosis_queue = queue.Queue(maxsize=10)
+            self._diagnosis_queue = queue.LifoQueue(maxsize=10)
             threading.Thread(target=self._output_diagnosis,
                              daemon=True).start()
 
@@ -167,7 +166,6 @@ class Operate(scope_.Source_interface):
     def DoCompletion(self, version):
         # {{{
         # if version['ReturnDiagnosis']:
-        self._diagnosis(version)
         if not self._check(version):
             return None
 
@@ -278,9 +276,6 @@ class Operate(scope_.Source_interface):
         return_['Results'] = result_lists
         return return_
 
-    def OnInsertModeLeave(self, version):
-        self._diagnosis(version)
-
     def _goto_definition(self, version, results):
         # can return mutiple definitions
         definitions = self._GetJediScript(version).goto_definitions()
@@ -321,7 +316,8 @@ class Operate(scope_.Source_interface):
         return results
 
     def OnBufferTextChanged(self, version):
-        self._diagnosis(version)
+        if version['ReturnDiagnosis']:
+            self._diagnosis(version)
 
     def _diagnosis(self, version):
         if has_pyflake and self._deamon_queue is not None:
@@ -330,14 +326,18 @@ class Operate(scope_.Source_interface):
 
     def _output_diagnosis(self):
         reporter = PyflakesDiagnosticReport('')
+        self.document_id = -1
         while 1:
             try:
                 version = self._diagnosis_queue.get()
+                if version['DocumentVersionID'] < self.document_id:
+                    continue
+                self.document_id = version['DocumentVersionID']
                 return_ = {'ID': version['VersionID'],
                            'Server_name': self._name}
                 return_['Event'] = 'diagnosis'
                 return_['EngineName'] = self._name
-                return_['DocumentID'] = version['DocumentVersionID']
+                return_['DocumentID'] = self.document_id
                 reporter.SetContent(version['AllTextList'])
                 pyflakes_api.check(
                     version['AllTextList'],
