@@ -30,22 +30,25 @@ class Operate(object):
         version['Filter_words'] = filter_words
         version['Filter_start_position'] = current_start_postion
 
-        if source_info['Name'] not in self.start_position:
+        engine_name = source_info['Name']
+        if engine_name not in self.start_position:
             # init
-            self.start_position[source_info['Name']] = {'Line': 0, 'Colum': 0}
+            self.start_position[engine_name] = {'Line': 0, 'Colum': 0}
 
-        if current_start_postion != self.start_position[source_info['Name']]\
-                or self.completion_items['Server_name'] != source_info['Name']:
+        if current_start_postion != self.start_position[engine_name]\
+                or self.completion_items['Server_name'] != engine_name:
             # reflesh cache
             return_ = source_obj.DoCompletion(version)
             if return_ is None or 'ErroCode' in return_:
+                if 'ErroCode' in return_:
+                    return_['EngineName'] = engine_name
                 return return_
             self.completion_items = return_
-            self.start_position[source_info['Name']] = current_start_postion
+            self.start_position[engine_name] = current_start_postion
 
         # filter the items with keywords
         all_list = self.completion_items['Lists']
-        current_start_postion = self.start_position[source_info['Name']]
+        current_start_postion = self.start_position[engine_name]
         trigger_len = int(version['TriggerLength'])
         return_ = []
         if len(filter_words) > trigger_len or \
@@ -74,7 +77,8 @@ class Operate(object):
             addtional_data = self.completion_items['AddtionalData']
         return {'Event': 'do_completion', 'Version_ID': version['VersionID'],
                 'Lists': return_, 'StartPosition': current_start_postion,
-                'Server_name': source_info['Name'],
+                'Server_name': engine_name,
+                'EngineName': engine_name,
                 'AddtionalData': addtional_data,
                 'Filter_words': filter_words}
 

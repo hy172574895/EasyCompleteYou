@@ -3,12 +3,11 @@
 
 
 class Operate(object):
-    """
-    """
 
-    def __init__(self):
-        pass
-
-    def Diagnosis(self, obj_,  version):
-        results = obj_.Diagnosis(version)
+    def Diagnosis(self, engine_obj,  version):
+        results = engine_obj.Diagnosis(version)
+        engine_name = engine_obj['Name']
+        if results is not None and 'ErroCode' not in results:
+            results['Event'] = 'diagnosis'
+            results['EngineName'] = engine_name
         return results

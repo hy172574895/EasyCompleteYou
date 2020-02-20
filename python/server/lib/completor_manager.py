@@ -130,6 +130,7 @@ class Operate(object):
             return {'Event': 'install_source',
                     'Status': 0,
                     'Name': engine_lib,
+                    'EngineName': engine_name,
                     'FileType': info_['WhiteList'],
                     'Description': 'Installation succeed.'}
         except:

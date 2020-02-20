@@ -9,25 +9,27 @@ class Operate(object):
         self.symbols_cache_list = []
         self.fuzzy_match = fm.FuzzyMatch()
 
-    def HandleIntegration(self, obj_, version):
+    def HandleIntegration(self, engine_obj, version):
         event_ = version['Integration_event']
         return_ = None
+        engine_name = engine_obj['Name']
         # returning  None will send nothing to client
         if event_ == 'go_to_definition':
-            return_ = obj_.GotoDefinition(version)
+            return_ = engine_obj.GotoDefinition(version)
 
         elif event_ == 'go_to_declaration_or_definition':
-            return_ = obj_.GoToDeclarationOrDefinition(version)
+            return_ = engine_obj.GoToDeclarationOrDefinition(version)
 
         elif event_ == 'get_symbols':
-            return_ = obj_.GetSymbol(version)
+            return_ = engine_obj.GetSymbol(version)
 
         if return_ is None:
             return_ = {'Results': 'ok',
                        'ErroCode': 3,
                        'Event': 'erro_code',
                        'Description': 'have no "' + event_ + '" event'}
-        else:
+        elif 'ErroCode' not in return_:
             return_['Event'] = 'integration'
+            return_['EngineName'] = engine_name
             return_['Integration_event'] = event_
         return return_
