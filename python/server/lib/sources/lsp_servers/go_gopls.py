@@ -31,7 +31,8 @@ class Operate(scope_.Source_interface):
         # self._start_server(version['StartingCMD'],
         #         version['Vimruntime'], version['Runtimepath'])
         self._start_server(workspace=version['WorkSpace'],
-                           starting_cmd=version['StartingCMD'])
+                           starting_cmd=version['StartingCMD'],
+                           is_enable_diagnosis=version['ReturnDiagnosis'])
         if self.is_server_start == 'started':
             return True
         return False
@@ -51,8 +52,10 @@ class Operate(scope_.Source_interface):
                 'Server_name': self._name,
                 'Description': msg}
         self._output_queue(temp)
+        
 
-    def _start_server(self, starting_cmd="", workspace=""):
+    def _start_server(self, starting_cmd="", workspace="",
+            is_enable_diagnosis=True):
         try:
             if self.is_server_start == 'not_started':
                 if starting_cmd == "":
@@ -65,6 +68,10 @@ class Operate(scope_.Source_interface):
                 workspace = {'uri': workspace, 'name': 'init'}
                 capabilities = self._lsp.BuildCapabilities()
                 capabilities['workspace']['configuration'] = True
+                if is_enable_diagnosis:
+                    is_enable_diagnosis = True
+                capabilities['textDocument']['publishDiagnostics']\
+                        ['relatedInformation'] = is_enable_diagnosis
                 temp = self._lsp.initialize(workspaceFolders=[workspace],
                                             rootUri=rooturi,
                                             capabilities=capabilities)
@@ -136,12 +143,6 @@ class Operate(scope_.Source_interface):
             self._did_open_list[uri]['change_version'] += 1
             return_id = self._lsp.didchange(
                 uri, text, version=self._did_open_list[uri]['change_version'])
-        # if is_return_diagnoiss:
-        #     # ask new diagnostics while user typing.
-        #     self.DocumentVersionID = document_id
-        # else:
-        #     # return old diagnostics while use typing.
-        #     self._output_queue(self._diagnosis_cache)
         return return_id
         # }}}
 
@@ -165,7 +166,8 @@ class Operate(scope_.Source_interface):
         return_ = {'Event': 'diagnosis'}
         while 1:
             try:
-                temp = self._lsp.GetResponse('textDocument/publishDiagnostics', timeout_=-1)
+                temp = self._lsp.GetResponse('textDocument/publishDiagnostics',
+                        timeout_=-1)
                 return_['DocumentID'] = self.DocumentVersionID
                 return_['Lists'] = self._diagnosis_analysis(temp['params'])
                 self._output_queue(return_)
@@ -241,13 +243,9 @@ class Operate(scope_.Source_interface):
             return None
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         uri_ = self._lsp.PathToUri(version['FilePath'])
-        line_text = version['AllTextList']
         current_start_postion = \
             {'line': version['StartPosition']['Line'],
              'character': version['StartPosition']['Colum']}
-        self._did_open_or_change(uri_, line_text,
-                                 version['DocumentVersionID'],
-                                 version['ReturnDiagnosis'])
         temp = self._lsp.completion(uri_, current_start_postion)
 
         _return_data = self._waitting_for_response(temp['Method'], temp['ID'])
