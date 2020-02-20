@@ -37,7 +37,6 @@ class Operate(scope_.Event):
         msg['TriggerLength'] = self._trigger_len
         msg['ReturnMatchPoint'] = self._is_return_match_point
         msg['StartingCMD'] = self._get_starting_cmd()
-        msg['ReturnDiagnosis'] = self._is_return_diagnosis
         return self._pack(msg, 'DoCompletion')
 
     def _pack(self, msg, event_name):

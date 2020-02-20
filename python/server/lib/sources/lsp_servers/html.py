@@ -29,7 +29,7 @@ class Operate(scope_.Source_interface):
         self.is_server_start = 'not started'
         self._deamon_queue = None
         self._starting_server_cmd = None
-        self._diagnosis_queue = queue.Queue(maxsize=10)
+        self._diagnosis_queue = queue.LifoQueue(maxsize=10)
         self._htmlHint = HtmlHint()
         self._is_http_server_started = None
         threading.Thread(target=self._diagnosis_notification).start()
@@ -59,6 +59,7 @@ class Operate(scope_.Source_interface):
         if self._deamon_queue is not None and msg is not None:
             msg['EngineName'] = self._name
             self._deamon_queue.put(msg)
+            g_logger.debug(msg)
 
     def _build_erro_msg(self, code, msg):
         """and and send it
@@ -139,21 +140,22 @@ class Operate(scope_.Source_interface):
         return None
 
     def OnBufferTextChanged(self, version):
-        self._diagnosis(version)
+        uri_ = self._lsp.PathToUri(version['FilePath'])
+        line_text = version['AllTextList']
+        self._did_open_or_change(uri_, line_text) # for completion
+        if version['ReturnDiagnosis']:
+            self._diagnosis(version)
 
     def DoCompletion(self, version):
 # {{{
-        self._diagnosis(version)
         if not self._check(version):
             return None
 
         return_ = {'ID': version['VersionID'], 'Server_name': self._name}
         uri_ = self._lsp.PathToUri(version['FilePath'])
-        line_text = version['AllTextList']
         current_start_postion = \
             {'line': version['StartPosition']['Line'],
              'character': version['StartPosition']['Colum']}
-        self._did_open_or_change(uri_, line_text)
         temp = self._lsp.completion(uri_, current_start_postion)
         _return_data = self._waitting_for_response(temp['Method'], temp['ID'])
         if _return_data is None:
@@ -222,12 +224,16 @@ class Operate(scope_.Source_interface):
         address = ('localhost', self._htmlHint.GetUnusedLocalhostPort())
         server = HTTPServer(address, Handler)
         threading.Thread(target=server.serve_forever).start()
+        self.document_id = -1
         return_ = {'Server_name': self._name, 'Event': 'diagnosis'}
         while 1:
             try:
                 version = self._diagnosis_queue.get()
+                if version['DocumentVersionID'] < self.document_id:
+                    continue
+                self.document_id = version['DocumentVersionID']
                 return_['ID'] = version['VersionID']
-                return_['DocumentID'] = version['DocumentVersionID']
+                return_['DocumentID'] = self.document_id
                 # workspace = version['WorkSpace']
                 # if workspace is not None:
                 #     cmd += '--config ' + workspace + '/.htmlhintrc'
@@ -235,11 +241,6 @@ class Operate(scope_.Source_interface):
                         version['HTMLHintCMD'],
                         version['AllTextList'], version['FilePath'])
                 return_['Lists'] = diagnosis_lists
-                if diagnosis_lists is None:
-                    # time out or something wrong
-                    # and we do nothing
-                    # continue
-                    return None
                 self._output_queue(return_)
             except:
                 g_logger.exception('')
