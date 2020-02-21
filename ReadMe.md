@@ -75,7 +75,7 @@ So check out the following lists carefully and install the dependence before you
 **Notes: you can not use `snippets-expanding` without `Ultisnips`,  can not use`goto-definition`, `goto-declaration`, `find-symbols`, `find-reference` without `LeaderF`.**  
 Here the full lists of engine that ECY supports. 
 
-name|language|abilities|dependence|doc link
+name|programming language|abilities|dependence|doc link
 --|:--:|--:|--:|--:
 label|all|completion|-|
 snippet|all|completion<br>snippets-expanding|-|
@@ -84,6 +84,7 @@ python_jedi|python|completion<br>diagnosis<br> goto-definition<br> find-symbols<
 html_lsp|html, xhtml|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[html-LSP](https://www.npmjs.com/package/vscode-html-languageservice) <br> [HTMLHint](https://www.npmjs.com/package/htmlhint)|
 vim_lsp|vimL|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
 go_langserver|golang|completion<br>|[go-langserver](https://github.com/sourcegraph/go-langserver)|
+go_gopls|golang|completion<br>diagnosis|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|
 
 ## Cooperate with [Ultisnips](https://github.com/SirVer/ultisnips)
 `Ultisnips` is a separate plugin, so you have to install it separately.
@@ -135,6 +136,3 @@ A: Ale use job(channel) feature to send data to linter, but ECY use python3 inst
 And every completion that ECY do will send data of current buffer to Server, on
 the same time, ECY can return diagnosis; that will be send only once. Using Ale
 will do it twice, sending to linter and ECY's Server.
-
-### Q: Why use go-langserver to be Server for golang, why not gopls?
-A: Gopls has a lot of issuses, such as you can't get completion's items util it's build done, you can only make a gopls work at one project that means you must open two gopls when you editting two golang file that belong to two different golang project and after tring to import a new package gopls won't work again.

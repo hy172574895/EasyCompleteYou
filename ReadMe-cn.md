@@ -88,6 +88,7 @@ python_jedi|python|completion<br>diagnosis<br> goto-definition<br> find-symbols<
 html_lsp|html, xhtml|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[html-LSP](https://www.npmjs.com/package/vscode-html-languageservice) <br> [HTMLHint](https://www.npmjs.com/package/htmlhint)|
 vim_lsp|vimL|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
 go_langserver|golang|completion<br>|[go-langserver](https://github.com/sourcegraph/go-langserver)|
+go_gopls|golang|completion<br>diagnosis|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|
 
 ## 配合 [Ultisnips](https://github.com/SirVer/ultisnips) 使用
 `Ultisnips` 是一个单独开发和维护的插件，所以你必须要单独地安装它.  
@@ -143,6 +144,3 @@ A：为了更好的开箱即用。例如说，YCM就像你所说的，每次要�
 A： Ale是依赖job的插件，使用时需要把buffer的内容通过job发送给linter，而且每次
 用户操作的时候，ECY都会把buffer的内容发送到Server端，如果使用Ale的话 就要发送两次相同的buffer，
 去做同一件事，这是极其低效率的。
-
-### Q: 为什么go语言的LSP服务端要用go-langserver，而不用gopls呢？
-A： 这是不得已的操作；不知道为什么，我在MS-windows上使用coc.nvim 或 vim-lsp等客户端，gopls都不能正常工作， 我也用尽了方法测试gopls，就是不知道如何让gopls返回正确的补全项，如果你有好的想法（比较熟悉 gopls） 欢迎PR。搞笑的是：我花了几分钟（直接粘贴复制已有的代码，修改了少许）就兼容了 go-langserver，而搞gopls却用了我一天。
