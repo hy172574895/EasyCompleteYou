@@ -142,7 +142,9 @@ class Operate(scope_.Source_interface):
     def OnBufferTextChanged(self, version):
         uri_ = self._lsp.PathToUri(version['FilePath'])
         line_text = version['AllTextList']
-        self._did_open_or_change(uri_, line_text) # for completion
+        if version['IsInsertMode']:
+            # for completion 
+            self._did_open_or_change(uri_, line_text)
         if version['ReturnDiagnosis']:
             self._diagnosis(version)
 
