@@ -4,6 +4,7 @@
 import utils.lsp.language_server_protocol as lsp
 import utils.interface as scope_
 import logging
+import os
 import threading
 global g_logger
 g_logger = logging.getLogger('ECY_server')
@@ -208,6 +209,58 @@ class Operate(scope_.Source_interface):
                     'position': position}
             results_list.append(temp)
         return results_list
+
+    def Goto(self, version):
+        if not self._check(version):
+            return None
+        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        position = \
+            {'line': version['StartPosition']['Line'],
+             'character': version['StartPosition']['Colum']}
+        uri_ = self._lsp.PathToUri(version['FilePath'])
+        result_lists = []
+        for item in version['GotoLists']:
+            try:
+                if item == 'references':
+                    # included declaration
+                    results = self._lsp.references(position, uri_)
+                    results = self._lsp.GetResponse(results['Method'])
+                    result_lists = self._build_goto(results, result_lists,
+                            kind="references")
+                if item == 'definition':
+                    results = self._lsp.definition(position, uri_)
+                    results = self._lsp.GetResponse(results['Method'])
+                    result_lists = self._build_goto(results, result_lists,
+                            kind="definition")
+            except:
+                # will return []
+                g_logger.exception('')
+        return_['Results'] = result_lists
+        return return_
+
+    def _build_goto(self, results, result_lists, kind="definition"):
+        if 'error' not in results:
+            results = results['result']
+            for item in results:
+                start_line = item['range']['start']['line'] + 1
+                start_colum = item['range']['start']['character']
+                # end_line = item['range']['end']['line'] + 1
+                # end_colum = item['range']['end']['character']
+
+                file_path = self._lsp.UriToPath(item['uri'])
+                file_size = str(int(os.path.getsize(file_path)/1000)) + 'KB'
+                position = {'line': start_line,
+                            'colum': start_colum, 'path': file_path}
+                pos = '[' + str(start_line) + ', ' + str(start_colum) + ']'
+                items = [{'name': '1', 'content': {'abbr': kind}},
+                         {'name': '3', 'content': {'abbr': pos}},
+                         {'name': '4', 'content': {'abbr': file_path}},
+                         {'name': '5', 'content': {'abbr': file_size}}]
+                temp = {'items': items,
+                        'type': kind,
+                        'position': position}
+                result_lists.append(temp)
+        return result_lists
 
     def OnBufferEnter(self, version):
         if self._check(version):

@@ -56,7 +56,7 @@ function! goto#Go_cb(items) abort
     call utility#StartLeaderfSelecting(s:goto_lists, 'goto#Selecting_cb')
   elseif len(s:goto_lists) == 0
       call utility#ShowMsg(
-            \"[ECY] Source return none at current position.", 2)
+            \"[ECY] Engine return none at current position.", 2)
   else
     " goto it directly.
     let l:item = a:items['Results'][0]['position']

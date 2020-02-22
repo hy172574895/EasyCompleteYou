@@ -40,7 +40,7 @@ class Operate(scope_.Event):
     def _pack(self, msg, event_name):
         msg = self._basic(msg)
         msg['Event'] = event_name
-        msg['Additional'] = self._get_snippets()
+        # msg['Additional'] = self._get_snippets()
         msg['HTMLHintCMD'] = self._get_HTMLHint_cmd()
         msg['StartingCMD'] = self._get_starting_cmd()
         return msg
