@@ -136,23 +136,22 @@ function! utility#ShowMsg(msg, style) abort
           \ 'border': [],
           \}
     if s:show_msg_windows_nr == -1
-      if type(a:msg) != 3
-        " != list
-        let s:show_msg_windows_text_list = [a:msg]
-      endif
-      let s:show_msg_windows_nr = popup_create(s:show_msg_windows_text_list, l:opts)
+      let s:show_msg_windows_text_list = []
     else
       call add(s:show_msg_windows_text_list, '--------------------')
-      if type(a:msg) == 3
-        " == list
-        call extend(s:show_msg_windows_text_list, a:msg)
-      else
-        call add(s:show_msg_windows_text_list, a:msg)
-      endif
+    endif
+    if type(a:msg) == 3
+      " == list
+      call extend(s:show_msg_windows_text_list, a:msg)
+    else
+      call add(s:show_msg_windows_text_list, a:msg)
+    endif
+    if s:show_msg_windows_nr == -1
+      let s:show_msg_windows_nr = popup_create(s:show_msg_windows_text_list, l:opts)
+    else
       " delay, have new msg.
       call popup_settext(s:show_msg_windows_nr, s:show_msg_windows_text_list)
     endif
-    let g:abc = s:show_msg_windows_text_list
     let s:show_msg_timer_id = timer_start(1000, function('g:ShowMsg_timer'))
   elseif g:has_floating_windows_support == 'has_no' 
     echohl WarningMsg |

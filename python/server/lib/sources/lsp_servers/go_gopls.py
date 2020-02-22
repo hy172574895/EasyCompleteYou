@@ -224,14 +224,10 @@ class Operate(scope_.Source_interface):
                 if item == 'references':
                     # included declaration
                     results = self._lsp.references(position, uri_)
-                    results = self._lsp.GetResponse(results['Method'])
-                    result_lists = self._build_goto(results, result_lists,
-                            kind="references")
                 if item == 'definition':
                     results = self._lsp.definition(position, uri_)
-                    results = self._lsp.GetResponse(results['Method'])
-                    result_lists = self._build_goto(results, result_lists,
-                            kind="definition")
+                results = self._lsp.GetResponse(results['Method'])
+                result_lists = self._build_goto(results, result_lists,kind=item)
             except:
                 # will return []
                 g_logger.exception('')
