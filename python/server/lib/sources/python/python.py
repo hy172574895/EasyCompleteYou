@@ -331,6 +331,7 @@ class Operate(scope_.Source_interface):
             try:
                 version = self._diagnosis_queue.get()
                 if version['DocumentVersionID'] < self.document_id:
+                    g_logger.debug(version['DocumentVersionID'])
                     continue
                 self.document_id = version['DocumentVersionID']
                 return_ = {'ID': version['VersionID'],
