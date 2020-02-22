@@ -83,8 +83,8 @@ path|all|completion|-|
 python_jedi|python|completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding|[jedi](https://pypi.org/project/jedi/)<br>[pyflakes](https://pypi.org/project/pyflakes/)|
 html_lsp|html, xhtml|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[html-LSP](https://www.npmjs.com/package/vscode-html-languageservice) <br> [HTMLHint](https://www.npmjs.com/package/htmlhint)|
 vim_lsp|vimL|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
-go_langserver|golang|completion<br>|[go-langserver](https://github.com/sourcegraph/go-langserver)|
-go_gopls|golang|completion<br>diagnosis|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|
+go_langserver|golang|completion<br>snippets-expanding|[go-langserver](https://github.com/sourcegraph/go-langserver)|
+go_gopls|golang|completion<br>diagnosis<br>snippets-expanding<br>goto-definition<br>goto-reference|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|
 
 ## Cooperate with [Ultisnips](https://github.com/SirVer/ultisnips)
 `Ultisnips` is a separate plugin, so you have to install it separately.
