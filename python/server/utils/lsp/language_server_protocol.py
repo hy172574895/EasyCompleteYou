@@ -354,6 +354,20 @@ class LSP(conec.Operate):
         params = {'query': query}
         return self._build_send(params, 'workspace/symbol')
 
+    def references(self, position, uri, includeDeclaration=True, query="",
+            ProgressToken="", partialProgressToken=""):
+        # ProgressToken = number | string
+        params = {'textDocument': {'uri': uri},
+                  'context': {'includeDeclaration':includeDeclaration },
+                  'workDoneToken': ProgressToken,
+                  'partialResultToken': partialProgressToken,
+                  'position':     position}
+        return self._build_send(params, 'textDocument/references')
+
+    def definition(self, position, uri):
+        params = {'textDocument': {'uri': uri}, 'position': position}
+        return self._build_send(params, 'textDocument/definition')
+
     def PathToUri(self, file_path):
         return urljoin('file:', pathname2url(file_path))
 
