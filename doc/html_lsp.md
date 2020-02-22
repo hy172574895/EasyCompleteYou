@@ -1,23 +1,46 @@
-Doc for LSP of HTML
-===============================================================================
-Installation
+# Document for LSP of HTML
 
-requires:
-  1.LSP of HTML              necessary
-  2.nodejs (for LSP server)  necessary
-  3.npm (for nodejs)         necessary
-  4.HTMLHint (for diagnosis) optional
+## Installation
+### Requires:
+  1.LSP of HTML              **necessary**  
+  2.nodejs (for LSP server)  **necessary**  
+  3.npm (for nodejs)         **necessary**  
+  4.HTMLHint (for diagnosis) **optional**  
+
+### Quickly install
+Execute the following command in normal mode in vim.
+
+`:call ECY_main#Install('html_lsp')`
 
 ECY will check that all, and will ask user to install when one of them 
 are missing.
 
-===============================================================================
-*For users:*
+### Full Installation guide
+  1.make sure you have `nodejs` in your OS; [help](https://www.google.com/search?q=how%20to%20install%20nodejs)  
+  2.make sure you have `npm` in your OS; [help](https://www.google.com/search?q=how%20to%20install%20nodejs)  
+  3.make sure you have `html_lsp` in your OS, install `html_lsp` with npm; [help](https://www.npmjs.com/package/vscode-html-languageservice)  
+  4.optionally install `HTMLHint` to your OS, for diagnosis; [help](https://www.npmjs.com/package/htmlhint)  
+  5.Execute `:call ECY_main#Install('html_lsp')`  
 
-1. Options Variable
+## Customized
 
-g:ECY_html_lsp_starting_cmd
-default: "html-languageserver --stdio"
+### Options Variable
 
-g:ECY_html_lsp_HtmlHint_cmd
-default: "htmlhint"
+#### 1. g:ECY_html_lsp_starting_cmd  
+default value: "html-languageserver --stdio"  
+
+for example, put the code into your vimrc:  
+`let g:ECY_html_lsp_starting_cmd = 'nodejs /home/xxx/yyyy/zzz/bin/html --stdio'`
+
+#### 2. g:ECY_html_lsp_HtmlHint_cmd
+default value: "htmlhint"
+
+for example, put the code into your vimrc:  
+`let g:ECY_html_lsp_HtmlHint_cmd = 'nodejs /home/xxx/node_modules/.bin/htmlhint`
+
+## Trouble shooting.
+### Showing a msg that `ECY can not start lsp server.`
+You have no `html_lsp` in your OS or you set a wrong path to html server bin.
+
+### Showing a msg that `ECY can not start htmlhint.`
+You have no `htmlhint` in your OS or you set a wrong path to htmlhint bin.
