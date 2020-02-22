@@ -131,8 +131,28 @@ which is one of ECY's principles, that `LeaderF` hightly fit with ECY.
 ### Q: I only need a engine for python, why ECY install all engine's code in my computer?
 A: For out of the box, better.  You should no worry about ECY code in you computer, because it is python script(totally open source) and its size is not big and even small.
 
-### Q: Whe not use Ale to do diagnosis?
+### Q: Why not use Ale to do diagnosis?
 A: Ale use job(channel) feature to send data to linter, but ECY use python3 instead.
 And every completion that ECY do will send data of current buffer to Server, on
 the same time, ECY can return diagnosis; that will be send only once. Using Ale
 will do it twice, sending to linter and ECY's Server.
+
+# Debug & Contribution
+## How to debug?
+Put `let g:ECY_debug = v:true` into your vimrc and restart Vim.  
+Reproduce the bug, then you can find a log file of `./python/client/ECY_client.log` and `./python/server/ECY_server.log`
+
+## Report bug.
+Thanks, and go [here]()
+
+## How to PR?
+Before pulling a request to ECY's master, make sure you had discussed that with a issuse `what your code can do for ECY`?  
+We are very welcome to contribute ECY.
+
+# Credit & Donate
+**Major maintainers:** 
+1. Jimmy Huang (1902161621@qq.com)
+2.
+
+**Sponsors:**  
+nobody
