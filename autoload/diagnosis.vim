@@ -19,7 +19,7 @@ function diagnosis#Init() abort
   " 1 means ask diagnosis when there are changes not including user in insert mode, trigger by DoCompletion()
   " 2 means ask diagnosis when there are changes including user in insert mode, trigger by OnBufferTextChanged().
   let g:ECY_update_diagnosis_mode
-        \= get(g:,'ECY_update_diagnosis_mode', 2)
+        \= get(g:,'ECY_update_diagnosis_mode', 1)
   if g:ECY_update_diagnosis_mode == 2
     let g:ECY_update_diagnosis_mode = v:true
   else
@@ -28,7 +28,6 @@ function diagnosis#Init() abort
   " user don't want to update diagnosis in insert mode, but engine had
   " returned diagnosis, so we cache it and update after user leave insert
   " mode.
-  let s:diagnosis_cache = []
   let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
   let g:ECY_enable_diagnosis
         \= get(g:,'ECY_enable_diagnosis', v:true)
@@ -44,9 +43,11 @@ function diagnosis#Init() abort
   "   \ "text" : "!!",
   "   \ "texthl" : g:ECY_warn_sign_highlight})
 
-  let g:ECY_sign_lists       = []
-  let s:current_diagnosis    = {}
-  let s:current_diagnosis_nr = -1
+  let s:current_diagnosis                    = {}
+  let s:current_diagnosis_nr                 = -1
+  let g:ECY_diagnosis_items_all              = []
+  let g:ECY_diagnosis_items_with_engine_name = {'nothing': []}
+
 
   call s:SetUpEvent()
 
@@ -81,7 +82,7 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
   let l:current_buffer_path = utility#GetCurrentBufferPath()
   let l:index_list        = []
   let i = 0
-  for item in g:ECY_sign_lists
+  for item in g:ECY_diagnosis_items_all
     let item['index'] = i
     let i += 1
     if item['buffer_name'] != l:current_buffer_path || 
@@ -110,7 +111,7 @@ function! diagnosis#ShowNextDiagnosis() abort
   let l:i = 0
   if s:current_diagnosis == {}
     " init
-    for item in g:ECY_sign_lists
+    for item in g:ECY_diagnosis_items_all
       if l:current_buffer_path == item['buffer_name']
         let l:line = item['position']['line']
         let l:colum = item['position']['range']['start']['colum']
@@ -126,13 +127,13 @@ function! diagnosis#ShowNextDiagnosis() abort
   endif
 
   let l:i = 0
-  for item in g:ECY_sign_lists
+  for item in g:ECY_diagnosis_items_all
     if item['position']['line'] == s:current_diagnosis['line']
-      let l:index = (l:i + 1) % len(g:ECY_sign_lists)
-      let l:line = g:ECY_sign_lists[l:index]['position']['line']
+      let l:index = (l:i + 1) % len(g:ECY_diagnosis_items_all)
+      let l:line = g:ECY_diagnosis_items_all[l:index]['position']['line']
       if  l:line != s:current_diagnosis['line'] 
             \&& l:current_buffer_path == s:current_diagnosis['buffer_name']
-        let l:colum = g:ECY_sign_lists[l:index]['position']['range']['start']['colum']
+        let l:colum = g:ECY_diagnosis_items_all[l:index]['position']['range']['start']['colum']
         call utility#MoveToBuffer(l:line, l:colum, l:current_buffer_path, 'current buffer')
         call diagnosis#ShowCurrentLineDiagnosis(v:true)
         let s:current_diagnosis['line'] = l:line
@@ -173,7 +174,7 @@ function! s:ShowDiagnosis(index_list) abort
       let l:line = string(item['position']['line'])
       let l:colum = string(item['position']['range']['start']['colum'])
       let l:index = string(item['index'] + 1)
-      let l:lists_len = string(len(g:ECY_sign_lists))
+      let l:lists_len = string(len(g:ECY_diagnosis_items_all))
       let l:nr = "(" . l:index . '/' . l:lists_len . ')'
       call add(l:text, item['kind'] . ' [' .l:line . ', ' . l:colum . '] ' . l:nr)
       call add(l:text, '(' . item['diagnosis'] . ')')
@@ -260,11 +261,11 @@ endfunction
 function! diagnosis#UnPlaceAllSignInBufferName(buffer_name) abort
 "{{{ remove all ECY's sign in current buffer.
   let i = 0
-  while i < len(g:ECY_sign_lists)
-    let l:temp = g:ECY_sign_lists[i]
+  while i < len(g:ECY_diagnosis_items_all)
+    let l:temp = g:ECY_diagnosis_items_all[i]
     if l:temp['buffer_name'] == a:buffer_name
       call sign_unplace('', {'buffer' : l:temp['buffer_name'], 'id': l:temp['id']})
-      unlet g:ECY_sign_lists[i]
+      unlet g:ECY_diagnosis_items_all[i]
       continue
     endif
     let i += 1
@@ -274,21 +275,49 @@ endfunction
 
 function! diagnosis#UnPlaceAllSign() abort
 "{{{
-  for item in g:ECY_sign_lists
+  for item in g:ECY_diagnosis_items_all
     call sign_unplace('', {'buffer' : item['buffer_name'], 'id' : item['id']})
   endfor
-  let g:ECY_sign_lists = []
+  let g:ECY_diagnosis_items_all = []
 "}}}
 endfunction
 
-function! diagnosis#UnPlaceAllSignByEngineName(engine_name) abort
+function! diagnosis#UnPlaceAllSignByEngineName(engine_name, is_clean_sign) abort
+"{{{
+  " let i = 0
+  " while i < len(g:ECY_diagnosis_items_all)
+  "   let l:temp = g:ECY_diagnosis_items_all[i]
+  "   if l:temp['engine_name'] == a:engine_name
+  "     unlet g:ECY_diagnosis_items_all[i]
+  "     continue
+  "   endif
+  "   let i += 1
+  " endw
+  let g:ECY_diagnosis_items_with_engine_name[a:engine_name] = []
+  if a:is_clean_sign
+    call sign_unplace(a:engine_name)
+  endif
+"}}}
+endfunction
+
+function! diagnosis#UnPlacePartialSignByEngineName(engine_name, new_lists) abort
 "{{{
   let i = 0
-  while i < len(g:ECY_sign_lists)
-    let l:temp = g:ECY_sign_lists[i]
+  while i < len(g:ECY_diagnosis_items_all)
+    let l:need = v:false
+    let l:temp = g:ECY_diagnosis_items_all[i]
     if l:temp['engine_name'] == a:engine_name
-      call sign_unplace('', {'buffer' : l:temp['buffer_name'], 'id': l:temp['id']})
-      unlet g:ECY_sign_lists[i]
+      for item in new_lists
+        if item['position'] == l:temp['position'] && 
+              \item['file_path'] == l:temp['buffer_name']
+          let l:need = v:true
+          break
+        endif
+      endfor
+      if !l:need
+        call sign_unplace('', {'buffer' : l:temp['buffer_name'], 'id': l:temp['id']})
+      endif
+      unlet g:ECY_diagnosis_items_all[i]
       continue
     endif
     let i += 1
@@ -296,7 +325,7 @@ function! diagnosis#UnPlaceAllSignByEngineName(engine_name) abort
 "}}}
 endfunction
 
-function! s:PlaceSign(position, diagnosis, items, style, path, engine_name) abort
+function! s:PlaceSign(position, diagnosis, items, style, path, engine_name, current_buffer_path) abort
 "{{{ place a sign in current buffer.
   " a:position = {'line': 10, 'range': {'start': { 'line': 5, 'colum': 23 },'end' : { 'line': 6, 'colum': 0 } }}
   " a:diagnosis = {'item':{'1':'asdf', '2':'sdf'}}
@@ -305,59 +334,106 @@ function! s:PlaceSign(position, diagnosis, items, style, path, engine_name) abor
   else
     let l:style = 'ECY_diagnosis_warn'
   endif
-  let l:sign_id = sign_place(0,'',l:style, a:path, {'lnum' : a:position['line']})
-  if utility#GetCurrentBufferPath() == a:path
+  let l:group_name = a:engine_name
+  let l:sign_id = sign_place(0,
+         \l:group_name,
+         \l:style, a:path,
+         \{'lnum' : a:position['line']})
+  if a:current_buffer_path == a:path
     call s:HighlightRange(a:position['range'], 'ECY_diagnosis_highlight')
   endif
-  let l:temp = {'position': a:position, 
-        \'id': l:sign_id,
-        \'items': a:items,
-        \'buffer_name': a:path,
-        \'engine_name': a:engine_name,
-        \'diagnosis': a:diagnosis,
-        \'kind': l:style}
-  call add(g:ECY_sign_lists, l:temp)
 "}}}
 endfunction
 
 function! diagnosis#OnInsertModeLeave() abort
-"{{{
+"{{{ show all.
   if !g:ECY_enable_diagnosis
     return
   endif
   if s:need_to_update_diagnosis_after_user_leave_insert_mode
     let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
-    for item in s:diagnosis_cache
-      call diagnosis#PlaceSign(item)
-    endfor
-    let s:diagnosis_cache = []
+    let l:engine_name = ECY_main#GetCurrentUsingSourceName()
+    call s:UpdateAllSign(l:engine_name)
   endif
 "}}}
 endfunction
 
-function! diagnosis#PlaceSign(msg) abort
-"{{{Place a Sign and highlight it.
-  if !g:ECY_enable_diagnosis
+function! s:PartlyPlaceSign_timer_cb(starts, ends, engine_name) abort
+"{{{
+  let l:ECY_endtime = reltimefloat(reltime())
+  if !exists('g:ECY_diagnosis_items_with_engine_name[a:engine_name]')
     return
   endif
-  " order matters
+  " let l:lists = py3eval('CalculateScreenSign(' . string(a:starts) . ',' . string(a:ends) . ')')
+  " call diagnosis#CleanAllSignHighlight()
+  " call sign_unplace(a:engine_name)
+  " for item in l:lists
+  "   call s:PlaceSign(item['position'], 
+  "         \item['diagnosis'],
+  "         \item['items'], item['kind'],
+  "         \item['file_path'],
+  "         \a:engine_name)
+  " endfor
+  let l:buffer_name = utility#GetCurrentBufferPath()
+  call diagnosis#CleanAllSignHighlight()
+  call sign_unplace(a:engine_name)
+  for item in g:ECY_diagnosis_items_with_engine_name[a:engine_name]
+    if item['file_path'] == l:buffer_name
+      let l:line = item['position']['line']
+      if a:starts <= l:line && a:ends >= l:line
+        call s:PlaceSign(item['position'], 
+              \item['diagnosis'],
+              \item['items'], item['kind'],
+              \item['file_path'],
+              \a:engine_name,
+              \l:buffer_name)
+      endif
+    endif
+  endfor
+  let g:abc = reltimefloat(reltime()) - l:ECY_endtime
+"}}}
+endfunction
+
+function! s:UpdateDiagnosisByEngineName(msg) abort
   let l:engine_name = a:msg['EngineName']
+  let g:ECY_diagnosis_items_with_engine_name[l:engine_name] = a:msg['Lists']
+  let s:current_diagnosis = {}
+endfunction
+
+function! diagnosis#PartlyPlaceSign(msg) abort
+  call s:StartUpdateTimer()
+endfunction
+
+function! diagnosis#PlaceSign(msg) abort
+"{{{Place Sign and highlight it. partly or all
+  let l:engine_name = a:msg['EngineName']
+  if !g:ECY_enable_diagnosis || l:engine_name == ''
+    return
+  endif
+  call s:UpdateDiagnosisByEngineName(a:msg) " but don't show sign, just update variable.
+  if len(a:msg['Lists']) > 80
+    call diagnosis#PartlyPlaceSign(a:msg)
+    return
+  else
+    call s:StopUpdateTimer()
+  endif
   if g:ECY_update_diagnosis_mode == v:false && mode() == 'i'
     " don't want to update diagnosis in insert mode
-    call add(s:diagnosis_cache, a:msg)
     let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:true
     return
   endif
+  " show sign.
+  call s:UpdateAllSign(l:engine_name)
+"}}}
+endfunction
+
+function! s:UpdateAllSign(engine_name) abort
+"{{{
   call diagnosis#CleanAllSignHighlight()
-  call diagnosis#UnPlaceAllSignByEngineName(l:engine_name)
-  " call diagnosis#UnPlaceAllSignInBufferName(utility#GetCurrentBufferPath())
-  let s:current_diagnosis = {}
-  let l:items = a:msg['Lists']
-  if len(l:items) > 500
-    call utility#ShowMsg("[ECY] Diagnosis will not be highlighted: the erros/warnnings are too much.", 2)
-    return
-  endif
-  for item in l:items
+  call sign_unplace(a:engine_name)
+  let l:sign_lists = g:ECY_diagnosis_items_with_engine_name[a:engine_name]
+  let l:buffer_name = utility#GetCurrentBufferPath()
+  for item in l:sign_lists
     " item = {'items':[
     " {'name':'1', 'content': {'abbr': 'xxx'}},
     " {'name':'2', 'content': {'abbr': 'yyy'}}
@@ -367,22 +443,35 @@ function! diagnosis#PlaceSign(msg) abort
           \item['diagnosis'],
           \item['items'], item['kind'],
           \item['file_path'],
-          \l:engine_name)
+          \a:engine_name,
+          \l:buffer_name)
   endfor
+"}}}
+endfunction
+
+function! diagnosis#GetAllDiagnosis() abort
+"{{{return lists
+ let l:temp = []
+ for [key, lists] in items(g:ECY_diagnosis_items_with_engine_name)
+   call extend(l:temp, lists)
+ endfor
+ return l:temp
 "}}}
 endfunction
 
 function! diagnosis#Toggle() abort
 "{{{
   let g:ECY_enable_diagnosis = (!g:ECY_enable_diagnosis)
-  if !g:ECY_enable_diagnosis 
-    call diagnosis#CleanAllSignHighlight()
-    call diagnosis#UnPlaceAllSign()
-  endif
   if g:ECY_enable_diagnosis
     let l:status = 'Alive'
+    call s:StartUpdateTimer()
   else
     let l:status = 'Disabled'
+    call s:StopUpdateTimer()
+    call diagnosis#CleanAllSignHighlight()
+    call diagnosis#UnPlaceAllSign()
+    let s:current_diagnosis       = {}
+    let s:current_diagnosis_nr    = -1
   endif
   call utility#ShowMsg('[ECY] Diagnosis status: ' . l:status, 2)
 "}}}
@@ -390,13 +479,13 @@ endfunction
 
 function! diagnosis#ShowSelecting() abort
 "{{{ show all
-  call utility#StartLeaderfSelecting(g:ECY_sign_lists, 'diagnosis#Selecting_cb')
+  call utility#StartLeaderfSelecting(g:ECY_diagnosis_items_all, 'diagnosis#Selecting_cb')
 "}}}
 endfunction
 
 function! diagnosis#Selecting_cb(line, event, index, nodes) abort
 "{{{
-  let l:data  = g:ECY_sign_lists[a:index]
+  let l:data  = g:ECY_diagnosis_items_all[a:index]
   if a:event == 'acceptSelection' || a:event == 'previewResult'
     let l:position = l:data['position']['range']['start']
     let l:path = l:data['buffer_name']
@@ -407,3 +496,61 @@ function! diagnosis#Selecting_cb(line, event, index, nodes) abort
   endif
 "}}}
 endfunction
+
+function! s:UpdateSignEvent(timer_id) abort 
+"{{{
+  if !g:ECY_enable_diagnosis
+    call s:StopUpdateTimer()
+    return
+  endif
+  if g:ECY_update_diagnosis_mode == v:false && mode() == 'i'
+    return
+  endif
+  let l:start = line('w0')
+  let l:end = line('w$')
+  let l:windows_nr = winnr()
+  if l:start != s:windows_start || l:end != s:windows_end || s:windows_nr !=
+        \l:windows_nr
+    let s:windows_start = l:start
+    let s:windows_end = l:end
+    let s:windows_nr = l:windows_nr
+    call s:PartlyPlaceSign_timer_cb(s:windows_start, s:windows_end,
+          \ECY_main#GetCurrentUsingSourceName())
+  endif
+"}}}
+endfunction
+
+function! s:StartUpdateTimer() abort 
+  let s:windows_start = -1
+  let s:windows_end = -1
+  let s:windows_nr = -1
+  " order matters
+  call s:StopUpdateTimer()
+  let s:update_timer_id = timer_start(1000, function('s:UpdateSignEvent'), {'repeat': -1})
+endfunction
+
+function! s:StopUpdateTimer() abort 
+  if exists('s:update_timer_id')
+    if s:update_timer_id != -1
+      call timer_stop(s:update_timer_id)
+    endif
+  endif
+  let s:update_timer_id = -1
+endfunction
+
+python3 <<endpython
+import vim
+
+def CalculateScreenSign(start, end):
+  engine_name = vim.eval('ECY_main#GetCurrentUsingSourceName()')
+  lists = "g:ECY_diagnosis_items_with_engine_name['" + engine_name + "']"
+  lists = vim.eval(lists)
+  buffer_name = vim.eval('utility#GetCurrentBufferPath()')
+  results = []
+  for item in lists:
+    line = int(item['position']['line'])
+    if item['file_path'] == buffer_name:
+      if start <= line and end >= line:
+        results.append(item)
+  return results
+endpython
