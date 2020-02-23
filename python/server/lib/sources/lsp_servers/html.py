@@ -249,7 +249,7 @@ class Operate(scope_.Source_interface):
                         version['AllTextList'], version['FilePath'])
                 return_['Lists'] = diagnosis_lists
                 self._output_queue(return_)
-                time.sleep(1)
+                # time.sleep(1)
             except:
                 g_logger.exception('')
 

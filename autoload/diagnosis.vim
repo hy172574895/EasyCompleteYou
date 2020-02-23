@@ -78,6 +78,7 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
     endif
     return ''
   endif
+  let g:ECY_diagnosis_items_all = diagnosis#GetAllDiagnosis()
   let l:current_line_nr   = line('.')
   let l:current_buffer_path = utility#GetCurrentBufferPath()
   let l:index_list        = []
@@ -85,7 +86,7 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
   for item in g:ECY_diagnosis_items_all
     let item['index'] = i
     let i += 1
-    if item['buffer_name'] != l:current_buffer_path || 
+    if item['file_path'] != l:current_buffer_path || 
           \item['position']['line'] != l:current_line_nr
       continue
     endif
@@ -93,7 +94,7 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
   endfor
   if len(l:index_list) != 0
     let s:current_diagnosis['line']      = l:current_line_nr
-    let s:current_diagnosis['buffer_name'] = l:current_buffer_path
+    let s:current_diagnosis['file_path'] = l:current_buffer_path
     call s:ShowDiagnosis(l:index_list)
   else
     if !a:is_triggered_by_event 
@@ -110,12 +111,13 @@ function! diagnosis#ShowNextDiagnosis() abort
 
   let l:i = 0
   if s:current_diagnosis == {}
+    let g:ECY_diagnosis_items_all = diagnosis#GetAllDiagnosis()
     " init
     for item in g:ECY_diagnosis_items_all
-      if l:current_buffer_path == item['buffer_name']
+      if l:current_buffer_path == item['file_path']
         let l:line = item['position']['line']
         let l:colum = item['position']['range']['start']['colum']
-        let s:current_diagnosis['buffer_name'] = l:current_buffer_path
+        let s:current_diagnosis['file_path'] = l:current_buffer_path
         let s:current_diagnosis['line'] = l:line
         call utility#MoveToBuffer(l:line, l:colum, l:current_buffer_path, 'current buffer')
         call diagnosis#ShowCurrentLineDiagnosis(v:true)
@@ -132,7 +134,7 @@ function! diagnosis#ShowNextDiagnosis() abort
       let l:index = (l:i + 1) % len(g:ECY_diagnosis_items_all)
       let l:line = g:ECY_diagnosis_items_all[l:index]['position']['line']
       if  l:line != s:current_diagnosis['line'] 
-            \&& l:current_buffer_path == s:current_diagnosis['buffer_name']
+            \&& l:current_buffer_path == s:current_diagnosis['file_path']
         let l:colum = g:ECY_diagnosis_items_all[l:index]['position']['range']['start']['colum']
         call utility#MoveToBuffer(l:line, l:colum, l:current_buffer_path, 'current buffer')
         call diagnosis#ShowCurrentLineDiagnosis(v:true)
@@ -176,7 +178,12 @@ function! s:ShowDiagnosis(index_list) abort
       let l:index = string(item['index'] + 1)
       let l:lists_len = string(len(g:ECY_diagnosis_items_all))
       let l:nr = "(" . l:index . '/' . l:lists_len . ')'
-      call add(l:text, item['kind'] . ' [' .l:line . ', ' . l:colum . '] ' . l:nr)
+      if item['kind'] == 1
+        let l:style = 'ECY_diagnosis_erro'
+      else
+        let l:style = 'ECY_diagnosis_warn'
+      endif
+      call add(l:text, l:style . ' [' .l:line . ', ' . l:colum . '] ' . l:nr)
       call add(l:text, '(' . item['diagnosis'] . ')')
     endfor
     if g:ECY_PreviewWindows_style == 'append'
@@ -258,13 +265,13 @@ function! diagnosis#CleanAllSignHighlight() abort
 "}}}
 endfunction
 
-function! diagnosis#UnPlaceAllSignInBufferName(buffer_name) abort
+function! diagnosis#UnPlaceAllSignInBufferName(file_path) abort
 "{{{ remove all ECY's sign in current buffer.
   let i = 0
   while i < len(g:ECY_diagnosis_items_all)
     let l:temp = g:ECY_diagnosis_items_all[i]
-    if l:temp['buffer_name'] == a:buffer_name
-      call sign_unplace('', {'buffer' : l:temp['buffer_name'], 'id': l:temp['id']})
+    if l:temp['file_path'] == a:file_path
+      call sign_unplace('', {'buffer' : l:temp['file_path'], 'id': l:temp['id']})
       unlet g:ECY_diagnosis_items_all[i]
       continue
     endif
@@ -276,7 +283,7 @@ endfunction
 function! diagnosis#UnPlaceAllSign() abort
 "{{{
   for item in g:ECY_diagnosis_items_all
-    call sign_unplace('', {'buffer' : item['buffer_name'], 'id' : item['id']})
+    call sign_unplace('', {'buffer' : item['file_path'], 'id' : item['id']})
   endfor
   let g:ECY_diagnosis_items_all = []
 "}}}
@@ -309,13 +316,13 @@ function! diagnosis#UnPlacePartialSignByEngineName(engine_name, new_lists) abort
     if l:temp['engine_name'] == a:engine_name
       for item in new_lists
         if item['position'] == l:temp['position'] && 
-              \item['file_path'] == l:temp['buffer_name']
+              \item['file_path'] == l:temp['file_path']
           let l:need = v:true
           break
         endif
       endfor
       if !l:need
-        call sign_unplace('', {'buffer' : l:temp['buffer_name'], 'id': l:temp['id']})
+        call sign_unplace('', {'buffer' : l:temp['file_path'], 'id': l:temp['id']})
       endif
       unlet g:ECY_diagnosis_items_all[i]
       continue
@@ -374,11 +381,11 @@ function! s:PartlyPlaceSign_timer_cb(starts, ends, engine_name) abort
   "         \item['file_path'],
   "         \a:engine_name)
   " endfor
-  let l:buffer_name = utility#GetCurrentBufferPath()
+  let l:file_path = utility#GetCurrentBufferPath()
   call diagnosis#CleanAllSignHighlight()
   call sign_unplace(a:engine_name)
   for item in g:ECY_diagnosis_items_with_engine_name[a:engine_name]
-    if item['file_path'] == l:buffer_name
+    if item['file_path'] == l:file_path
       let l:line = item['position']['line']
       if a:starts <= l:line && a:ends >= l:line
         call s:PlaceSign(item['position'], 
@@ -386,7 +393,7 @@ function! s:PartlyPlaceSign_timer_cb(starts, ends, engine_name) abort
               \item['items'], item['kind'],
               \item['file_path'],
               \a:engine_name,
-              \l:buffer_name)
+              \l:file_path)
       endif
     endif
   endfor
@@ -432,7 +439,7 @@ function! s:UpdateAllSign(engine_name) abort
   call diagnosis#CleanAllSignHighlight()
   call sign_unplace(a:engine_name)
   let l:sign_lists = g:ECY_diagnosis_items_with_engine_name[a:engine_name]
-  let l:buffer_name = utility#GetCurrentBufferPath()
+  let l:file_path = utility#GetCurrentBufferPath()
   for item in l:sign_lists
     " item = {'items':[
     " {'name':'1', 'content': {'abbr': 'xxx'}},
@@ -444,7 +451,7 @@ function! s:UpdateAllSign(engine_name) abort
           \item['items'], item['kind'],
           \item['file_path'],
           \a:engine_name,
-          \l:buffer_name)
+          \l:file_path)
   endfor
 "}}}
 endfunction
@@ -479,20 +486,22 @@ endfunction
 
 function! diagnosis#ShowSelecting() abort
 "{{{ show all
+  let g:ECY_diagnosis_items_all = diagnosis#GetAllDiagnosis()
   call utility#StartLeaderfSelecting(g:ECY_diagnosis_items_all, 'diagnosis#Selecting_cb')
 "}}}
 endfunction
 
 function! diagnosis#Selecting_cb(line, event, index, nodes) abort
 "{{{
-  let l:data  = g:ECY_diagnosis_items_all[a:index]
+ let l:data = diagnosis#GetAllDiagnosis()
+  let l:data  = l:data[a:index]
   if a:event == 'acceptSelection' || a:event == 'previewResult'
     let l:position = l:data['position']['range']['start']
-    let l:path = l:data['buffer_name']
+    let l:path = l:data['file_path']
     call utility#MoveToBuffer(l:position['line'], 
           \l:position['colum'], 
           \l:path, 
-          \'current buffer_name')
+          \'current buffer')
   endif
 "}}}
 endfunction
@@ -545,11 +554,11 @@ def CalculateScreenSign(start, end):
   engine_name = vim.eval('ECY_main#GetCurrentUsingSourceName()')
   lists = "g:ECY_diagnosis_items_with_engine_name['" + engine_name + "']"
   lists = vim.eval(lists)
-  buffer_name = vim.eval('utility#GetCurrentBufferPath()')
+  file_path = vim.eval('utility#GetCurrentBufferPath()')
   results = []
   for item in lists:
     line = int(item['position']['line'])
-    if item['file_path'] == buffer_name:
+    if item['file_path'] == file_path:
       if start <= line and end >= line:
         results.append(item)
   return results
