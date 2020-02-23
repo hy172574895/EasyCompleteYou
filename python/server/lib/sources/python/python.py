@@ -52,7 +52,7 @@ class Operate(scope_.Source_interface):
         self._deamon_queue = None
         g_logger.debug('python_jedi has pyflakes:' + str(has_pyflake))
         if has_pyflake:
-            self._diagnosis_queue = queue.LifoQueue(maxsize=10)
+            self._diagnosis_queue = queue.LifoQueue()
             threading.Thread(target=self._output_diagnosis,
                              daemon=True).start()
 

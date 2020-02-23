@@ -9,6 +9,7 @@ g_logger = logging.getLogger('ECY_server')
 # for htmlhint
 import subprocess
 import queue
+import time
 from socket import *
 import shlex
 import json
@@ -29,7 +30,7 @@ class Operate(scope_.Source_interface):
         self.is_server_start = 'not started'
         self._deamon_queue = None
         self._starting_server_cmd = None
-        self._diagnosis_queue = queue.LifoQueue(maxsize=10)
+        self._diagnosis_queue = queue.LifoQueue()
         self._htmlHint = HtmlHint()
         self._is_http_server_started = None
         threading.Thread(target=self._diagnosis_notification).start()
@@ -231,7 +232,11 @@ class Operate(scope_.Source_interface):
         while 1:
             try:
                 version = self._diagnosis_queue.get()
+                g_logger.debug(version['DocumentVersionID'])
+                g_logger.debug(self.document_id)
+                g_logger.debug('-------------')
                 if version['DocumentVersionID'] < self.document_id:
+                    g_logger.debug('filter a unless diagnosis')
                     continue
                 self.document_id = version['DocumentVersionID']
                 return_['ID'] = version['VersionID']
@@ -244,6 +249,7 @@ class Operate(scope_.Source_interface):
                         version['AllTextList'], version['FilePath'])
                 return_['Lists'] = diagnosis_lists
                 self._output_queue(return_)
+                time.sleep(1)
             except:
                 g_logger.exception('')
 

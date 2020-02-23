@@ -59,7 +59,7 @@ class LSP(conec.Operate):
     def GetResponse(self, _method_name, timeout_=5):
         if _method_name not in self._queue_dict:
             # new
-            self._queue_dict[_method_name] = queue.Queue(maxsize=10)
+            self._queue_dict[_method_name] = queue.Queue()
         if timeout_ == -1:
             return self._queue_dict[_method_name].get()
         else:
