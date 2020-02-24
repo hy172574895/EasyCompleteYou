@@ -367,37 +367,37 @@ endfunction
 
 function! s:PartlyPlaceSign_timer_cb(starts, ends, engine_name) abort
 "{{{
-  let l:ECY_endtime = reltimefloat(reltime())
   if !exists('g:ECY_diagnosis_items_with_engine_name[a:engine_name]')
     return
   endif
-  " let l:lists = py3eval('CalculateScreenSign(' . string(a:starts) . ',' . string(a:ends) . ')')
-  " call diagnosis#CleanAllSignHighlight()
-  " call sign_unplace(a:engine_name)
-  " for item in l:lists
-  "   call s:PlaceSign(item['position'], 
-  "         \item['diagnosis'],
-  "         \item['items'], item['kind'],
-  "         \item['file_path'],
-  "         \a:engine_name)
-  " endfor
   let l:file_path = utility#GetCurrentBufferPath()
+  let l:lists = py3eval('CalculateScreenSign(' . string(a:starts) . ',' . string(a:ends) . ')')
   call diagnosis#CleanAllSignHighlight()
   call sign_unplace(a:engine_name)
-  for item in g:ECY_diagnosis_items_with_engine_name[a:engine_name]
-    if item['file_path'] == l:file_path
-      let l:line = item['position']['line']
-      if a:starts <= l:line && a:ends >= l:line
-        call s:PlaceSign(item['position'], 
-              \item['diagnosis'],
-              \item['items'], item['kind'],
-              \item['file_path'],
-              \a:engine_name,
-              \l:file_path)
-      endif
-    endif
+  for item in l:lists
+    call s:PlaceSign(item['position'], 
+          \item['diagnosis'],
+          \item['items'], item['kind'],
+          \item['file_path'],
+          \a:engine_name,
+          \l:file_path)
   endfor
-  let g:abc = reltimefloat(reltime()) - l:ECY_endtime
+  " let l:file_path = utility#GetCurrentBufferPath()
+  " call diagnosis#CleanAllSignHighlight()
+  " call sign_unplace(a:engine_name)
+  " for item in g:ECY_diagnosis_items_with_engine_name[a:engine_name]
+  "   if item['file_path'] == l:file_path
+  "     let l:line = item['position']['line']
+  "     if a:starts <= l:line && a:ends >= l:line
+  "       call s:PlaceSign(item['position'], 
+  "             \item['diagnosis'],
+  "             \item['items'], item['kind'],
+  "             \item['file_path'],
+  "             \a:engine_name,
+  "             \l:file_path)
+  "     endif
+  "   endif
+  " endfor
 "}}}
 endfunction
 
@@ -424,7 +424,7 @@ function! diagnosis#PlaceSign(msg) abort
   else
     call s:StopUpdateTimer()
   endif
-  if g:ECY_update_diagnosis_mode == v:false && mode() == 'i'
+  if g:ECY_update_diagnosis_mode == v:false && mode() != 'n'
     " don't want to update diagnosis in insert mode
     let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:true
     return
@@ -476,9 +476,11 @@ function! diagnosis#Toggle() abort
     let l:status = 'Disabled'
     call s:StopUpdateTimer()
     call diagnosis#CleanAllSignHighlight()
-    call diagnosis#UnPlaceAllSign()
+    call sign_unplace('*')
     let s:current_diagnosis       = {}
     let s:current_diagnosis_nr    = -1
+    let g:ECY_diagnosis_items_all = []
+    let g:ECY_diagnosis_items_with_engine_name = {}
   endif
   call utility#ShowMsg('[ECY] Diagnosis status: ' . l:status, 2)
 "}}}
@@ -512,7 +514,7 @@ function! s:UpdateSignEvent(timer_id) abort
     call s:StopUpdateTimer()
     return
   endif
-  if g:ECY_update_diagnosis_mode == v:false && mode() == 'i'
+  if g:ECY_update_diagnosis_mode == v:false && mode() != 'n'
     return
   endif
   let l:start = line('w0')
