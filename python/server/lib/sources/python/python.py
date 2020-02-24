@@ -4,6 +4,7 @@
 import os
 import queue
 import threading
+import time
 import logging
 global g_logger
 g_logger = logging.getLogger('ECY_server')
@@ -330,7 +331,7 @@ class Operate(scope_.Source_interface):
         while 1:
             try:
                 version = self._diagnosis_queue.get()
-                if version['DocumentVersionID'] < self.document_id:
+                if version['DocumentVersionID'] <= self.document_id:
                     g_logger.debug(version['DocumentVersionID'])
                     continue
                 self.document_id = version['DocumentVersionID']
@@ -347,6 +348,7 @@ class Operate(scope_.Source_interface):
                 return_['Lists'] = reporter.GetDiagnosis()
                 self._deamon_queue.put(return_)
                 g_logger.debug(return_)
+                time.sleep(1)
             except:
                 g_logger.exception('diagnosis of python_jedi')
 
