@@ -19,7 +19,7 @@ function diagnosis#Init() abort
   " 1 means ask diagnosis when there are changes not including user in insert mode, trigger by DoCompletion()
   " 2 means ask diagnosis when there are changes including user in insert mode, trigger by OnBufferTextChanged().
   let g:ECY_update_diagnosis_mode
-        \= get(g:,'ECY_update_diagnosis_mode', 1)
+        \= get(g:,'ECY_update_diagnosis_mode', 2)
   if g:ECY_update_diagnosis_mode == 2
     let g:ECY_update_diagnosis_mode = v:true
   else
@@ -342,10 +342,13 @@ function! s:PlaceSign(position, diagnosis, items, style, path, engine_name, curr
     let l:style = 'ECY_diagnosis_warn'
   endif
   let l:group_name = a:engine_name
-  let l:sign_id = sign_place(0,
-         \l:group_name,
-         \l:style, a:path,
-         \{'lnum' : a:position['line']})
+  try
+    call sign_place(0,
+           \l:group_name,
+           \l:style, a:path,
+           \{'lnum' : a:position['line']})
+  catch 
+  endtry
   if a:current_buffer_path == a:path
     call s:HighlightRange(a:position['range'], 'ECY_diagnosis_highlight')
   endif
