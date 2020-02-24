@@ -54,7 +54,7 @@ function diagnosis#Init() abort
   let g:ECY_show_diagnosis_in_normal_mode = get(g:,'ECY_show_diagnosis_in_normal_mode', 'H')
   let g:ECY_show_next_diagnosis_in_normal_mode = get(g:,'ECY_show_next_diagnosis_in_normal_mode', '[j')
   exe 'nmap ' . g:ECY_show_diagnosis_in_normal_mode . ' :call diagnosis#ShowCurrentLineDiagnosis(v:false)<CR>'
-  exe 'nmap ' . g:ECY_show_next_diagnosis_in_normal_mode . ' :call diagnosis#ShowNextDiagnosis()<CR>'
+  exe 'nmap ' . g:ECY_show_next_diagnosis_in_normal_mode . ' :call diagnosis#ShowNextDiagnosis(1)<CR>'
 "}}}
 endfunction
 
@@ -78,73 +78,98 @@ function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
     endif
     return ''
   endif
-  let g:ECY_diagnosis_items_all = diagnosis#GetAllDiagnosis()
-  let l:current_line_nr   = line('.')
+  let l:current_line_nr     = line('.')
+  let l:current_col_nr      = col('.')
   let l:current_buffer_path = utility#GetCurrentBufferPath()
-  let l:index_list        = []
-  let i = 0
-  for item in g:ECY_diagnosis_items_all
-    let item['index'] = i
-    let i += 1
-    if item['file_path'] != l:current_buffer_path || 
-          \item['position']['line'] != l:current_line_nr
-      continue
-    endif
-    call add(l:index_list, item)
-  endfor
-  if len(l:index_list) != 0
-    let s:current_diagnosis['line']      = l:current_line_nr
-    let s:current_diagnosis['file_path'] = l:current_buffer_path
-    call s:ShowDiagnosis(l:index_list)
-  else
-    if !a:is_triggered_by_event 
-      call utility#ShowMsg("[ECY] Diagnosis has nothing to show in current buffer.", 2)
-    endif
-  endif
-  return ''
+  call diagnosis#Show(l:current_buffer_path, l:current_line_nr,
+        \l:current_col_nr, a:is_triggered_by_event)
+  
+  return '' " we should return ''
 "}}}
 endfunction
 
-function! diagnosis#ShowNextDiagnosis() abort
-"{{{ show diagnosis msg in normal mode at current buffer. 
-  let l:current_buffer_path = utility#GetCurrentBufferPath()
-
-  let l:i = 0
-  if s:current_diagnosis == {}
-    let g:ECY_diagnosis_items_all = diagnosis#GetAllDiagnosis()
-    " init
-    for item in g:ECY_diagnosis_items_all
-      if l:current_buffer_path == item['file_path']
-        let l:line = item['position']['line']
-        let l:colum = item['position']['range']['start']['colum']
-        let s:current_diagnosis['file_path'] = l:current_buffer_path
-        let s:current_diagnosis['line'] = l:line
-        call utility#MoveToBuffer(l:line, l:colum, l:current_buffer_path, 'current buffer')
-        call diagnosis#ShowCurrentLineDiagnosis(v:true)
-        break
-      endif
-      let l:i += 1
-    endfor
-    return ''
+function! diagnosis#Show(file_path, line, colum, is_triggered_by_event) abort
+"{{{ show a popup windows and move to that position.
+  if g:ECY_diagnosis_items_all == []
+    call s:InitDiagnosisLists()
   endif
 
-  let l:i = 0
+  let l:index_list = []
+  let l:index = -1
   for item in g:ECY_diagnosis_items_all
-    if item['position']['line'] == s:current_diagnosis['line']
-      let l:index = (l:i + 1) % len(g:ECY_diagnosis_items_all)
-      let l:line = g:ECY_diagnosis_items_all[l:index]['position']['line']
-      if  l:line != s:current_diagnosis['line'] 
-            \&& l:current_buffer_path == s:current_diagnosis['file_path']
-        let l:colum = g:ECY_diagnosis_items_all[l:index]['position']['range']['start']['colum']
-        call utility#MoveToBuffer(l:line, l:colum, l:current_buffer_path, 'current buffer')
-        call diagnosis#ShowCurrentLineDiagnosis(v:true)
-        let s:current_diagnosis['line'] = l:line
-        return ''
-      endif
+    if a:file_path != item['file_path'] || a:line != item['position']['line']
+      continue
     endif
-    let l:i += 1
+    let l:index = item['index']
+    call add(l:index_list, item)
   endfor
-  call utility#ShowMsg("[ECY] Diagnosis has no next one.", 2)
+
+  if len(l:index_list) == 0
+    if !a:is_triggered_by_event
+      call utility#ShowMsg("[ECY] Diagnosis has nothing to show at current buffer line.", 2)
+    endif
+    return
+  endif
+
+  let s:current_diagnosis              = {}
+  let s:current_diagnosis['file_path'] = a:file_path
+  let s:current_diagnosis['line']      = a:line
+  let s:current_diagnosis['colum']     = a:colum
+  let s:current_diagnosis['index']     = l:index
+
+  call utility#MoveToBuffer(a:line, a:colum, a:file_path, 'current buffer')
+
+  if g:has_floating_windows_support == 'vim'
+    call s:ShowDiagnosis_vim(l:index_list)
+  elseif g:has_floating_windows_support == 'neovim'
+    " TODO
+  endif
+"}}}
+endfunction
+
+function! diagnosis#ShowNextDiagnosis(next_or_pre) abort
+"{{{ show diagnosis msg in normal mode at current buffer. 
+  let l:items_len = len(g:ECY_diagnosis_items_all)
+  if l:items_len == 0
+    call s:InitDiagnosisLists()
+    let l:items_len = len(g:ECY_diagnosis_items_all)
+    if l:items_len == 0
+      call utility#ShowMsg("[ECY] Diagnosis has nothing to show at current buffer line.", 2)
+      return ''
+    endif
+  endif
+
+  let l:file_path = utility#GetCurrentBufferPath()
+
+  let g:abc = s:current_diagnosis
+  if s:current_diagnosis != {}
+    let l:index = (s:current_diagnosis['index'] + a:next_or_pre) % l:items_len
+    let g:abcd = l:index
+    try
+      let item = g:ECY_diagnosis_items_all[l:index]
+      let l:file_path = item['file_path']
+      let l:line = item['position']['line']
+      let l:colum = item['position']['range']['start']['colum']
+    catch 
+      let s:current_diagnosis = {}
+    endtry
+  endif
+
+  if s:current_diagnosis == {}
+    for item in g:ECY_diagnosis_items_all
+      if l:file_path == item['file_path']
+        let l:line = item['position']['line']
+        let l:colum = item['position']['range']['start']['colum']
+        break
+      endif
+    endfor
+    if !exists('l:line')
+      call utility#ShowMsg("[ECY] Diagnosis has nothing to show at current buffer line.", 2)
+      return ''
+    endif
+  endif
+
+  call diagnosis#Show(l:file_path, l:line, l:colum, v:true)
   return ''
 "}}}
 endfunction
@@ -164,48 +189,46 @@ function! s:CloseDiagnosisPopupWindows() abort
 "}}}
 endfunction
 
-function! s:ShowDiagnosis(index_list) abort
+function! s:ShowDiagnosis_vim(index_list) abort
 "{{{ 
   call s:CloseDiagnosisPopupWindows()
-  if g:has_floating_windows_support == 'vim'
-    let l:text = []
-    for item in a:index_list
-      if len(l:text) != 0
-        call add(l:text, '----------------------------')
-      endif
-      let l:line = string(item['position']['line'])
-      let l:colum = string(item['position']['range']['start']['colum'])
-      let l:index = string(item['index'] + 1)
-      let l:lists_len = string(len(g:ECY_diagnosis_items_all))
-      let l:nr = "(" . l:index . '/' . l:lists_len . ')'
-      if item['kind'] == 1
-        let l:style = 'ECY_diagnosis_erro'
-      else
-        let l:style = 'ECY_diagnosis_warn'
-      endif
-      call add(l:text, l:style . ' [' .l:line . ', ' . l:colum . '] ' . l:nr)
-      call add(l:text, '(' . item['diagnosis'] . ')')
-    endfor
-    if g:ECY_PreviewWindows_style == 'append'
-      " show a popup windows aside current cursor.
-      let l:opts = {
-          \ 'minwidth': g:ECY_preview_windows_size[0][0],
-          \ 'maxwidth': g:ECY_preview_windows_size[0][1],
-          \ 'minheight': g:ECY_preview_windows_size[1][0],
-          \ 'maxheight': g:ECY_preview_windows_size[1][1],
-          \ 'border': [],
-          \ 'close': 'click',
-          \ 'callback': 'g:Diagnosis_vim_cb',
-          \ 'scrollbar': 1,
-          \ 'firstline': 1,
-          \ 'padding': [0,1,0,1],
-          \ 'zindex': 2000}
-      let l:nr = popup_atcursor(l:text, l:opts)
-      call setbufvar(winbufnr(l:nr), '&syntax', 'ECY_d')
-      " let l:exe = "call prop_add(1, 1, {'length': 100,'type': 'ECY_diagnosis_text'})"
-      " call win_execute(l:nr, l:exe)
-      let s:current_diagnosis_nr = l:nr
+  let l:text = []
+  for item in a:index_list
+    if len(l:text) != 0
+      call add(l:text, '----------------------------')
     endif
+    let l:line = string(item['position']['line'])
+    let l:colum = string(item['position']['range']['start']['colum'])
+    let l:index = string(s:current_diagnosis['index'] + 1)
+    let l:lists_len = string(len(g:ECY_diagnosis_items_all))
+    let l:nr = "(" . l:index . '/' . l:lists_len . ')'
+    if item['kind'] == 1
+      let l:style = 'ECY_diagnosis_erro'
+    else
+      let l:style = 'ECY_diagnosis_warn'
+    endif
+    call add(l:text, l:style . ' [' .l:line . ', ' . l:colum . '] ' . l:nr)
+    call add(l:text, '(' . item['diagnosis'] . ')')
+  endfor
+  if g:ECY_PreviewWindows_style == 'append'
+    " show a popup windows aside current cursor.
+    let l:opts = {
+        \ 'minwidth': g:ECY_preview_windows_size[0][0],
+        \ 'maxwidth': g:ECY_preview_windows_size[0][1],
+        \ 'minheight': g:ECY_preview_windows_size[1][0],
+        \ 'maxheight': g:ECY_preview_windows_size[1][1],
+        \ 'border': [],
+        \ 'close': 'click',
+        \ 'callback': 'g:Diagnosis_vim_cb',
+        \ 'scrollbar': 1,
+        \ 'firstline': 1,
+        \ 'padding': [0,1,0,1],
+        \ 'zindex': 2000}
+    let l:nr = popup_atcursor(l:text, l:opts)
+    call setbufvar(winbufnr(l:nr), '&syntax', 'ECY_d')
+    " let l:exe = "call prop_add(1, 1, {'length': 100,'type': 'ECY_diagnosis_text'})"
+    " call win_execute(l:nr, l:exe)
+    let s:current_diagnosis_nr = l:nr
   endif
 "}}}
 endfunction
@@ -265,41 +288,8 @@ function! diagnosis#CleanAllSignHighlight() abort
 "}}}
 endfunction
 
-function! diagnosis#UnPlaceAllSignInBufferName(file_path) abort
-"{{{ remove all ECY's sign in current buffer.
-  let i = 0
-  while i < len(g:ECY_diagnosis_items_all)
-    let l:temp = g:ECY_diagnosis_items_all[i]
-    if l:temp['file_path'] == a:file_path
-      call sign_unplace('', {'buffer' : l:temp['file_path'], 'id': l:temp['id']})
-      unlet g:ECY_diagnosis_items_all[i]
-      continue
-    endif
-    let i += 1
-  endw
-"}}}
-endfunction
-
-function! diagnosis#UnPlaceAllSign() abort
-"{{{
-  for item in g:ECY_diagnosis_items_all
-    call sign_unplace('', {'buffer' : item['file_path'], 'id' : item['id']})
-  endfor
-  let g:ECY_diagnosis_items_all = []
-"}}}
-endfunction
-
 function! diagnosis#UnPlaceAllSignByEngineName(engine_name, is_clean_sign) abort
 "{{{
-  " let i = 0
-  " while i < len(g:ECY_diagnosis_items_all)
-  "   let l:temp = g:ECY_diagnosis_items_all[i]
-  "   if l:temp['engine_name'] == a:engine_name
-  "     unlet g:ECY_diagnosis_items_all[i]
-  "     continue
-  "   endif
-  "   let i += 1
-  " endw
   let g:ECY_diagnosis_items_with_engine_name[a:engine_name] = []
   if a:is_clean_sign
     call sign_unplace(a:engine_name)
@@ -408,6 +398,7 @@ endfunction
 function! s:UpdateDiagnosisByEngineName(msg) abort
   let l:engine_name = a:msg['EngineName']
   let g:ECY_diagnosis_items_with_engine_name[l:engine_name] = a:msg['Lists']
+  let g:ECY_diagnosis_items_all = []
   let s:current_diagnosis = {}
 endfunction
 
@@ -460,13 +451,27 @@ function! s:UpdateAllSign(engine_name) abort
 "}}}
 endfunction
 
-function! diagnosis#GetAllDiagnosis() abort
+function! s:InitDiagnosisLists() abort
 "{{{return lists
  let l:temp = []
  for [key, lists] in items(g:ECY_diagnosis_items_with_engine_name)
    call extend(l:temp, lists)
  endfor
+ let g:ECY_diagnosis_items_all = l:temp
+ let i = 0
+ while i < len(g:ECY_diagnosis_items_all)
+   let g:ECY_diagnosis_items_all[i]['index'] = i
+   let i += 1
+ endw
  return l:temp
+"}}}
+endfunction
+
+function! diagnosis#ClearAllSign() abort
+"{{{
+  for [key, lists] in items(g:ECY_diagnosis_items_with_engine_name)
+    call sign_unplace(key) " clear all sign
+  endfor
 "}}}
 endfunction
 
@@ -480,7 +485,7 @@ function! diagnosis#Toggle() abort
     let l:status = 'Disabled'
     call s:StopUpdateTimer()
     call diagnosis#CleanAllSignHighlight()
-    call sign_unplace('*')
+    call diagnosis#ClearAllSign()
     let s:current_diagnosis       = {}
     let s:current_diagnosis_nr    = -1
     let g:ECY_diagnosis_items_all = []
@@ -492,14 +497,14 @@ endfunction
 
 function! diagnosis#ShowSelecting() abort
 "{{{ show all
-  let g:ECY_diagnosis_items_all = diagnosis#GetAllDiagnosis()
+  call s:InitDiagnosisLists()
   call utility#StartLeaderfSelecting(g:ECY_diagnosis_items_all, 'diagnosis#Selecting_cb')
 "}}}
 endfunction
 
 function! diagnosis#Selecting_cb(line, event, index, nodes) abort
 "{{{
- let l:data = diagnosis#GetAllDiagnosis()
+ let l:data = g:ECY_diagnosis_items_all
   let l:data  = l:data[a:index]
   if a:event == 'acceptSelection' || a:event == 'previewResult'
     let l:position = l:data['position']['range']['start']

@@ -112,6 +112,7 @@ function! s:OnBufferEnter() abort
   let  s:indentexpr           = &indentexpr
   let  s:completeopt_temp     = &completeopt
   let  s:completeopt_fuc_temp = &completefunc
+  call ECY_main#ChangeDocumentVersionID()
   call diagnosis#CleanAllSignHighlight()
   call s:SetUpCompleteopt()
   " OnBufferEnter will trigger Diagnosis
@@ -524,7 +525,7 @@ function! ECY_main#AfterUserChooseASource() abort
 " lists
   " order matters
   call diagnosis#CleanAllSignHighlight()
-  call diagnosis#UnPlaceAllSignInBufferName(utility#GetCurrentBufferPath())
+  " call diagnosis#ClearAllSign()
   if utility#HasYCM()
     " according the user's settings to optionally complete.
     let l:filetype = &filetype

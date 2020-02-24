@@ -27,13 +27,13 @@ class Operate(scope_.Source_interface):
         self._name = 'html_lsp'
         self._did_open_list = {}
         self._lsp = lsp.LSP()
-        self.is_server_start = 'not started'
         self._deamon_queue = None
         self._starting_server_cmd = None
         self._diagnosis_queue = queue.LifoQueue()
         self._htmlHint = HtmlHint()
         self._is_http_server_started = None
-        threading.Thread(target=self._diagnosis_notification).start()
+        self.is_server_start = 'not started'
+        threading.Thread(target=self._handle_diagnosis).start()
 
     def GetInfo(self):
         return {'Name': self._name, 'WhiteList': ['html', 'xhtml'],
@@ -223,7 +223,7 @@ class Operate(scope_.Source_interface):
             self._build_erro_msg(4, "Failed to call HtmlHint.")
         return None
 
-    def _diagnosis_notification(self):
+    def _handle_diagnosis(self):
         address = ('localhost', self._htmlHint.GetUnusedLocalhostPort())
         server = HTTPServer(address, Handler)
         threading.Thread(target=server.serve_forever).start()
