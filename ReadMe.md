@@ -113,6 +113,42 @@ Some useful command of `LeaderF` are follow.
 
 Especially the `ctags` support of `LeaderF`
 
+# Configuration
+
+## Key Variables
+variable name|default values|description
+--|:--:|--:
+`g:ECY_show_switching_source_popup`|\<Tab\>|**String**. Show a prompting board in normal mode for current buffer's available engines.
+`g:ECY_expand_snippets_key`|\<CR\> a.k.a \<Enter\>|**String**. Expand a snippet in Insert mode by ultsnippes while the popup is showing and there are snippet that can be expanded. 
+`g:ECY_show_switching_source_popup`|\<Tab\>|**String**. Show a prompting board for current buffer's available engines.
+`g:ECY_select_items`|['\<Tab\>','\<S-TAB\>']|**String**. Must be a list containing 2 item, the first value is shifting down the items, the second one is shifting up the items.
+`g:ECY_rolling_key_of_floating_windows`|['\<C-h\>', '\<C-l\>']|**String**. Available only when your vim support floating windows (popup windows). the first one is rolling down, the second one is rolling up.
+
+## String&Int&Boolean Variables(part, check engine document for more)
+variable name|default values|description
+--|:--:|--:
+`g:ECY_python3_cmd`|'python'|**String**. CMD of executing python3. Pointing to python3 bin in your computer.
+`g:ycm_autoclose_preview_window_after_completion`|v:true|**Boolean**. Same as YCM. Close preview windows after popup windows closed.
+`g:ECY_disable_diagnosis`|v:false|**Boolean**. Wether to show diagnosis.
+`g:ECY_use_floating_windows_to_be_popup_windows`|v:true|**Boolean**. If your vim supports floating windows, but you don't want to use it as popup, you can set to v:false.
+`g:ECY_triggering_length`|1|**Int**. ECY show popup windows only when there are more than xx character.
+`g:ECY_disable_for_files_larger_than_kb`|1000|**Int**. Same as `g:ycm_disable_for_files_larger_than_kb` of YCM. Current buffer size more than xxx KB, then ECY won't work.
+`g:ECY_update_diagnosis_mode`|1|**Int**. 1 means update diagnosis both in Insert mode and Normal mode. 2 means only update diagnosis in Normal mode.
+`g:ECY_preview_windows_size`|[[30, 50], [2, 14]]|**Lists**. Available only when your vim support floating windows. Size of preview windows like: [[minwidth, maxwidth], [minheight, maxheight]]
+
+## Style Variables
+variable name|default values|description
+--|:--:|--:
+`g:ECY_highlight_normal_matched_word`|'ECY_normal_matched_word'|**String**. Only available when you have floating windows.
+`g:ECY_highlight_normal_items`|'ECY_normal_items'|**String**. Only available when you have floating windows.
+`g:ECY_highlight_selected_matched_word`|'ECY_selected_matched_word'|**String**. Only available when you have floating windows.
+`g:ECY_highlight_selected_item`|'ECY_selected_item'|**String**. Only available when you have floating windows.
+`g:ECY_diagnosis_erro`|'ECY_diagnosis_erro'|**String**. Color or Styles of diagnosis error.
+`g:ECY_diagnosis_warn`|'ECY_diagnosis_warn'|**String**. Color or Styles of diagnosis warning.
+`g:ECY_diagnosis_highlight`|'ECY_diagnosis_highlight'|**String**. Color or Styles of diagnostic underline hint.
+`g:ECY_erro_sign_highlight`|'ECY_erro_sign_highlight'|**String**. Color of error sign.
+`g:ECY_warn_sign_highlight`|'ECY_warn_sign_highlight'|**String**. Color of warning sign.
+
 # Q&A
 
 ### Q: Why there are a few of [Snippets](https://www.techopedia.com/definition/5472/snippet-programming) options to complete? I need more.  
