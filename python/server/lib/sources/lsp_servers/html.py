@@ -141,10 +141,10 @@ class Operate(scope_.Source_interface):
         return None
 
     def OnBufferTextChanged(self, version):
-        uri_ = self._lsp.PathToUri(version['FilePath'])
-        line_text = version['AllTextList']
         if version['IsInsertMode']:
-            # for completion 
+            # only for completion 
+            uri_ = self._lsp.PathToUri(version['FilePath'])
+            line_text = version['AllTextList']
             self._did_open_or_change(uri_, line_text)
         if version['ReturnDiagnosis']:
             self._diagnosis(version)
@@ -232,10 +232,7 @@ class Operate(scope_.Source_interface):
         while 1:
             try:
                 version = self._diagnosis_queue.get()
-                g_logger.debug(version['DocumentVersionID'])
-                g_logger.debug(self.document_id)
-                g_logger.debug('-------------')
-                if version['DocumentVersionID'] < self.document_id:
+                if version['DocumentVersionID'] <= self.document_id:
                     g_logger.debug('filter a unless diagnosis')
                     continue
                 self.document_id = version['DocumentVersionID']
@@ -249,7 +246,7 @@ class Operate(scope_.Source_interface):
                         version['AllTextList'], version['FilePath'])
                 return_['Lists'] = diagnosis_lists
                 self._output_queue(return_)
-                # time.sleep(1)
+                time.sleep(1)
             except:
                 g_logger.exception('')
 
