@@ -86,7 +86,7 @@ function! goto#Go(...) abort
       let i += 1
       if !utility#IsInList(l:temp, s:available_goto)
         call utility#ShowMsg(
-              \"[ECY] Goto name is wrong: " . 
+              \"[ECY] Goto wrong name: " . 
               \l:temp . "; available_goto: " . string(s:available_goto), 2)
         return
       endif
