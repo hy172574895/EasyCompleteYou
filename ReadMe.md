@@ -16,6 +16,7 @@
 ---
 ---
 [中文版文档](https://gitee.com/Jimmy_Huang/EasyCompleteYou) | **English(currently)**
+---
 
 # Brief Introduction
 1. Automatically compatible with [YCM](https://github.com/ycm-core/YouCompleteMe), can be a extension for YCM.
@@ -24,6 +25,8 @@
 4. Fuzzy-find support like YCM.
 5. Buildin [LSP](https://microsoft.github.io/language-server-protocol).
 6. Out of the box.
+
+[Screenshots of ECY -->>>>](https://github.com/hy172574895/EasyCompleteYou/issues/1)
 
 # How to install
 

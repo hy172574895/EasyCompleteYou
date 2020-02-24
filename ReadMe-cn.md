@@ -17,6 +17,7 @@
 ---
 ---
 [English](https://github.com/hy172574895/EasyCompleteYou) | **中文版文档(当前)**
+---
 
 # 介绍
 1. 自动兼容 [YCM](https://github.com/ycm-core/YouCompleteMe), 可以作为YCM的补充。
@@ -25,6 +26,8 @@
 4. 类似YCM的模糊匹配.
 5. 内置 [LSP](https://microsoft.github.io/language-server-protocol).
 6. 开箱即用.
+
+[运行截图 -->>>>](https://gitee.com/Jimmy_Huang/EasyCompleteYou/issues/I1A5UA)
 
 # 怎么安装
 
