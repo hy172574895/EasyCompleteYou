@@ -40,7 +40,16 @@ strongly suggest to use the newest one(Vim 8.2).
 #### Options 1:
 Using some Plugin-manager like vim-plug or Vunble:  
 Put the line into your vimrc, then install it.  
+
+For vim-plug:
 > Plug 'hy172574895/EasyCompleteYou'
+
+For Vunble:
+> Plugin 'hy172574895/EasyCompleteYou'
+
+For Someone in fucking China. A mirror.
+> Plug 'https://gitee.com/Jimmy_Huang/EasyCompleteYou'
+
 
 #### Options 2:  
 Download the whole repository and put it into vim's `runtimepath`.  
@@ -116,6 +125,22 @@ Especially the `ctags` support of `LeaderF`
 # Configuration
 
 ## Key Variables
+All the options of setting a key can be only set as '<xx>' such as '<F8>' not "\<F8>", because there are different between that two styles in vim.
+
+For Example:   
+```
+  let g:ECY_show_switching_source_popup = '<C-g>'    √
+
+  let g:ECY_show_switching_source_popup = "\<C-g>"   ×
+
+  let g:ECY_show_switching_source_popup = "\<C-g\>"  ×
+
+
+  let g:ECY_select_items = ['<C-j>', '<C-k>']         √
+
+  let g:ECY_select_items = [<C-j>, <C-k>]             ×
+```
+
 variable name|default values|description
 --|:--:|--:
 `g:ECY_show_switching_source_popup`|\<Tab\>|**String**. Show a prompting board in normal mode for current buffer's available engines.
@@ -125,6 +150,35 @@ variable name|default values|description
 `g:ECY_rolling_key_of_floating_windows`|['\<C-h\>', '\<C-l\>']|**String**. Available only when your vim support floating windows (popup windows). the first one is rolling down, the second one is rolling up.
 
 ## String&Int&Boolean Variables(part, check engine document for more)
+For Example:   
+```
+  let g:ECY_python3_cmd = '/home/python38/python.exe'           √
+
+  let g:ECY_python3_cmd = '/home/python38/python.exe --debug'   ×
+
+
+  let g:ECY_preview_windows_size = [[30, 50], [2, 14]]     √
+
+  let g:ECY_preview_windows_size = [30, 50, 2, 14]         ×
+
+
+  let g:ECY_use_floating_windows_to_be_popup_windows = v:false    √
+
+  let g:ECY_use_floating_windows_to_be_popup_windows = v:true     √
+
+  let g:ECY_use_floating_windows_to_be_popup_windows = false      ×
+
+  let g:ECY_use_floating_windows_to_be_popup_windows = 'v:false'  ×
+
+
+  let g:ECY_disable_for_files_larger_than_kb = 200     √
+
+  let g:ECY_disable_for_files_larger_than_kb = -1      ×
+
+  let g:ECY_disable_for_files_larger_than_kb = 0       ×
+
+
+```
 variable name|default values|description
 --|:--:|--:
 `g:ECY_python3_cmd`|'python'|**String**. CMD of executing python3. Pointing to python3 bin in your computer.
@@ -137,6 +191,14 @@ variable name|default values|description
 `g:ECY_preview_windows_size`|[[30, 50], [2, 14]]|**Lists**. Available only when your vim support floating windows. Size of preview windows like: [[minwidth, maxwidth], [minheight, maxheight]]
 
 ## Style Variables
+For Example:   
+```
+  hi your_highlight1  guifg=#945596	guibg=#073642	ctermfg=red	ctermbg=darkBlue gui=bold
+  let g:ECY_normal_matched_word  = 'your_highlight1'  √
+
+  let g:ECY_normal_matched_word  = 'a_hightlight_does_not_exits'  ×
+```
+
 variable name|default values|description
 --|:--:|--:
 `g:ECY_highlight_normal_matched_word`|'ECY_normal_matched_word'|**String**. Only available when you have floating windows.
