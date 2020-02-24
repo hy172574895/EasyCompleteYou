@@ -12,7 +12,7 @@ function! s:restore_cpo()
   unlet s:save_cpo
 endfunction
 
-let g:ECY_version = {'version': 11, 'tags': '1.1'}
+let g:ECY_version = {'version': 12, 'tags': '1.2'}
 let g:is_vim = !has('nvim')
 
 if exists( "g:loaded_easycomplete" )
