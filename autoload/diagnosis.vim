@@ -19,7 +19,7 @@ function diagnosis#Init() abort
   " 1 means ask diagnosis when there are changes not including user in insert mode, trigger by DoCompletion()
   " 2 means ask diagnosis when there are changes including user in insert mode, trigger by OnBufferTextChanged().
   let g:ECY_update_diagnosis_mode
-        \= get(g:,'ECY_update_diagnosis_mode', 2)
+        \= get(g:,'ECY_update_diagnosis_mode', 1)
   if g:ECY_update_diagnosis_mode == 2
     let g:ECY_update_diagnosis_mode = v:true
   else
@@ -360,7 +360,8 @@ function! diagnosis#OnInsertModeLeave() abort
   if !g:ECY_enable_diagnosis
     return
   endif
-  if s:need_to_update_diagnosis_after_user_leave_insert_mode
+  if s:need_to_update_diagnosis_after_user_leave_insert_mode &&
+        \g:ECY_update_diagnosis_mode
     let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
     let l:engine_name = ECY_main#GetCurrentUsingSourceName()
     call s:UpdateAllSign(l:engine_name)
