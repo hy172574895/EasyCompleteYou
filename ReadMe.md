@@ -35,7 +35,7 @@
 1. Python >= 3.0  
 strongly suggest to use python3.6+  
 [How to get python support for vim?](https://vi.stackexchange.com/questions/11526/how-to-enable-python-feature-in-vim)
-2. Vim >= 8.0  
+2. Vim >= 8.0 with `timer` and `job`.
 strongly suggest to use the newest one(Vim 8.2).  
 
 ### Install  
@@ -72,10 +72,6 @@ So if you want a specific engine works on a buffer, you can change the filetype 
 
 You can also check available engine of ECY by pressing `<Tab>` in normal mode.
 It will show a floating windows containing all the engine you can use in current buffera. Change `<Tab>`  by `g:ECY_show_switching_source_popup`.
-
-## How to change the default value to you want?
-All of them are variables of vimL, so you can put a code such as     
-`let g:ECY_expand_snippets_key = '<F7>'` into your [vimrc](https://stackoverflow.com/questions/10921441/where-is-my-vimrc-file).  
 
 ## Enable more.
 
@@ -126,13 +122,18 @@ Some useful command of `LeaderF` are follow.
 Especially the `ctags` support of `LeaderF`
 
 # Configuration
+## How to change the default values to you want?
+All of them are variables of vimL, so you can put a code such as     
+`let g:ECY_expand_snippets_key = '<F7>'` into your [vimrc](https://stackoverflow.com/questions/10921441/where-is-my-vimrc-file).  
 
 ## Key Variables
-All the options of setting a key can be only set as '<xx>' such as '<F8>' not "\<F8>", because there are different between that two styles in vim.
+All the options of setting a key can be only set as '\<xx\>' such as '\<F8\>' not '\\\<F8\>', because there are different between that two styles in vim.
 
 For Example:   
 ```
   let g:ECY_show_switching_source_popup = '<C-g>'    √
+
+  let g:ECY_show_switching_source_popup = "<C-g>"    √
 
   let g:ECY_show_switching_source_popup = "\<C-g>"   ×
 
@@ -146,11 +147,10 @@ For Example:
 
 variable name|default values|description
 --|:--:|--:
-`g:ECY_show_switching_source_popup`|\<Tab\>|**String**. Show a prompting board in normal mode for current buffer's available engines.
+`g:ECY_show_switching_source_popup`|\<Tab\>|**String**. Show a prompting board for current buffer's available engines in normal mode .
 `g:ECY_expand_snippets_key`|\<CR\> a.k.a \<Enter\>|**String**. Expand a snippet in Insert mode by ultsnippes while the popup is showing and there are snippet that can be expanded. 
-`g:ECY_show_switching_source_popup`|\<Tab\>|**String**. Show a prompting board for current buffer's available engines.
-`g:ECY_select_items`|['\<Tab\>','\<S-TAB\>']|**String**. Must be a list containing 2 item, the first value is shifting down the items, the second one is shifting up the items.
-`g:ECY_rolling_key_of_floating_windows`|['\<C-h\>', '\<C-l\>']|**String**. Available only when your vim support floating windows (popup windows). the first one is rolling down, the second one is rolling up.
+`g:ECY_select_items`|['\<Tab\>','\<S-TAB\>']|**String**. Must be a list containing 2 items, the first value is shifting down a candidate, the second one is shifting up a candidate.
+`g:ECY_rolling_key_of_floating_windows`|['\<C-h\>', '\<C-l\>']|**String**. Available only when your vim supports floating windows (popup windows). the first one is rolling down text in floating widnows, the second one is rolling up text in floating windows.
 
 ## String&Int&Boolean Variables(part, check engine document for more)
 For Example:   
@@ -186,7 +186,7 @@ variable name|default values|description
 --|:--:|--:
 `g:ECY_python3_cmd`|'python'|**String**. CMD of executing python3. Pointing to python3 bin in your computer.
 `g:ycm_autoclose_preview_window_after_completion`|v:true|**Boolean**. Same as YCM. Close preview windows after popup windows closed.
-`g:ECY_disable_diagnosis`|v:false|**Boolean**. Wether to show diagnosis.
+`g:ECY_disable_diagnosis`|v:false|**Boolean**. Wether to enable diagnosis.
 `g:ECY_use_floating_windows_to_be_popup_windows`|v:true|**Boolean**. If your vim supports floating windows, but you don't want to use it as popup, you can set to v:false.
 `g:ECY_triggering_length`|1|**Int**. ECY show popup windows only when there are more than xx character.
 `g:ECY_disable_for_files_larger_than_kb`|1000|**Int**. Same as `g:ycm_disable_for_files_larger_than_kb` of YCM. Current buffer size more than xxx KB, then ECY won't work.
