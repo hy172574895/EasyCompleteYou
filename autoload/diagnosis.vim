@@ -52,6 +52,7 @@ function diagnosis#Init() abort
 
 
   call s:SetUpEvent()
+  call s:SetUpPython()
 
   let g:ECY_show_diagnosis_in_normal_mode = get(g:,'ECY_show_diagnosis_in_normal_mode', 'H')
   let g:ECY_show_next_diagnosis_in_normal_mode = get(g:,'ECY_show_next_diagnosis_in_normal_mode', '[j')
@@ -64,6 +65,25 @@ function s:SetUpEvent() abort
   augroup EasyCompleteYou_Diagnosis
     autocmd CursorHold * call s:OnCursorHold()
   augroup END
+endfunction
+
+function s:SetUpPython() abort
+python3 <<endpython
+import vim
+
+def CalculateScreenSign(start, end):
+  engine_name = vim.eval('ECY_main#GetCurrentUsingSourceName()')
+  lists = "g:ECY_diagnosis_items_with_engine_name['" + engine_name + "']"
+  lists = vim.eval(lists)
+  file_path = vim.eval('utility#GetCurrentBufferPath()')
+  results = []
+  for item in lists:
+    line = int(item['position']['line'])
+    if item['file_path'] == file_path:
+      if start <= line and end >= line:
+        results.append(item)
+  return results
+endpython
 endfunction
 
 function s:OnCursorHold() abort
@@ -568,19 +588,3 @@ function! s:StopUpdateTimer() abort
   let s:update_timer_id = -1
 endfunction
 
-python3 <<endpython
-import vim
-
-def CalculateScreenSign(start, end):
-  engine_name = vim.eval('ECY_main#GetCurrentUsingSourceName()')
-  lists = "g:ECY_diagnosis_items_with_engine_name['" + engine_name + "']"
-  lists = vim.eval(lists)
-  file_path = vim.eval('utility#GetCurrentBufferPath()')
-  results = []
-  for item in lists:
-    line = int(item['position']['line'])
-    if item['file_path'] == file_path:
-      if start <= line and end >= line:
-        results.append(item)
-  return results
-endpython
