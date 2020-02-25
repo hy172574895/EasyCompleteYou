@@ -32,15 +32,15 @@
 
 ### Requires
 
-1. Python >= 3.0  
+1. Python >= 3.0 with standerd library.  
 strongly suggest to use python3.6+  
 [How to get python support for vim?](https://vi.stackexchange.com/questions/11526/how-to-enable-python-feature-in-vim)
-2. Vim >= 8.0 with `timer` and `job`.
+2. Vim >= 8.0 with `timer` and `job` .  
 strongly suggest to use the newest one(Vim 8.2).  
 
 ### Install  
 
-#### Options 1:
+#### Options 1 (recommend):
 Using some Plugin-manager like vim-plug or Vunble:  
 Put the line into your vimrc, then install it.  
 
@@ -75,13 +75,22 @@ It will show a floating windows containing all the engine you can use in current
 
 ## Enable more.
 
-there only three buildin engine which is `label`,`python` and `path` after you installed ECY. If you want ECY work on `HTML`, you can activate that engine by: `:call ECY_Installer('HTML_LSP')` in vim.  
+there only three buildin engine which is `label`,`python` and `path` after you installed ECY. If you want ECY work on `HTML`, you can activate that engine with its name by: `:ECYInstall html_lsp` in vim.  
 
 **Importance**: There are might dependence while you installing a engine of ECY
 So check out the following lists carefully and install the dependence before you install it.
 
 **Notes: you can not use `snippets-expanding` without `Ultisnips`,  can not use`goto-definition`, `goto-declaration`, `find-symbols`, `find-reference` without `LeaderF`.**  
 Here the full lists of engine that ECY supports. 
+
+For Example:
+```vim
+ :ECYInstall go_gopls   √
+
+ :ECYInstall snippet    √
+
+ :ECYInstall a_name_we_do_not_have   ×
+```
 
 name|programming language|abilities|dependence|doc link
 --|:--:|--:|--:|--:
@@ -93,6 +102,7 @@ html_lsp|html, xhtml|completion<br> diagnosis<br> snippet-expanding<br>find-symb
 vim_lsp|vimL|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
 go_langserver|golang|completion<br>snippets-expanding|[go-langserver](https://github.com/sourcegraph/go-langserver)|
 go_gopls|golang|completion<br>diagnosis<br>snippets-expanding<br>goto-definition<br>goto-reference|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|
+
 
 ## Cooperate with [Ultisnips](https://github.com/SirVer/ultisnips)
 `Ultisnips` is a separate plugin, so you have to install it separately.
@@ -121,6 +131,19 @@ Some useful command of `LeaderF` are follow.
 
 Especially the `ctags` support of `LeaderF`
 
+# Commands
+Run in Normal mode, such as 
+```
+ :ECYDiagnosisLists
+```
+cmd|params|description
+--|:--:|--:
+`ECYDiagnosisLists`|-| Show diagnostic lists with `leaderf`.
+`ECYToggleDiagnosis`|-| Toggle diagnosis.
+`ECYSymbols`|-| Show symbols lists with `leaderf`.
+`ECYGoTo`|1| goto somewhere, such as `:ECYGoTo reference`.
+`ECYInstall`|1| Install a new engine, such as `:ECYInstall html_lsp`.
+
 # Configuration
 ## How to change the default values to you want?
 All of them are variables of vimL, so you can put a code such as     
@@ -130,7 +153,7 @@ All of them are variables of vimL, so you can put a code such as
 All the options of setting a key can be only set as '\<xx\>' such as '\<F8\>' not '\\\<F8\>', because there are different between that two styles in vim.
 
 For Example:   
-```
+```vim
   let g:ECY_show_switching_source_popup = '<C-g>'    √
 
   let g:ECY_show_switching_source_popup = "<C-g>"    √
@@ -154,7 +177,7 @@ variable name|default values|description
 
 ## String&Int&Boolean Variables(part, check engine document for more)
 For Example:   
-```
+```vim
   let g:ECY_python3_cmd = '/home/python38/python.exe'           √
 
   let g:ECY_python3_cmd = '/home/python38/python.exe --debug'   ×
@@ -195,7 +218,7 @@ variable name|default values|description
 
 ## Style Variables
 For Example:   
-```
+```vim
   hi your_highlight1  guifg=#945596	guibg=#073642	ctermfg=red	ctermbg=darkBlue gui=bold
   let g:ECY_normal_matched_word  = 'your_highlight1'  √
 
