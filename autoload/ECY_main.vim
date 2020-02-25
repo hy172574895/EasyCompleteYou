@@ -55,7 +55,18 @@ function! s:OnSelectingMenu() abort
     call completion_preview_windows#Show(s:user_data[l:item_index],&filetype)
   catch
   endtry
+  let s:completion_text_id += 1
+  call timer_start(1000, function('s:CallTextChangedEventWithTimer', [s:completion_text_id]))
 "}}}
+endfunction
+
+function! s:CallTextChangedEventWithTimer(completion_text_id, timer_id) abort 
+  "{{{
+  if a:completion_text_id != s:completion_text_id
+    return
+  endif
+  call s:OnTextChangedNormalMode()
+  "}}}
 endfunction
 
 function! s:OnBufferLeave() abort 
@@ -286,8 +297,9 @@ function! s:SetVariable() abort
   let  s:isSelecting          = v:false
   let  s:indentexpr           = &indentexpr
   let  s:completeopt_temp     = &completeopt
-  let  s:completeopt_fuc_temp = &completefunc
   let  s:back_to_source_key   = get(s:,'back_to_source_key',['<Space>'])
+  let  s:completion_text_id   = 0
+  let  s:completeopt_fuc_temp = &completefunc
   " we suggest to use socket, because we the results of testing the job is 
   " too slow.
   let  s:is_using_stdio = v:false
