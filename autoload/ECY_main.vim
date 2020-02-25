@@ -537,7 +537,7 @@ function! ECY_main#AfterUserChooseASource() abort
 " lists
   " order matters
   call diagnosis#CleanAllSignHighlight()
-  " call diagnosis#ClearAllSign()
+  call diagnosis#ClearAllSign()
   if utility#HasYCM()
     " according the user's settings to optionally complete.
     let l:filetype = &filetype
