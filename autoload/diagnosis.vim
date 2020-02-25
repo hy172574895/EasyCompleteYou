@@ -288,41 +288,8 @@ function! diagnosis#CleanAllSignHighlight() abort
 "}}}
 endfunction
 
-function! diagnosis#UnPlaceAllSignByEngineName(engine_name, is_clean_sign) abort
-"{{{
-  let g:ECY_diagnosis_items_with_engine_name[a:engine_name] = []
-  if a:is_clean_sign
-    call sign_unplace(a:engine_name)
-  endif
-"}}}
-endfunction
-
-function! diagnosis#UnPlacePartialSignByEngineName(engine_name, new_lists) abort
-"{{{
-  let i = 0
-  while i < len(g:ECY_diagnosis_items_all)
-    let l:need = v:false
-    let l:temp = g:ECY_diagnosis_items_all[i]
-    if l:temp['engine_name'] == a:engine_name
-      for item in new_lists
-        if item['position'] == l:temp['position'] && 
-              \item['file_path'] == l:temp['file_path']
-          let l:need = v:true
-          break
-        endif
-      endfor
-      if !l:need
-        call sign_unplace('', {'buffer' : l:temp['file_path'], 'id': l:temp['id']})
-      endif
-      unlet g:ECY_diagnosis_items_all[i]
-      continue
-    endif
-    let i += 1
-  endw
-"}}}
-endfunction
-
-function! s:PlaceSign(position, diagnosis, items, style, path, engine_name, current_buffer_path) abort
+function! s:PlaceSignAndHighlight(position, diagnosis, items, style, path,
+      \engine_name, current_buffer_path) abort
 "{{{ place a sign in current buffer.
   " a:position = {'line': 10, 'range': {'start': { 'line': 5, 'colum': 23 },'end' : { 'line': 6, 'colum': 0 } }}
   " a:diagnosis = {'item':{'1':'asdf', '2':'sdf'}}
@@ -333,15 +300,30 @@ function! s:PlaceSign(position, diagnosis, items, style, path, engine_name, curr
   endif
   let l:group_name = a:engine_name
   try
-    call sign_place(0,
-           \l:group_name,
-           \l:style, a:path,
-           \{'lnum' : a:position['line']})
+    call s:PlaceSign(a:engine_name, l:style, a:path, a:position['line'])
+    " call sign_place(0,
+    "        \l:group_name,
+    "        \l:style, a:path,
+    "        \{'lnum' : a:position['line']})
   catch 
   endtry
   if a:current_buffer_path == a:path
     call s:HighlightRange(a:position['range'], 'ECY_diagnosis_highlight')
   endif
+"}}}
+endfunction
+
+function! s:PlaceSign(engine_name, style, path, line) abort
+"{{{
+  
+  let l:temp = 'sign place 454 line='.a:line.' group='.a:engine_name.' name='.a:style.' file='.a:path
+  execute l:temp
+"}}}
+endfunction
+
+function! s:UnplaceAllSignByEngineName(engine_name) abort
+"{{{
+  execute 'sign unplace * group=' . a:engine_name
 "}}}
 endfunction
 
@@ -353,7 +335,7 @@ function! diagnosis#OnInsertModeLeave() abort
   if s:need_to_update_diagnosis_after_user_leave_insert_mode
     let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
     let l:engine_name = ECY_main#GetCurrentUsingSourceName()
-    call s:UpdateAllSign(l:engine_name)
+    call s:UpdateSignLists(l:engine_name)
   endif
 "}}}
 endfunction
@@ -366,9 +348,9 @@ function! s:PartlyPlaceSign_timer_cb(starts, ends, engine_name) abort
   let l:file_path = utility#GetCurrentBufferPath()
   let l:lists = py3eval('CalculateScreenSign(' . string(a:starts) . ',' . string(a:ends) . ')')
   call diagnosis#CleanAllSignHighlight()
-  call sign_unplace(a:engine_name)
+  call s:UnplaceAllSignByEngineName(a:engine_name)
   for item in l:lists
-    call s:PlaceSign(item['position'], 
+    call s:PlaceSignAndHighlight(item['position'], 
           \item['diagnosis'],
           \item['items'], item['kind'],
           \item['file_path'],
@@ -377,12 +359,12 @@ function! s:PartlyPlaceSign_timer_cb(starts, ends, engine_name) abort
   endfor
   " let l:file_path = utility#GetCurrentBufferPath()
   " call diagnosis#CleanAllSignHighlight()
-  " call sign_unplace(a:engine_name)
+  " call s:UnplaceAllSignByEngineName(a:engine_name)
   " for item in g:ECY_diagnosis_items_with_engine_name[a:engine_name]
   "   if item['file_path'] == l:file_path
   "     let l:line = item['position']['line']
   "     if a:starts <= l:line && a:ends >= l:line
-  "       call s:PlaceSign(item['position'], 
+  "       call s:PlaceSignAndHighlight(item['position'], 
   "             \item['diagnosis'],
   "             \item['items'], item['kind'],
   "             \item['file_path'],
@@ -425,14 +407,14 @@ function! diagnosis#PlaceSign(msg) abort
     return
   endif
   " show sign.
-  call s:UpdateAllSign(l:engine_name)
+  call s:UpdateSignLists(l:engine_name)
 "}}}
 endfunction
 
-function! s:UpdateAllSign(engine_name) abort
+function! s:UpdateSignLists(engine_name) abort
 "{{{
   call diagnosis#CleanAllSignHighlight()
-  call sign_unplace(a:engine_name)
+  call s:UnplaceAllSignByEngineName(a:engine_name)
   let l:sign_lists = g:ECY_diagnosis_items_with_engine_name[a:engine_name]
   let l:file_path = utility#GetCurrentBufferPath()
   for item in l:sign_lists
@@ -441,7 +423,7 @@ function! s:UpdateAllSign(engine_name) abort
     " {'name':'2', 'content': {'abbr': 'yyy'}}
     "  ],
     " 'position':{...}, 'diagnosis': 'strings'}
-    call s:PlaceSign(item['position'], 
+    call s:PlaceSignAndHighlight(item['position'], 
           \item['diagnosis'],
           \item['items'], item['kind'],
           \item['file_path'],
@@ -470,7 +452,7 @@ endfunction
 function! diagnosis#ClearAllSign() abort
 "{{{
   for [key, lists] in items(g:ECY_diagnosis_items_with_engine_name)
-    call sign_unplace(key) " clear all sign
+    call s:UnplaceAllSignByEngineName(key)
   endfor
 "}}}
 endfunction
