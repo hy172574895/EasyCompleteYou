@@ -5,7 +5,7 @@ function! ECY_Install#Init() abort
 "{{{ must be called before setupPython()
    " put buildin engine name into Client
    " when Client finding no Clent event will omit it to genernal
-   let s:ECY_buildin_engine = {
+   let s:ECY_buildin_engine_client = {
          \'html_lsp': 'lib.event.html_lsp',
          \'go_langserver': 'lib.event.go_langserver',
          \'go_gopls': 'lib.event.go_gopls',
@@ -20,7 +20,9 @@ function! ECY_Install#Init() abort
          \'go_gopls': function('ECY_Install#Go_gopls'),
          \'vim_lsp': function('ECY_Install#HTML_LSP')
          \}
-  for [key, lib] in items(s:ECY_buildin_engine)
+  for [key, lib] in items(s:ECY_buildin_engine_client)
+    " if a new engine did not register a client, ECY will use the default one
+    " instead.
     call ECY_Install#RegisterClient(key, lib)
   endfor
   for [key, Fuc] in items(s:ECY_buildin_engine_installer)
@@ -58,7 +60,7 @@ function! ECY_Install#HTML_LSP()
   catch
     echo "[Suggestion] We hightly recommend you to install UltiSnips plugin for better experience of HTML's source."
   endtry
-  return {'status':'0','description':"ok",'lib': {'html_lsp':'lib.sources.lsp_servers.html'}, 'name':'html_lsp'}
+  return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.html', 'name':'html_lsp', 'path': ''}
 "}}}
 endfunction
 
@@ -67,7 +69,7 @@ function! ECY_Install#Go_gopls()
   if !executable('gopls')
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
   endif
-  return {'status':'0','description':"ok",'lib': {'go_gopls':'lib.sources.lsp_servers.go_gopls'}, 'name':'go_gopls'}
+  return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.go_gopls', 'name':'go_gopls', 'path': ''}
 "}}}
 endfunction
 
@@ -76,7 +78,7 @@ function! ECY_Install#Go_langserver()
   if !executable('go-langserver')
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
   endif
-  return {'status':'0','description':"ok",'lib': {'go_langserver':'lib.sources.lsp_servers.go_langserver'}, 'name':'go_langserver'}
+  return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.go_langserver', 'name':'go_langserver', 'path': ''}
 "}}}
 endfunction
 
@@ -88,7 +90,7 @@ function! ECY_Install#Snippets()
   catch
     return {'status':'-1','description':"ECY failed to install it. You missing vim-snippets plugin. Please install that plugin, firstly. "}
   endtry
-  return {'status':'0','description':"ok",'lib': {'snippets':'lib.sources.snippets.snippets'}, 'name':'snippets'}
+  return {'status':'0','description':"ok",'lib': 'lib.sources.snippets.snippets', 'name':'snippets', 'path': ''}
 "}}}
 endfunction
 
@@ -97,7 +99,7 @@ function! ECY_Install#YCM()
   if !utility#HasYCM()
     return {'status':'-1','description':"ECY failed to install it. You missing YCM. Please install that plugin, firstly. "}
   endif
-  return {'status':'0','description':"ok",'lib': {'youcompleteme':'lib.sources.youcompleteme.ycm'}, 'name':'youcompleteme'}
+  return {'status':'0','description':"ok",'lib':'lib.sources.youcompleteme.ycm', 'name':'youcompleteme', 'path': ''}
 "}}}
 endfunction
 
@@ -108,7 +110,7 @@ function! ECY_Install#Pygment()
   catch
     return {'status':'-1','description':"ECY failed to install it. You missing Pygment. Please install that plugin, firstly. "}
   endtry
-  return {'status':'0','description':"ok",'lib': {'pygment':'lib.sources.pygment.pygment'}, 'name':'pygment'}
+  return {'status':'0','description':"ok",'lib': 'lib.sources.pygment.pygment', 'name':'pygment', 'path': ''}
 "}}}
 endfunction
 

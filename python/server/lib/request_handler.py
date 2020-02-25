@@ -70,8 +70,9 @@ class EventHandler(object):
         elif event_ == 'integration':
             temp = self.integration.HandleIntegration(engine_obj, version_dict)
         elif event_ == 'InstallSource':
-            temp = self.source_manager.InstallSource(
-                version_dict['SourcePath'])
+            temp = self.source_manager.InstallSource(version_dict['EngineName'],
+                    version_dict['EngineLib'],
+                    package_path=version_dict['EnginePath'])
             results_.append(temp)
             temp = self.source_manager.GetAvailableSourceForFiletype(file_type)
         results_.append(temp)

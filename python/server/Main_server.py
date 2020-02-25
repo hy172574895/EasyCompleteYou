@@ -45,7 +45,7 @@ if g_args.debug_log:
     fileHandler = logging.FileHandler(
         output_log_dir, mode="w", encoding="UTF-8")
     formatter = logging.Formatter(
-        '%(asctime)s %(filename)s:%(lineno)d %(message)s')
+        '%(asctime)s %(filename)s:%(lineno)d | %(message)s')
     fileHandler.setFormatter(formatter)
 global g_logger
 g_logger = logging.getLogger('ECY_server')

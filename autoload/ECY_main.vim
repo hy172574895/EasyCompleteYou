@@ -930,15 +930,18 @@ function! ECY_main#Install(name) abort
   if l:install_return['status'] == 0
     " refleshing all the running completor to make new completor work at every
     " where.
-    call utility#ShowMsg('[ECY] checked the requires of "'.l:install_return['name'].'" successfully.', 3)
+    let l:engine_name = l:install_return['name']
+    call utility#ShowMsg('[ECY] checked the requires of "'.l:engine_name.'" successfully.', 3)
   else
     "failed while check.
     call utility#ShowMsg(l:install_return['description'], 3)
     return
   endif
-  let g:ecy_source_name_2_install = l:install_return['lib']
+  let g:ecy_source_name_2_install = {'EngineLib': l:install_return['lib'],
+        \'EnginePath': l:install_return['path'],
+        \'EngineName': l:engine_name}
   call ECY_main#Do("InstallSource", v:true)
-  call utility#ShowMsg('[ECY] installing "'.l:install_return['name'].'".', 3)
+  call utility#ShowMsg('[ECY] installing "'.l:engine_name.'".', 3)
 "}}}
 endfunction
 

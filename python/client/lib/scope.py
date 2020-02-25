@@ -1,5 +1,8 @@
 # Author: Jimmy Huang (1902161621@qq.com)
 # License: WTFPL
+import logging
+global g_logger
+g_logger = logging.getLogger('ECY_client')
 
 import lib.vim_or_neovim_support as vim_lib
 
@@ -34,8 +37,10 @@ class Event(object):
 
     def InstallSource(self):
         msg = {}
-        msg['SourcePath'] = vim_lib.GetVariableValue(
-            'g:ecy_source_name_2_install')
+        temp = vim_lib.GetVariableValue('g:ecy_source_name_2_install')
+        msg['EngineLib'] = temp['EngineLib']
+        msg['EnginePath'] = temp['EnginePath']
+        msg['EngineName'] = temp['EngineName']
         return self._pack(msg, 'InstallSource')
 
     def OnBufferEnter(self):

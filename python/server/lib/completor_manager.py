@@ -27,7 +27,7 @@ class Operate(object):
         self.conf = MyConf()
         self._cache_file_name = None
         self.file_type_available_source = {}
-        self._load_source()
+        self._load_engine()
 
     def _get_cache_file(self):
         if self._cache_file_name is None:
@@ -67,22 +67,23 @@ class Operate(object):
             installed_engine_path = self.conf['installed_engine_path']
         return installed_engine_lib, installed_engine_path
 
-    def _load_source(self, specify_lib=None, specify_path={}):
+    def _load_engine(self, specify_lib=None, specify_path={}):
         """ load the installed source list when specify_lib is None
+        e.g.
+        specify_lib = {'engine_name': 'lib.sources.label.Label'}
+        specify_path = {'engine_name': 'd:/gvim/xxx/'}
         """
         try:
             if specify_lib is None:
                 loading_source_lib, loading_source_path = self._load_config()
             else:
-                g_logger.debug('installing a engine')
                 loading_source_lib = specify_lib
-                if not isinstance(specify_lib, dict):
-                    # return erro
-                    g_logger.debug('can not install an unkonw engine.')
-                    g_logger.debug(specify_lib)
-                    return None
                 loading_source_path = specify_path
+                g_logger.debug('installing new engine')
+                g_logger.debug(loading_source_lib)
+                g_logger.debug(loading_source_path)
 
+            module_temp = None
             # loading_source_lib is a dict
             for name, lib in loading_source_lib.items():
                 # e.g.
@@ -93,7 +94,7 @@ class Operate(object):
                             loading_source_path[name] != '':
                         temp = loading_source_path[name]
                         sys.path.append(temp)
-                        g_logger.debug('added a package:' + temp)
+                        g_logger.debug('appended a new path:' + temp)
                     module_temp = importlib.import_module(lib)
                     obj_temp = module_temp.Operate()
                     module_temp = obj_temp.GetInfo()  # return a dict
@@ -106,23 +107,24 @@ class Operate(object):
                     g_logger.exception("failed to load engine.")
             return module_temp
         except:
-            raise
+            raise "Failed to load engine."
 
-    def InstallSource(self, engine_lib, package_path=''):
-        """this method will not check if it's runable.
-        the source's depence must be checked in the vim side.
+    def InstallSource(self, engine_name, engine_lib, package_path=''):
+        """this method will not check if engine is runable.
+        the engine's depence must be checked in the vim side.
         """
-        # e.g.
-        # engine_lib = {'label': 'lib.sources.label.Label'}
         try:
             path_temp = self._get_cache_file()
-            info_ = self._load_source(specify_lib=engine_lib,\
-                    specify_path=package_path)
+            lib_dict = {}
+            path_dict = {}
+            lib_dict[engine_name] = engine_lib
+            path_dict[engine_name] = package_path
+            info_ = self._load_engine(specify_lib=lib_dict,\
+                    specify_path=path_dict)
             if info_ is None:
-                raise
+                raise "Failed to Install a engine."
             self.conf.read(path_temp)
-            engine_name = info_['Name']
-            self.conf['installed_engine_lib'][engine_name] = engine_lib[engine_name]
+            self.conf['installed_engine_lib'][engine_name] = engine_lib
             self.conf['installed_engine_path'][engine_name] = package_path
             fp = open(path_temp, mode="w", encoding='utf-8')
             self.conf.write(fp)
