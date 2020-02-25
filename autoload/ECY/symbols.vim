@@ -1,7 +1,7 @@
 " Author: Jimmy Huang (1902161621@qq.com)
 " License: WTFPL
 
-function! symbols#Selecting_cb(line, event, index, nodes) abort
+function! ECY#symbols#Selecting_cb(line, event, index, nodes) abort
 "{{{
   let l:data  = g:ECY_items_data[a:index]
   let g:abc = a:nodes
@@ -15,7 +15,7 @@ function! symbols#Selecting_cb(line, event, index, nodes) abort
       let l:node = 't'
     endif
 
-    call utility#MoveToBuffer(l:temp['line'], 
+    call ECY#utility#MoveToBuffer(l:temp['line'], 
           \l:temp['colum'], 
           \l:temp['path'], 
           \l:node)
@@ -23,6 +23,6 @@ function! symbols#Selecting_cb(line, event, index, nodes) abort
 "}}}
 endfunction
 
-function! symbols#ReturingResults_cb(items_2_show) abort
-  call utility#StartLeaderfSelecting(a:items_2_show, 'symbols#Selecting_cb')
+function! ECY#symbols#ReturingResults_cb(items_2_show) abort
+  call ECY#utility#StartLeaderfSelecting(a:items_2_show, 'ECY#symbols#Selecting_cb')
 endfunction

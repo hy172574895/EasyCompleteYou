@@ -6,7 +6,7 @@ let s:show_msg_windows_text_list = []
 let s:show_msg_time = 5
 let s:show_msg_timer_id = -1
 
-function! utility#MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
+function! ECY#utility#MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
 "{{{ move cursor to windows, in normal mode
 " a:colum is 0-based
 " a:line is 1-based
@@ -28,7 +28,7 @@ function! utility#MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
     " use current buffer's windows to open that buffer if current buffer is
     " not that buffer, and if current buffer is that buffer, it will fit
     " perfectly.
-    if utility#GetCurrentBufferPath() != a:buffer_name
+    if ECY#utility#GetCurrentBufferPath() != a:buffer_name
       silent exe "hide edit " .  a:buffer_name
     endif
   endif
@@ -36,7 +36,7 @@ function! utility#MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
 "}}}
 endfunction
 
-function! utility#GetLoadedFile() abort
+function! ECY#utility#GetLoadedFile() abort
 "{{{
   "return the loaded file with path
   let l:list_of_buf = []
@@ -49,7 +49,7 @@ function! utility#GetLoadedFile() abort
 "}}}
 endfunction
 
-function! utility#GetCurrentBufferPath(...) abort
+function! ECY#utility#GetCurrentBufferPath(...) abort
 "{{{
   " let l:full_path = fnamemodify(@%, ':p')
   let l:full_path = expand('%:p')
@@ -58,13 +58,13 @@ function! utility#GetCurrentBufferPath(...) abort
 "}}}
 endfunction
 
-function! utility#SendKeys(keys) abort
+function! ECY#utility#SendKeys(keys) abort
 "{{{
   call feedkeys( a:keys, 'in' )
 "}}}
 endfunction
 
-function! utility#HasYCM() abort
+function! ECY#utility#HasYCM() abort
 "{{{
   if exists('g:loaded_youcompleteme')
     if g:loaded_youcompleteme == 1
@@ -75,7 +75,7 @@ function! utility#HasYCM() abort
 "}}}
 endfunction
 
-function! utility#IsCurrentBufferBigFile()
+function! ECY#utility#IsCurrentBufferBigFile()
 "{{{ we use same variable as YCM's one
   if exists( 'b:ycm_largefile' )
     return b:ycm_largefile
@@ -85,7 +85,7 @@ function! utility#IsCurrentBufferBigFile()
         \ threshold > 0 && getfsize(expand('%')) > threshold
   if b:ycm_largefile
     " only echo once because this will only check once
-    call utility#ShowMsg("ECY unavailable: the file exceeded the max size.", 2)
+    call ECY#utility#ShowMsg("ECY unavailable: the file exceeded the max size.", 2)
   endif
   return b:ycm_largefile
 "}}}
@@ -116,7 +116,7 @@ function! g:ShowMsg_timer(timer_id)
 "}}}
 endfunction
 
-function! utility#ShowMsg(msg, style) abort
+function! ECY#utility#ShowMsg(msg, style) abort
 "{{{
   " if a:style == 1 means short
   " a:style == 2 warning with no redraw
@@ -161,7 +161,7 @@ function! utility#ShowMsg(msg, style) abort
 "}}}
 endfunction
 
-function! utility#IsInList(item, list) abort
+function! ECY#utility#IsInList(item, list) abort
 "{{{
   let i = 0
   while i < len(a:list)
@@ -174,19 +174,19 @@ function! utility#IsInList(item, list) abort
 "}}}
 endfunction
 
-function! utility#FormatPosition(line, colum) abort
+function! ECY#utility#FormatPosition(line, colum) abort
 "{{{ return such as "[34, 35]"
   let l:temp = '[' . string(a:line). ', ' . string(a:colum) . ']'
   return l:temp
 "}}}
 endfunction
 
-function! utility#StartLeaderfSelecting(content, callback_name) abort
+function! ECY#utility#StartLeaderfSelecting(content, callback_name) abort
 "{{{
   try
     call leaderf_ECY#items_selecting#Start(a:content, a:callback_name)
   catch 
-    call utility#ShowMsg("[ECY] You are missing 'Leaderf' or its version is too low. Please install/update it.", 2)
+    call ECY#utility#ShowMsg("[ECY] You are missing 'Leaderf' or its version is too low. Please install/update it.", 2)
   endtry
 "}}}
 endfunction

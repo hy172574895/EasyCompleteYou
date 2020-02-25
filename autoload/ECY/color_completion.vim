@@ -1,7 +1,7 @@
 " Author: Jimmy Huang (1902161621@qq.com)
 " License: WTFPL
 
-function color_completion#Init() abort
+function ECY#color_completion#Init() abort
 "{{{
   let g:ECY_use_floating_windows_to_be_popup_windows = 
         \get(g:,'ECY_use_floating_windows_to_be_popup_windows',v:true)
@@ -88,7 +88,7 @@ function! s:ShowPrompt_vim(items_info, fliter_words) abort
     let j = 0
     let l:point = l:to_show_matched_point[i]
     while j < len(l:to_show[i])
-      if utility#IsInList(j, l:point)
+      if ECY#utility#IsInList(j, l:point)
         let l:hightlight = 'item_normal_matched'
       else
         let l:hightlight = 'item_normal'
@@ -141,7 +141,7 @@ function! s:SelectItems_vim(next_or_pre,start_colum) abort
     let l:point = l:info['match_point']
     let i = 0
     while i < g:ECY_current_popup_windows_info['floating_windows_width']
-      if utility#IsInList(i, l:point)
+      if ECY#utility#IsInList(i, l:point)
         let l:hightlight = 'item_selected_matched'
       else
         let l:hightlight = 'item_selected'
@@ -167,7 +167,7 @@ function! s:SelectItems_vim(next_or_pre,start_colum) abort
     let l:point = l:info['match_point']
     let i = 0
     while i < g:ECY_current_popup_windows_info['floating_windows_width']
-      if utility#IsInList(i, l:point)
+      if ECY#utility#IsInList(i, l:point)
         let l:hightlight = 'item_normal_matched'
       else
         let l:hightlight = 'item_normal'
@@ -193,7 +193,7 @@ function! s:SelectItems_vim(next_or_pre,start_colum) abort
 "}}}
 endfunction
 
-function! color_completion#IsPromptOpen() abort
+function! ECY#color_completion#IsPromptOpen() abort
 "{{{
   if g:has_floating_windows_support == 'vim'
     if g:ECY_use_floating_windows_to_be_popup_windows == v:false
@@ -209,7 +209,7 @@ function! color_completion#IsPromptOpen() abort
 "}}}
 endfunction
 
-function! color_completion#ClosePrompt() abort
+function! ECY#color_completion#ClosePrompt() abort
   if g:has_floating_windows_support == 'vim'
     call popup_close(s:popup_windows_nr)
     let s:popup_windows_nr = -1
@@ -218,7 +218,7 @@ function! color_completion#ClosePrompt() abort
   endif
 endfunction
 
-function! color_completion#ShowPrompt(items_info, fliter_words) abort
+function! ECY#color_completion#ShowPrompt(items_info, fliter_words) abort
   if g:has_floating_windows_support == 'vim'
     call s:ShowPrompt_vim(a:items_info, a:fliter_words)
   else
@@ -226,7 +226,7 @@ function! color_completion#ShowPrompt(items_info, fliter_words) abort
   endif
 endfunction
 
-function! color_completion#SelectItems(next_or_pre, start_colum) abort
+function! ECY#color_completion#SelectItems(next_or_pre, start_colum) abort
   if g:has_floating_windows_support == 'vim'
     call s:SelectItems_vim(a:next_or_pre, a:start_colum)
   else

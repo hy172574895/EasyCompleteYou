@@ -1,7 +1,7 @@
 " Author: Jimmy Huang (1902161621@qq.com)
 " License: WTFPL
 
-function! ECY_Install#Init() abort
+function! ECY#install#Init() abort
 "{{{ must be called before setupPython()
    " put buildin engine name into Client
    " when Client finding no Clent event will omit it to genernal
@@ -13,39 +13,39 @@ function! ECY_Install#Init() abort
          \'vim_lsp': 'lib.event.vim'}
 
    let s:ECY_buildin_engine_installer = {
-         \'html_lsp': function('ECY_Install#HTML_LSP'),
-         \'snippets': function('ECY_Install#Snippets'),
-         \'youcompleteme': function('ECY_Install#YCM'),
-         \'go_langserver': function('ECY_Install#Go_langserver'),
-         \'go_gopls': function('ECY_Install#Go_gopls'),
-         \'vim_lsp': function('ECY_Install#HTML_LSP')
+         \'html_lsp': function('ECY#install#HTML_LSP'),
+         \'snippets': function('ECY#install#Snippets'),
+         \'youcompleteme': function('ECY#install#YCM'),
+         \'go_langserver': function('ECY#install#Go_langserver'),
+         \'go_gopls': function('ECY#install#Go_gopls'),
+         \'vim_lsp': function('ECY#install#HTML_LSP')
          \}
   for [key, lib] in items(s:ECY_buildin_engine_client)
     " if a new engine did not register a client, ECY will use the default one
     " instead.
-    call ECY_Install#RegisterClient(key, lib)
+    call ECY#install#RegisterClient(key, lib)
   endfor
   for [key, Fuc] in items(s:ECY_buildin_engine_installer)
-    call ECY_Install#RegisterInstallFunction(key, Fuc)
+    call ECY#install#RegisterInstallFunction(key, Fuc)
   endfor
 "}}}
 endfunction
 
-function! ECY_Install#RegisterInstallFunction(engine_name, functions)
+function! ECY#install#RegisterInstallFunction(engine_name, functions)
   if !exists('g:ECY_available_engine_installer')
     let g:ECY_available_engine_installer = {}
   endif
   let g:ECY_available_engine_installer[a:engine_name] = a:functions
 endfunction
 
-function! ECY_Install#RegisterClient(engine_name, client_lib)
+function! ECY#install#RegisterClient(engine_name, client_lib)
   if !exists('g:ECY_available_engine_lists')
     let g:ECY_available_engine_lists = {}
   endif
   let g:ECY_available_engine_lists[a:engine_name] = a:client_lib
 endfunction
 
-function! ECY_Install#HTML_LSP()
+function! ECY#install#HTML_LSP()
 "{{{
   " options: 1. cmd for starting Server
   " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
@@ -64,7 +64,7 @@ function! ECY_Install#HTML_LSP()
 "}}}
 endfunction
 
-function! ECY_Install#Go_gopls()
+function! ECY#install#Go_gopls()
 "{{{
   if !executable('gopls')
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
@@ -73,7 +73,7 @@ function! ECY_Install#Go_gopls()
 "}}}
 endfunction
 
-function! ECY_Install#Go_langserver()
+function! ECY#install#Go_langserver()
 "{{{
   if !executable('go-langserver')
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
@@ -82,7 +82,7 @@ function! ECY_Install#Go_langserver()
 "}}}
 endfunction
 
-function! ECY_Install#Snippets()
+function! ECY#install#Snippets()
 "{{{
   " requeirs: 1. plugin of UltiSnips
   try
@@ -94,7 +94,7 @@ function! ECY_Install#Snippets()
 "}}}
 endfunction
 
-function! ECY_Install#YCM()
+function! ECY#install#YCM()
 "{{{
   if !utility#HasYCM()
     return {'status':'-1','description':"ECY failed to install it. You missing YCM. Please install that plugin, firstly. "}
@@ -103,7 +103,7 @@ function! ECY_Install#YCM()
 "}}}
 endfunction
 
-function! ECY_Install#Pygment()
+function! ECY#install#Pygment()
 "{{{
   try
     call s:ExeCMD("pip install Pygments")
@@ -114,7 +114,7 @@ function! ECY_Install#Pygment()
 "}}}
 endfunction
 
-function! ECY_Install#Install_cb(dict) abort
+function! ECY#install#Install_cb(dict) abort
 "{{{
   if a:dict['Status'] == 0
     " succeed

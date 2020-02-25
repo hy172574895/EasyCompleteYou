@@ -2,7 +2,7 @@
 " License: WTFPL
 
 " can only have one preview windows
-function! completion_preview_windows#Init() abort
+function! ECY#completion_preview_windows#Init() abort
 "{{{ 
   let s:preview_windows_nr = get(s:,'preview_windows_nr',-1)
   let g:ECY_preview_windows_size = 
@@ -13,7 +13,7 @@ function! completion_preview_windows#Init() abort
 "}}}
 endfunction
 
-function! completion_preview_windows#Show(msg, using_highlight) abort
+function! ECY#completion_preview_windows#Show(msg, using_highlight) abort
 "{{{ won't be triggered when there are no floating windows features.
   if g:has_floating_windows_support == 'vim'
     let s:preview_windows_nr = s:PreviewWindows_vim(a:msg,a:using_highlight)
@@ -23,7 +23,7 @@ function! completion_preview_windows#Show(msg, using_highlight) abort
 "}}}
 endfunction
 
-function! completion_preview_windows#Close() abort
+function! ECY#completion_preview_windows#Close() abort
 "{{{
   if g:has_floating_windows_support == 'vim' && 
         \g:ECY_use_floating_windows_to_be_popup_windows == v:true
@@ -56,7 +56,7 @@ function! completion_preview_windows#Close() abort
 "}}}
 endfunction
 
-function! completion_preview_windows#Roll(up_or_down) abort
+function! ECY#completion_preview_windows#Roll(up_or_down) abort
 "{{{ a:up_or_down = -1 = up; a:up_or_down = 1 = down
 "this function will be mapped, so we should return ''
   if g:has_floating_windows_support == 'vim' && 

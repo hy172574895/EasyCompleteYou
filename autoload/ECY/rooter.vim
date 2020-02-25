@@ -173,7 +173,7 @@ function! s:ChangeToRootDirectory()
 endfunction
 
 " For third-parties.  Not used by plugin.
-function! rooter#GetCurrentBufferWorkSpace()
+function! ECY#rooter#GetCurrentBufferWorkSpace()
   let s:fd = expand('%:p')
 
   if empty(s:fd)

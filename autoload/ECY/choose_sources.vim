@@ -87,7 +87,7 @@ function! s:ChooseSource_neovim() abort
 " TODO:
 endfunction
 
-function! choose_sources#Start() abort
+function! ECY#choose_sources#Start() abort
 "{{{
   call ECY_main#Log('user start a windows of selecting source')
   if exists("g:ECY_file_type_info[".string(&filetype)."]")

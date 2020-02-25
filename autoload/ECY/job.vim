@@ -279,7 +279,7 @@ function! s:job_pid(jobid) abort
 endfunction
 
 " public apis {{{
-function! job#ECY_Start(cmd, opts) abort
+function! ECY#job#ECY_Start(cmd, opts) abort
     return s:job_start(a:cmd, a:opts)
 endfunction
 
@@ -287,7 +287,7 @@ endfunction
 "     call s:job_stop(a:jobid)
 " endfunction
 
-function! job#ECY_Send(jobid, data) abort
+function! ECY#job#ECY_Send(jobid, data) abort
     call s:job_send(a:jobid, a:data)
 endfunction
 

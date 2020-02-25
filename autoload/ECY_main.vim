@@ -40,7 +40,7 @@ endfunction
 function! s:OnSelectingMenu() abort 
 "{{{ 
   try
-    call completion_preview_windows#Close()
+    call ECY#completion_preview_windows#Close()
     if g:ECY_use_floating_windows_to_be_popup_windows == v:true 
           \&& g:has_floating_windows_support == 'vim'
       let l:item_index = g:ECY_current_popup_windows_info['selecting_item']
@@ -52,7 +52,7 @@ function! s:OnSelectingMenu() abort
       " v:completed_item could be none, so we try it.
       let l:item_index  = v:completed_item['user_data']
     endif
-    call completion_preview_windows#Show(s:user_data[l:item_index],&filetype)
+    call ECY#completion_preview_windows#Show(s:user_data[l:item_index],&filetype)
   catch
   endtry
   let s:completion_text_id += 1
@@ -81,7 +81,7 @@ function! s:OnTextChangedNormalMode() abort
     return
   endif
   call ECY_main#ChangeDocumentVersionID()
-  call diagnosis#CleanAllSignHighlight()
+  call ECY#diagnosis#CleanAllSignHighlight()
   call ECY_main#Do("OnBufferTextChanged", v:true)
   "}}}
 endfunction
@@ -107,8 +107,8 @@ function! s:OnInsertModeLeave() abort
   endif
   " order matters
   call s:BackToLastSource(-1)
-  call diagnosis#OnInsertModeLeave()
-  call completion_preview_windows#Close()
+  call ECY#diagnosis#OnInsertModeLeave()
+  call ECY#completion_preview_windows#Close()
   " we don't trigger this event to Server,
   " because we frequently escape insert mode and this event is unless for most of engines.
   " call ECY_main#Do("OnInsertModeLeave", v:true)
@@ -124,7 +124,7 @@ function! s:OnBufferEnter() abort
   let  s:completeopt_temp     = &completeopt
   let  s:completeopt_fuc_temp = &completefunc
   call ECY_main#ChangeDocumentVersionID()
-  call diagnosis#CleanAllSignHighlight()
+  call ECY#diagnosis#CleanAllSignHighlight()
   call s:SetUpCompleteopt()
   " OnBufferEnter will trigger Diagnosis
   call ECY_main#Log("asked Diagnosis.")
@@ -138,7 +138,7 @@ function! s:OnTextChangedInsertMode() abort
     return
   endif
   call ECY_main#ChangeDocumentVersionID()
-  call diagnosis#CleanAllSignHighlight()
+  call ECY#diagnosis#CleanAllSignHighlight()
   call s:DoCompletion()
   "}}}
 endfunction
@@ -174,9 +174,9 @@ function! s:DoCompletion() abort
       return
     endif
     " reflesh it when user typing key into buffer.
-    call completion_preview_windows#Close()
+    call ECY#completion_preview_windows#Close()
     let &indentexpr = s:indentexpr
-    call color_completion#ClosePrompt()
+    call ECY#color_completion#ClosePrompt()
   endif
   call ECY_main#ChangeVersionID()
   call ECY_main#Do("DoCompletion", v:true)
@@ -189,7 +189,7 @@ function! s:OnInsertChar() abort
     return
   endif
   if pumvisible()
-    call utility#SendKeys( "\<C-e>" )
+    call ECY#utility#SendKeys( "\<C-e>" )
   endif
 "}}}
 endfunction
@@ -230,7 +230,7 @@ function! s:UsingSpecicalSource(completor_name, invoke_key, is_replace) abort
       endif
     endfor
   endif
-  call utility#SendKeys(a:invoke_key)
+  call ECY#utility#SendKeys(a:invoke_key)
   return ''
 "}}}
 endfunction
@@ -322,13 +322,13 @@ function! s:BackToLastSource(typing_key) abort
     let g:ECY_file_type_info[l:curren_file_type]['special_position'] = {}
   endif
   if a:typing_key != -1
-    call utility#SendKeys(a:typing_key)
+    call ECY#utility#SendKeys(a:typing_key)
     return ''
   endif
   if g:has_floating_windows_support == 'vim' && 
         \g:ECY_use_floating_windows_to_be_popup_windows == v:true
       " reset
-      call color_completion#ClosePrompt()
+      call ECY#color_completion#ClosePrompt()
       let &indentexpr = s:indentexpr
       let s:isSelecting = v:false
   endif
@@ -369,10 +369,10 @@ function! s:ShowPopup(fliter_words,list_info) abort
   endif
   if g:has_floating_windows_support == 'vim' && 
         \g:ECY_use_floating_windows_to_be_popup_windows == v:true
-    call color_completion#ShowPrompt(a:list_info, a:fliter_words)
+    call ECY#color_completion#ShowPrompt(a:list_info, a:fliter_words)
   else 
     " have no color
-    call utility#SendKeys( "\<C-X>\<C-U>\<C-P>" )
+    call ECY#utility#SendKeys( "\<C-X>\<C-U>\<C-P>" )
   endif
 
 "}}}
@@ -427,7 +427,7 @@ function! s:DefaultSourcesCheck(current_sources_list) abort
     let g:ECY_is_installed_snippets = v:true
   endif
 
-  if utility#HasYCM() && !exists('g:ECY_is_working_with_YCM')
+  if ECY#utility#HasYCM() && !exists('g:ECY_is_working_with_YCM')
     let l:is_has = v:false
     for item in a:current_sources_list
       if item == 'youcompleteme'
@@ -470,7 +470,7 @@ function! ECY_main#IsECYWorksAtCurrentBuffer() abort
 "{{{
 "return v:false means not working.
 
-  if utility#IsCurrentBufferBigFile()
+  if ECY#utility#IsCurrentBufferBigFile()
     return v:false
   endif
 
@@ -481,7 +481,7 @@ function! ECY_main#IsECYWorksAtCurrentBuffer() abort
     return v:false
   endif
 
-  if utility#HasYCM() &&  l:current_source == 'youcompleteme'
+  if ECY#utility#HasYCM() &&  l:current_source == 'youcompleteme'
     "if user have no ycm, so ecy will work at that file
     return v:false
   endif
@@ -536,9 +536,9 @@ function! ECY_main#AfterUserChooseASource() abort
 "{{{ a callback for pressing <ESC> at choosing sources or firstly get sources
 " lists
   " order matters
-  call diagnosis#CleanAllSignHighlight()
-  call diagnosis#ClearAllSign()
-  if utility#HasYCM()
+  call ECY#diagnosis#CleanAllSignHighlight()
+  call ECY#diagnosis#ClearAllSign()
+  if ECY#utility#HasYCM()
     " according the user's settings to optionally complete.
     let l:filetype = &filetype
     if ECY_main#GetCurrentUsingSourceName() == 'youcompleteme'
@@ -574,7 +574,7 @@ function! s:ErroCode_cb(msg) abort
     else
       call add(l:temp, a:msg['Description'])
     endif
-    call utility#ShowMsg(l:temp, 2)
+    call ECY#utility#ShowMsg(l:temp, 2)
   endif
 "}}}
 endfunction
@@ -656,19 +656,19 @@ function! s:Integration_cb(msg) abort
 
   if ECY_main#GetVersionID() != a:msg['ID'] || mode() == 'i'
     " stop a useless poll
-    call utility#ShowMsg('[ECY] An event: '.a:msg['Integration_event'] .
+    call ECY#utility#ShowMsg('[ECY] An event: '.a:msg['Integration_event'] .
           \' was abandoned. Trigger it again if you really want it.', 2)
     return
   endif
   let l:event = a:msg['Integration_event']
   if l:event == 'go_to_declaration_or_definition'
-    call user_ui#CheckGoto(a:msg['Results'],&filetype)
+    call ECY#user_ui#CheckGoto(a:msg['Results'],&filetype)
   elseif l:event == 'GoToDefinition'
     " TODO
   elseif l:event == 'get_symbols'
-    call symbols#ReturingResults_cb(a:msg['Results'])
+    call ECY#symbols#ReturingResults_cb(a:msg['Results'])
   elseif l:event == 'diagnostics'
-    call diagnosis#PlaceSign(a:msg['Results'])
+    call ECY#diagnosis#PlaceSign(a:msg['Results'])
   endif
 "}}}
 endfunction
@@ -727,11 +727,11 @@ function! s:EventSort(id, data, event) abort
       elseif l:Event == 'integration'
         call s:Integration_cb(l:data_dict)
       elseif l:Event == 'install_source'
-        call ECY_Install#Install_cb(l:data_dict)
+        call ECY#install#Install_cb(l:data_dict)
       elseif l:Event == 'diagnosis'
-        call diagnosis#PlaceSign(l:data_dict)
+        call ECY#diagnosis#PlaceSign(l:data_dict)
       elseif l:Event == 'goto'
-        call goto#Go_cb(l:data_dict)
+        call ECY#goto#Go_cb(l:data_dict)
       endif
     endfor
   " catch
@@ -747,17 +747,17 @@ function! ECY_main#SelectItems(next_or_pre, send_key) abort
   " windows first, so it just need to create a new one diretly.
   " a:next_or_pre is 0 meaning next one
 
-  if color_completion#IsPromptOpen()
+  if ECY#color_completion#IsPromptOpen()
     let s:isSelecting = v:true
     let &indentexpr = ''
 
     " select it, then complete it into buffer
-    call color_completion#SelectItems(a:next_or_pre,s:show_item_position)
+    call ECY#color_completion#SelectItems(a:next_or_pre,s:show_item_position)
 
     " a callback
     call s:OnSelectingMenu()
   else
-    call utility#SendKeys(a:send_key)
+    call ECY#utility#SendKeys(a:send_key)
   endif
   return ''
 "}}}
@@ -765,7 +765,7 @@ endfunction
 
 function! s:ExpandSnippet() abort
 "{{{ this function will not tirgger when there are no UltiSnips plugin.
-  if ECY_main#IsECYWorksAtCurrentBuffer() && color_completion#IsPromptOpen() 
+  if ECY_main#IsECYWorksAtCurrentBuffer() && ECY#color_completion#IsPromptOpen() 
     " we can see that we require every item of completion must contain full
     " infos which is a dict with all key.
     if g:has_floating_windows_support == 'vim' && 
@@ -803,7 +803,7 @@ function! s:ExpandSnippet() abort
     catch
     endtry
   endif
-  call utility#SendKeys(g:ECY_expand_snippets_key)
+  call ECY#utility#SendKeys(g:ECY_expand_snippets_key)
   return ''
 "}}}
 endfunction
@@ -814,7 +814,7 @@ function! s:SetMapping() abort
   call s:MappingSelection()
 
   exe 'nmap ' . g:ECY_show_switching_source_popup .
-        \ ' :call choose_sources#Start()<CR>'
+        \ ' :call ECY#choose_sources#Start()<CR>'
 
   if g:has_ultisnips_support
   " UltiSnips' API must be called in <C-R>
@@ -833,8 +833,8 @@ function! s:SetMapping() abort
   endfor
 
   if g:has_floating_windows_support != 'has_no'
-    exe 'inoremap <expr>' . g:ECY_rolling_key_of_floating_windows[0] . ' completion_preview_windows#Roll(1)'
-    exe 'inoremap <expr>' . g:ECY_rolling_key_of_floating_windows[1] . ' completion_preview_windows#Roll(-1)'
+    exe 'inoremap <expr>' . g:ECY_rolling_key_of_floating_windows[0] . ' ECY#completion_preview_windows#Roll(1)'
+    exe 'inoremap <expr>' . g:ECY_rolling_key_of_floating_windows[1] . ' ECY#completion_preview_windows#Roll(-1)'
   endif
 
 "}}}
@@ -857,7 +857,7 @@ function! s:StartCommunication() abort
   endif
 
   try
-    let s:server_job_id = job#ECY_Start(l:start_cmd, {
+    let s:server_job_id = ECY#job#ECY_Start(l:start_cmd, {
         \ 'on_stdout': function('s:EventSort')
         \ })
     if !s:is_using_stdio
@@ -883,7 +883,7 @@ function! s:StartClient(timer_id) abort
     if s:PythonEval('ECY_Client_.socket_connection.is_connected')
       return
     elseif s:is_connected == 3
-      call utility#ShowMsg("can't connect a Server. Maybe this a bug.", 2)
+      call ECY#utility#ShowMsg("can't connect a Server. Maybe this a bug.", 2)
       return
     endif
     let s:is_connected += 1
@@ -922,7 +922,7 @@ function! ECY_main#Install(name) abort
 "{{{
 "check source's requires
   if !exists("g:ECY_available_engine_installer[a:name]")
-    call utility#ShowMsg('[ECY] have no "'.a:name.'" supported.', 3)
+    call ECY#utility#ShowMsg('[ECY] have no "'.a:name.'" supported.', 3)
     return
   endif
   let l:Fuc = g:ECY_available_engine_installer[a:name]
@@ -931,17 +931,17 @@ function! ECY_main#Install(name) abort
     " refleshing all the running completor to make new completor work at every
     " where.
     let l:engine_name = l:install_return['name']
-    call utility#ShowMsg('[ECY] checked the requires of "'.l:engine_name.'" successfully.', 3)
+    call ECY#utility#ShowMsg('[ECY] checked the requires of "'.l:engine_name.'" successfully.', 3)
   else
     "failed while check.
-    call utility#ShowMsg(l:install_return['description'], 3)
+    call ECY#utility#ShowMsg(l:install_return['description'], 3)
     return
   endif
   let g:ecy_source_name_2_install = {'EngineLib': l:install_return['lib'],
         \'EnginePath': l:install_return['path'],
         \'EngineName': l:engine_name}
   call ECY_main#Do("InstallSource", v:true)
-  call utility#ShowMsg('[ECY] installing "'.l:engine_name.'".', 3)
+  call ECY#utility#ShowMsg('[ECY] installing "'.l:engine_name.'".', 3)
 "}}}
 endfunction
 
@@ -953,7 +953,7 @@ if a:is_event
     let l:Fuc  = function('genernal' . '#'. a:cmd)
     let l:temp = l:Fuc()
     let l:temp = "{'Method': 'receive_all_msg','Msg':".l:temp."}\n"
-    call job#ECY_Send(s:server_job_id, l:temp)
+    call ECY#job#ECY_Send(s:server_job_id, l:temp)
   else
     let l:temp = "ECY_Client_.Exe('" . a:cmd . "')"
     call s:PythonEval(l:temp)

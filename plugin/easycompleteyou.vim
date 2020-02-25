@@ -64,21 +64,21 @@ else
   let g:ECY_use_floating_windows_to_be_popup_windows = v:false
 endif
 
-command! -bar -nargs=0 ECYDiagnosisLists  call diagnosis#ShowSelecting()
-command! -bar -nargs=0 ECYToggleDiagnosis call diagnosis#Toggle()
+command! -bar -nargs=0 ECYDiagnosisLists  call ECY#diagnosis#ShowSelecting()
+command! -bar -nargs=0 ECYToggleDiagnosis call ECY#diagnosis#Toggle()
 command! -bar -nargs=0 ECYSymbols         call ECY_main#Execute('get_symbols')
 
-command! -bar -nargs=1 ECYGoTo            call goto#Go('<args>')
+command! -bar -nargs=1 ECYGoTo            call ECY#goto#Go('<args>')
 command! -bar -nargs=1 ECYInstall         call ECY_main#Install('<args>')
 
 let g:loaded_easycomplete = v:true
 
 " main:
-call diagnosis#Init()
-call completion_preview_windows#Init()
-call color_completion#Init()
-call goto#Init()
-call ECY_Install#Init()
+call ECY#diagnosis#Init()
+call ECY#completion_preview_windows#Init()
+call ECY#color_completion#Init()
+call ECY#goto#Init()
+call ECY#install#Init()
 call ECY_main#Start()
 
 let g:ECY_endtime = reltimefloat(reltime())

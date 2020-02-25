@@ -1,7 +1,7 @@
 " Author: Jimmy Huang (1902161621@qq.com)
 " License: WTFPL
  
-function diagnosis#Init() abort
+function ECY#diagnosis#Init() abort
 "{{{ var init
   let g:ECY_enable_diagnosis
         \= get(g:,'ECY_enable_diagnosis', v:true)
@@ -56,8 +56,8 @@ function diagnosis#Init() abort
 
   let g:ECY_show_diagnosis_in_normal_mode = get(g:,'ECY_show_diagnosis_in_normal_mode', 'H')
   let g:ECY_show_next_diagnosis_in_normal_mode = get(g:,'ECY_show_next_diagnosis_in_normal_mode', '[j')
-  exe 'nmap ' . g:ECY_show_diagnosis_in_normal_mode . ' :call diagnosis#ShowCurrentLineDiagnosis(v:false)<CR>'
-  exe 'nmap ' . g:ECY_show_next_diagnosis_in_normal_mode . ' :call diagnosis#ShowNextDiagnosis(1)<CR>'
+  exe 'nmap ' . g:ECY_show_diagnosis_in_normal_mode . ' :call ECY#diagnosis#ShowCurrentLineDiagnosis(v:false)<CR>'
+  exe 'nmap ' . g:ECY_show_next_diagnosis_in_normal_mode . ' :call ECY#diagnosis#ShowNextDiagnosis(1)<CR>'
 "}}}
 endfunction
 
@@ -75,7 +75,7 @@ def CalculateScreenSign(start, end):
   engine_name = vim.eval('ECY_main#GetCurrentUsingSourceName()')
   lists = "g:ECY_diagnosis_items_with_engine_name['" + engine_name + "']"
   lists = vim.eval(lists)
-  file_path = vim.eval('utility#GetCurrentBufferPath()')
+  file_path = vim.eval('ECY#utility#GetCurrentBufferPath()')
   results = []
   for item in lists:
     line = int(item['position']['line'])
@@ -88,29 +88,29 @@ endfunction
 
 function s:OnCursorHold() abort
   if s:current_diagnosis_nr == -1
-    call diagnosis#ShowCurrentLineDiagnosis(v:true)
+    call ECY#diagnosis#ShowCurrentLineDiagnosis(v:true)
   endif
 endfunction
 
-function! diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
+function! ECY#diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
 "{{{ show diagnosis msg in normal mode.
   if !g:ECY_enable_diagnosis || mode() != 'n'
     if !a:is_triggered_by_event
-      call utility#ShowMsg("[ECY] Diagnosis had been turn off.", 2)
+      call ECY#utility#ShowMsg("[ECY] Diagnosis had been turn off.", 2)
     endif
     return ''
   endif
   let l:current_line_nr     = line('.')
   let l:current_col_nr      = col('.')
-  let l:current_buffer_path = utility#GetCurrentBufferPath()
-  call diagnosis#Show(l:current_buffer_path, l:current_line_nr,
+  let l:current_buffer_path = ECY#utility#GetCurrentBufferPath()
+  call ECY#diagnosis#Show(l:current_buffer_path, l:current_line_nr,
         \l:current_col_nr, a:is_triggered_by_event)
   
   return '' " we should return ''
 "}}}
 endfunction
 
-function! diagnosis#Show(file_path, line, colum, is_triggered_by_event) abort
+function! ECY#diagnosis#Show(file_path, line, colum, is_triggered_by_event) abort
 "{{{ show a popup windows and move to that position.
   if g:ECY_diagnosis_items_all == []
     call s:InitDiagnosisLists()
@@ -128,7 +128,7 @@ function! diagnosis#Show(file_path, line, colum, is_triggered_by_event) abort
 
   if len(l:index_list) == 0
     if !a:is_triggered_by_event
-      call utility#ShowMsg("[ECY] Diagnosis has nothing to show at current buffer line.", 2)
+      call ECY#utility#ShowMsg("[ECY] Diagnosis has nothing to show at current buffer line.", 2)
     endif
     return
   endif
@@ -139,7 +139,7 @@ function! diagnosis#Show(file_path, line, colum, is_triggered_by_event) abort
   let s:current_diagnosis['colum']     = a:colum
   let s:current_diagnosis['index']     = l:index
 
-  call utility#MoveToBuffer(a:line, a:colum, a:file_path, 'current buffer')
+  call ECY#utility#MoveToBuffer(a:line, a:colum, a:file_path, 'current buffer')
 
   if g:has_floating_windows_support == 'vim'
     call s:ShowDiagnosis_vim(l:index_list)
@@ -149,19 +149,19 @@ function! diagnosis#Show(file_path, line, colum, is_triggered_by_event) abort
 "}}}
 endfunction
 
-function! diagnosis#ShowNextDiagnosis(next_or_pre) abort
+function! ECY#diagnosis#ShowNextDiagnosis(next_or_pre) abort
 "{{{ show diagnosis msg in normal mode at current buffer. 
   let l:items_len = len(g:ECY_diagnosis_items_all)
   if l:items_len == 0
     call s:InitDiagnosisLists()
     let l:items_len = len(g:ECY_diagnosis_items_all)
     if l:items_len == 0
-      call utility#ShowMsg("[ECY] Diagnosis has nothing to show at current buffer line.", 2)
+      call ECY#utility#ShowMsg("[ECY] Diagnosis has nothing to show at current buffer line.", 2)
       return ''
     endif
   endif
 
-  let l:file_path = utility#GetCurrentBufferPath()
+  let l:file_path = ECY#utility#GetCurrentBufferPath()
 
   let g:abc = s:current_diagnosis
   if s:current_diagnosis != {}
@@ -186,12 +186,12 @@ function! diagnosis#ShowNextDiagnosis(next_or_pre) abort
       endif
     endfor
     if !exists('l:line')
-      call utility#ShowMsg("[ECY] Diagnosis has nothing to show at current buffer line.", 2)
+      call ECY#utility#ShowMsg("[ECY] Diagnosis has nothing to show at current buffer line.", 2)
       return ''
     endif
   endif
 
-  call diagnosis#Show(l:file_path, l:line, l:colum, v:true)
+  call ECY#diagnosis#Show(l:file_path, l:line, l:colum, v:true)
   return ''
 "}}}
 endfunction
@@ -296,7 +296,7 @@ function! s:HighlightRange(range, highlights) abort
 "}}}
 endfunction
 
-function! diagnosis#CleanAllSignHighlight() abort
+function! ECY#diagnosis#CleanAllSignHighlight() abort
 "{{{ should be called after text had been changed.
   if !g:ECY_enable_diagnosis
     return
@@ -372,7 +372,7 @@ function! s:UnplaceAllSignByEngineName(engine_name) abort
 "}}}
 endfunction
 
-function! diagnosis#OnInsertModeLeave() abort
+function! ECY#diagnosis#OnInsertModeLeave() abort
 "{{{ show all.
   if !g:ECY_enable_diagnosis
     return
@@ -390,9 +390,9 @@ function! s:PartlyPlaceSign_timer_cb(starts, ends, engine_name) abort
   if !exists('g:ECY_diagnosis_items_with_engine_name[a:engine_name]')
     return
   endif
-  let l:file_path = utility#GetCurrentBufferPath()
+  let l:file_path = ECY#utility#GetCurrentBufferPath()
   let l:lists = py3eval('CalculateScreenSign(' . string(a:starts) . ',' . string(a:ends) . ')')
-  call diagnosis#CleanAllSignHighlight()
+  call ECY#diagnosis#CleanAllSignHighlight()
   call s:UnplaceAllSignByEngineName(a:engine_name)
   for item in l:lists
     call s:PlaceSignAndHighlight(item['position'], 
@@ -402,8 +402,8 @@ function! s:PartlyPlaceSign_timer_cb(starts, ends, engine_name) abort
           \a:engine_name,
           \l:file_path)
   endfor
-  " let l:file_path = utility#GetCurrentBufferPath()
-  " call diagnosis#CleanAllSignHighlight()
+  " let l:file_path = ECY#utility#GetCurrentBufferPath()
+  " call ECY#diagnosis#CleanAllSignHighlight()
   " call s:UnplaceAllSignByEngineName(a:engine_name)
   " for item in g:ECY_diagnosis_items_with_engine_name[a:engine_name]
   "   if item['file_path'] == l:file_path
@@ -428,11 +428,11 @@ function! s:UpdateDiagnosisByEngineName(msg) abort
   let s:current_diagnosis = {}
 endfunction
 
-function! diagnosis#PartlyPlaceSign(msg) abort
+function! ECY#diagnosis#PartlyPlaceSign(msg) abort
   call s:StartUpdateTimer()
 endfunction
 
-function! diagnosis#PlaceSign(msg) abort
+function! ECY#diagnosis#PlaceSign(msg) abort
 "{{{Place Sign and highlight it. partly or all
   let l:engine_name = a:msg['EngineName']
   if !g:ECY_enable_diagnosis || l:engine_name == ''
@@ -441,7 +441,7 @@ function! diagnosis#PlaceSign(msg) abort
   call s:UpdateDiagnosisByEngineName(a:msg) " but don't show sign, just update variable.
   if len(a:msg['Lists']) > 80
     let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
-    call diagnosis#PartlyPlaceSign(a:msg)
+    call ECY#diagnosis#PartlyPlaceSign(a:msg)
     return
   else
     call s:StopUpdateTimer()
@@ -461,10 +461,10 @@ function! s:UpdateSignLists(engine_name) abort
   if !exists('g:ECY_diagnosis_items_with_engine_name[a:engine_name]')
     return
   endif
-  call diagnosis#CleanAllSignHighlight()
+  call ECY#diagnosis#CleanAllSignHighlight()
   call s:UnplaceAllSignByEngineName(a:engine_name)
   let l:sign_lists = g:ECY_diagnosis_items_with_engine_name[a:engine_name]
-  let l:file_path = utility#GetCurrentBufferPath()
+  let l:file_path = ECY#utility#GetCurrentBufferPath()
   for item in l:sign_lists
     " item = {'items':[
     " {'name':'1', 'content': {'abbr': 'xxx'}},
@@ -497,7 +497,7 @@ function! s:InitDiagnosisLists() abort
 "}}}
 endfunction
 
-function! diagnosis#ClearAllSign() abort
+function! ECY#diagnosis#ClearAllSign() abort
 "{{{
   for [key, lists] in items(g:ECY_diagnosis_items_with_engine_name)
     call s:UnplaceAllSignByEngineName(key)
@@ -505,7 +505,7 @@ function! diagnosis#ClearAllSign() abort
 "}}}
 endfunction
 
-function! diagnosis#Toggle() abort
+function! ECY#diagnosis#Toggle() abort
 "{{{
   let g:ECY_enable_diagnosis = (!g:ECY_enable_diagnosis)
   if g:ECY_enable_diagnosis
@@ -514,32 +514,32 @@ function! diagnosis#Toggle() abort
   else
     let l:status = 'Disabled'
     call s:StopUpdateTimer()
-    call diagnosis#CleanAllSignHighlight()
-    call diagnosis#ClearAllSign()
+    call ECY#diagnosis#CleanAllSignHighlight()
+    call ECY#diagnosis#ClearAllSign()
     let s:current_diagnosis       = {}
     let s:current_diagnosis_nr    = -1
     let g:ECY_diagnosis_items_all = []
     let g:ECY_diagnosis_items_with_engine_name = {}
   endif
-  call utility#ShowMsg('[ECY] Diagnosis status: ' . l:status, 2)
+  call ECY#utility#ShowMsg('[ECY] Diagnosis status: ' . l:status, 2)
 "}}}
 endfunction
 
-function! diagnosis#ShowSelecting() abort
+function! ECY#diagnosis#ShowSelecting() abort
 "{{{ show all
   call s:InitDiagnosisLists()
-  call utility#StartLeaderfSelecting(g:ECY_diagnosis_items_all, 'diagnosis#Selecting_cb')
+  call ECY#utility#StartLeaderfSelecting(g:ECY_diagnosis_items_all, 'ECY#diagnosis#Selecting_cb')
 "}}}
 endfunction
 
-function! diagnosis#Selecting_cb(line, event, index, nodes) abort
+function! ECY#diagnosis#Selecting_cb(line, event, index, nodes) abort
 "{{{
  let l:data = g:ECY_diagnosis_items_all
   let l:data  = l:data[a:index]
   if a:event == 'acceptSelection' || a:event == 'previewResult'
     let l:position = l:data['position']['range']['start']
     let l:path = l:data['file_path']
-    call utility#MoveToBuffer(l:position['line'], 
+    call ECY#utility#MoveToBuffer(l:position['line'], 
           \l:position['colum'], 
           \l:path, 
           \'current buffer')

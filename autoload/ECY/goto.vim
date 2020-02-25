@@ -4,7 +4,7 @@
 " goto --> declaration | definition | typeDefinition | implementation 
 " | references and so on. 
 "
-function! goto#Init() abort
+function! ECY#goto#Init() abort
 "{{{
   let s:available_goto = ['declaration',
                         \'definition',
@@ -16,7 +16,7 @@ function! goto#Init() abort
 "}}}
 endfunction
 
-function! goto#Selecting_cb(line, event, index, nodes) abort
+function! ECY#goto#Selecting_cb(line, event, index, nodes) abort
 "{{{
   let l:item = s:goto_lists[a:index]
   if l:item['position'] != {}
@@ -26,7 +26,7 @@ function! goto#Selecting_cb(line, event, index, nodes) abort
           \l:item['path'], 
           \a:nodes)
   else
-      call utility#ShowMsg(
+      call ECY#utility#ShowMsg(
             \"[ECY] Current goto have no position. So we can't jump.", 2)
   endif
 "}}}
@@ -40,22 +40,22 @@ function! s:MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
   if a:windows_to_show == 't'
     let l:windows_to_show = 't'
   endif
-  call utility#ShowMsg("[ECY] You had gone to : " . utility#FormatPosition(a:line, a:colum) , 2)
-  call utility#MoveToBuffer(a:line, a:colum, a:buffer_name,l:windows_to_show)
+  call ECY#utility#ShowMsg("[ECY] You had gone to : " . ECY#utility#FormatPosition(a:line, a:colum) , 2)
+  call ECY#utility#MoveToBuffer(a:line, a:colum, a:buffer_name,l:windows_to_show)
 "}}}
 endfunction
 
 
-function! goto#Go_cb(items) abort
+function! ECY#goto#Go_cb(items) abort
 "{{{
   if a:items['ID'] < ECY_main#GetVersionID()
     return
   endif
   let s:goto_lists = a:items['Results']
   if len(s:goto_lists) > 1
-    call utility#StartLeaderfSelecting(s:goto_lists, 'goto#Selecting_cb')
+    call ECY#utility#StartLeaderfSelecting(s:goto_lists, 'ECY#goto#Selecting_cb')
   elseif len(s:goto_lists) == 0
-      call utility#ShowMsg(
+      call ECY#utility#ShowMsg(
             \"[ECY] Engine return none at current position.", 2)
   else
     " goto it directly.
@@ -66,13 +66,13 @@ function! goto#Go_cb(items) abort
             \l:item['path'], 
             \'current buffer')
     else
-      call utility#StartLeaderfSelecting(s:goto_lists, 'goto#Selecting_cb')
+      call ECY#utility#StartLeaderfSelecting(s:goto_lists, 'ECY#goto#Selecting_cb')
     endif
   endif
 "}}}
 endfunction
 
-function! goto#Go(...) abort
+function! ECY#goto#Go(...) abort
 "{{{
   if a:0 == 0
     " ask server that where current position can goto.
@@ -84,8 +84,8 @@ function! goto#Go(...) abort
     while i < a:0
       let l:temp = a:000[i]
       let i += 1
-      if !utility#IsInList(l:temp, s:available_goto)
-        call utility#ShowMsg(
+      if !ECY#utility#IsInList(l:temp, s:available_goto)
+        call ECY#utility#ShowMsg(
               \"[ECY] Goto wrong name: " . 
               \l:temp . "; available_goto: " . string(s:available_goto), 2)
         return
@@ -93,7 +93,7 @@ function! goto#Go(...) abort
       call add(g:ECY_goto_info, l:temp)
     endw
   endif
-  call utility#ShowMsg("[ECY] Going to ....", 2)
+  call ECY#utility#ShowMsg("[ECY] Going to ....", 2)
   call ECY_main#ChangeVersionID()
   call ECY_main#Do('Goto', v:true)
 "}}}
