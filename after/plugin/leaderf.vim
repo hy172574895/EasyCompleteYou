@@ -7,16 +7,19 @@ function! s:SetUpLeaderf() abort
   call g:LfRegisterSelf("ECY_selecting", "Plugin for EasyCompleteYou")
 
   " In order to make this plugin in Leaderf available 
-  let l:extension = {
+  let s:extension = {
               \   "name": "ECY_selecting",
               \   "help": "check out Doc of ECY",
               \   "registerFunc": "leaderf_ECY#items_selecting#register",
               \   "arguments": [
               \   ]
               \ }
-  call g:LfRegisterPythonExtension(l:extension.name, l:extension)
-  let s:is_init_leaderf_support = v:true
+  call g:LfRegisterPythonExtension(s:extension.name, s:extension)
 "}}}
 endfunction
 
-call s:SetUpLeaderf()
+try
+  call s:SetUpLeaderf()
+catch 
+  call ECY#utility#ShowMsg("[ECY] You have no Leaderf.", 2)
+endtry

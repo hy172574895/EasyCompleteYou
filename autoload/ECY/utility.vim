@@ -154,8 +154,13 @@ function! ECY#utility#ShowMsg(msg, style) abort
     endif
     let s:show_msg_timer_id = timer_start(1000, function('g:ShowMsg_timer'))
   elseif g:has_floating_windows_support == 'has_no' 
+    if type(a:msg) == 3
+      let l:temp = join(a:msg, '|')
+    else
+      let l:temp = a:msg
+    endif
     echohl WarningMsg |
-          \ echomsg a:msg |
+          \ echomsg l:temp |
           \ echohl None
   endif
 "}}}

@@ -60,7 +60,6 @@ class Operate(scope_.Source_interface):
         if self._deamon_queue is not None and msg is not None:
             msg['EngineName'] = self._name
             self._deamon_queue.put(msg)
-            g_logger.debug(msg)
 
     def _build_erro_msg(self, code, msg):
         """and and send it
@@ -85,8 +84,7 @@ class Operate(scope_.Source_interface):
                 # capabilities_dict['completion']['dynamicRegistration'] = True
                 init_msg = self._lsp.initialize(
                     initializationOptions=None, rootUri=None)
-                temp = self._lsp.GetResponse(init_msg['Method'])
-                g_logger.debug(temp)
+                self._lsp.GetResponse(init_msg['Method'])
                 self.is_server_start = 'started'
         except:
             g_logger.exception(self._starting_server_cmd)
@@ -138,7 +136,6 @@ class Operate(scope_.Source_interface):
             self._did_open_or_change(uri_, line_text)
         # every event must return something. 'None' means send nothing to client
         self._diagnosis(version)
-        g_logger.debug("onbufferenter")
         return None
 
     def OnBufferTextChanged(self, version):
@@ -308,7 +305,6 @@ class HtmlHint:
             # user may have no htmlhint
             g_logger.exception("can not call htmlhint.")
             self.is_available = 2
-            g_logger.debug(results)
             return None
         results_list = []
         for item in results:

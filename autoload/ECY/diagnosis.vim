@@ -143,8 +143,10 @@ function! ECY#diagnosis#Show(file_path, line, colum, is_triggered_by_event) abor
 
   if g:has_floating_windows_support == 'vim'
     call s:ShowDiagnosis_vim(l:index_list)
-  elseif g:has_floating_windows_support == 'neovim'
+  elseif g:has_floating_windows_support == 'nvim'
     " TODO
+  else
+    call s:ShowDiagnosis_all(l:index_list)
   endif
 "}}}
 endfunction
@@ -251,6 +253,21 @@ function! s:ShowDiagnosis_vim(index_list) abort
     " call win_execute(l:nr, l:exe)
     let s:current_diagnosis_nr = l:nr
   endif
+"}}}
+endfunction
+
+function! s:ShowDiagnosis_all(index_list) abort
+"{{{ 
+  let l:temp = '[ECY] '
+  let i = 0
+  for item in a:index_list
+    let l:temp .= item['diagnosis']
+    if i != 0
+      let l:temp .= '|'
+    endif
+    let i += 1
+  endfor
+  call ECY#utility#ShowMsg(l:temp, 2)
 "}}}
 endfunction
 
