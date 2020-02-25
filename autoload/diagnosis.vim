@@ -350,8 +350,7 @@ function! diagnosis#OnInsertModeLeave() abort
   if !g:ECY_enable_diagnosis
     return
   endif
-  if s:need_to_update_diagnosis_after_user_leave_insert_mode &&
-        \g:ECY_update_diagnosis_mode
+  if s:need_to_update_diagnosis_after_user_leave_insert_mode
     let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
     let l:engine_name = ECY_main#GetCurrentUsingSourceName()
     call s:UpdateAllSign(l:engine_name)
@@ -414,6 +413,7 @@ function! diagnosis#PlaceSign(msg) abort
   endif
   call s:UpdateDiagnosisByEngineName(a:msg) " but don't show sign, just update variable.
   if len(a:msg['Lists']) > 80
+    let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
     call diagnosis#PartlyPlaceSign(a:msg)
     return
   else
