@@ -3,6 +3,12 @@
  
 function diagnosis#Init() abort
 "{{{ var init
+  let g:ECY_enable_diagnosis
+        \= get(g:,'ECY_enable_diagnosis', v:true)
+  if !g:ECY_enable_diagnosis
+    return
+  endif
+
   hi ECY_diagnosis_highlight  term=undercurl gui=undercurl guisp=DarkRed cterm=underline
   let g:ECY_diagnosis_highlight = get(g:,'ECY_diagnosis_highlight','ECY_diagnosis_highlight')
 
@@ -10,11 +16,6 @@ function diagnosis#Init() abort
   hi ECY_warn_sign_highlight  guifg=yellow	ctermfg=yellow
   let g:ECY_erro_sign_highlight = get(g:,'ECY_erro_sign_highlight', 'ECY_erro_sign_highlight')
   let g:ECY_warn_sign_highlight = get(g:,'ECY_warn_sign_highlight', 'ECY_warn_sign_highlight')
-
-  if g:has_floating_windows_support == 'vim'
-    let g:ECY_diagnosis_text = get(g:,'ECY_diagnosis_text', 'Title')
-    call prop_type_add('ECY_diagnosis_text', {'highlight': g:ECY_diagnosis_text})
-  endif
 
   " 1 means ask diagnosis when there are changes not including user in insert mode, trigger by DoCompletion()
   " 2 means ask diagnosis when there are changes including user in insert mode, trigger by OnBufferTextChanged().
@@ -25,12 +26,6 @@ function diagnosis#Init() abort
   else
     let g:ECY_update_diagnosis_mode = v:false
   endif
-  " user don't want to update diagnosis in insert mode, but engine had
-  " returned diagnosis, so we cache it and update after user leave insert
-  " mode.
-  let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
-  let g:ECY_enable_diagnosis
-        \= get(g:,'ECY_enable_diagnosis', v:true)
 
   " can not use sign_define()
   execute 'sign define ECY_diagnosis_erro text=>> texthl=' . g:ECY_erro_sign_highlight
@@ -43,10 +38,17 @@ function diagnosis#Init() abort
   "   \ "text" : "!!",
   "   \ "texthl" : g:ECY_warn_sign_highlight})
 
+  let s:supports_sign_groups = has('nvim-0.4.2') || exists('*sign_define')
+  let s:supports_sign_groups = v:false
+  let s:sign_id_dict                         = {}
   let s:current_diagnosis                    = {}
   let s:current_diagnosis_nr                 = -1
   let g:ECY_diagnosis_items_all              = []
   let g:ECY_diagnosis_items_with_engine_name = {'nothing': []}
+  " user don't want to update diagnosis in insert mode, but engine had
+  " returned diagnosis, so we cache it and update after user leave insert
+  " mode.
+  let s:need_to_update_diagnosis_after_user_leave_insert_mode = v:false
 
 
   call s:SetUpEvent()
@@ -226,7 +228,6 @@ function! s:ShowDiagnosis_vim(index_list) abort
         \ 'zindex': 2000}
     let l:nr = popup_atcursor(l:text, l:opts)
     call setbufvar(winbufnr(l:nr), '&syntax', 'ECY_d')
-    " let l:exe = "call prop_add(1, 1, {'length': 100,'type': 'ECY_diagnosis_text'})"
     " call win_execute(l:nr, l:exe)
     let s:current_diagnosis_nr = l:nr
   endif
@@ -316,14 +317,38 @@ endfunction
 function! s:PlaceSign(engine_name, style, path, line) abort
 "{{{
   
-  let l:temp = 'sign place 454 line='.a:line.' group='.a:engine_name.' name='.a:style.' file='.a:path
+  if s:supports_sign_groups
+    let l:temp = 'sign place 454 line='.a:line.' group='.a:engine_name.' name='.a:style.' file='.a:path
+  else
+    let l:increment_id = s:sign_id_dict[a:engine_name]['increment_id'] + 1
+    let s:sign_id_dict[a:engine_name]['increment_id'] = l:increment_id
+    " l:increment_id will not exceed 45481. so we don't need to consider that id
+    " will be invalid. why 454? it doesn't matter, and just a number.
+    let l:increment_id = '454'.string(s:sign_id_dict[a:engine_name]['name_id'] ) . string(l:increment_id)
+    call add(s:sign_id_dict[a:engine_name]['id_lists'] , {'sign_id': l:increment_id, 'file_path': a:path})
+    let l:temp = 'sign place '.l:increment_id.' line='.a:line.' name='.a:style.' file='.a:path
+  endif
+  let g:abc = l:temp
   execute l:temp
 "}}}
 endfunction
 
 function! s:UnplaceAllSignByEngineName(engine_name) abort
 "{{{
-  execute 'sign unplace * group=' . a:engine_name
+  if s:supports_sign_groups
+    execute 'sign unplace * group=' . a:engine_name
+  else
+    if !exists('s:sign_id_dict[a:engine_name]')
+      let s:sign_id_dict[a:engine_name] = {'id_lists': [], 
+            \'name_id': len(g:ECY_diagnosis_items_with_engine_name),
+            \'increment_id': 1}
+    endif
+    for item in s:sign_id_dict[a:engine_name]['id_lists']
+      execute 'sign unplace '.item['sign_id'].' file=' . item['file_path']
+    endfor
+    let s:sign_id_dict[a:engine_name]['id_lists']     = []
+    let s:sign_id_dict[a:engine_name]['increment_id'] = 1
+  endif
 "}}}
 endfunction
 
@@ -413,6 +438,9 @@ endfunction
 
 function! s:UpdateSignLists(engine_name) abort
 "{{{
+  if !exists('g:ECY_diagnosis_items_with_engine_name[a:engine_name]')
+    return
+  endif
   call diagnosis#CleanAllSignHighlight()
   call s:UnplaceAllSignByEngineName(a:engine_name)
   let l:sign_lists = g:ECY_diagnosis_items_with_engine_name[a:engine_name]
