@@ -28,8 +28,8 @@ function ECY#diagnosis#Init() abort
   endif
 
   " can not use sign_define()
-  execute 'sign define ECY_diagnosis_erro text=>> texthl=' . g:ECY_erro_sign_highlight
-  execute 'sign define ECY_diagnosis_warn text=!! texthl=' . g:ECY_warn_sign_highlight
+  silent! execute 'sign define ECY_diagnosis_erro text=>> texthl=' . g:ECY_erro_sign_highlight
+  silent! execute 'sign define ECY_diagnosis_warn text=!! texthl=' . g:ECY_warn_sign_highlight
 
   " call sign_define("ECY_diagnosis_erro", {
   "   \ "text" : ">>",
@@ -366,14 +366,14 @@ function! s:PlaceSign(engine_name, style, path, line) abort
     let l:temp = 'sign place '.l:increment_id.' line='.a:line.' name='.a:style.' file='.a:path
   endif
   let g:abc = l:temp
-  execute l:temp
+  silent! execute l:temp
 "}}}
 endfunction
 
 function! s:UnplaceAllSignByEngineName(engine_name) abort
 "{{{
   if s:supports_sign_groups
-    execute 'sign unplace * group=' . a:engine_name
+    silent! execute 'sign unplace * group=' . a:engine_name
   else
     if !exists('s:sign_id_dict[a:engine_name]')
       let s:sign_id_dict[a:engine_name] = {'id_lists': [], 
@@ -381,7 +381,7 @@ function! s:UnplaceAllSignByEngineName(engine_name) abort
             \'increment_id': 1}
     endif
     for item in s:sign_id_dict[a:engine_name]['id_lists']
-      execute 'sign unplace '.item['sign_id'].' file=' . item['file_path']
+      silent! execute 'sign unplace '.item['sign_id'].' file=' . item['file_path']
     endfor
     let s:sign_id_dict[a:engine_name]['id_lists']     = []
     let s:sign_id_dict[a:engine_name]['increment_id'] = 1
