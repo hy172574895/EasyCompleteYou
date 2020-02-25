@@ -138,6 +138,7 @@ class Operate(scope_.Source_interface):
             self._did_open_or_change(uri_, line_text)
         # every event must return something. 'None' means send nothing to client
         self._diagnosis(version)
+        g_logger.debug("onbufferenter")
         return None
 
     def OnBufferTextChanged(self, version):
@@ -146,8 +147,7 @@ class Operate(scope_.Source_interface):
             uri_ = self._lsp.PathToUri(version['FilePath'])
             line_text = version['AllTextList']
             self._did_open_or_change(uri_, line_text)
-        if version['ReturnDiagnosis']:
-            self._diagnosis(version)
+        self._diagnosis(version)
 
     def DoCompletion(self, version):
 # {{{

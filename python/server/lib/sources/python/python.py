@@ -52,6 +52,7 @@ class Operate(scope_.Source_interface):
         self._name = 'python_jedi'
         self._deamon_queue = None
         g_logger.debug('python_jedi has pyflakes:' + str(has_pyflake))
+        self._jedi_cache = None
         if has_pyflake:
             self._diagnosis_queue = queue.LifoQueue()
             threading.Thread(target=self._output_diagnosis,
@@ -62,14 +63,19 @@ class Operate(scope_.Source_interface):
                 'TriggerKey': ['.']}
 
     def _GetJediScript(self, version):
-        path = version['FilePath']
-        line_nr = version['StartPosition']['Line'] + 1
-        line_text = version['AllTextList']
-        current_colum = version['StartPosition']['Colum']
-        return jedi.Script(line_text,
-                           line_nr,
-                           current_colum,
-                           path)
+        try:
+            path = version['FilePath']
+            line_nr = version['StartPosition']['Line'] + 1
+            line_text = version['AllTextList']
+            current_colum = version['StartPosition']['Colum']
+            temp = jedi.Script(line_text,
+                               line_nr,
+                               current_colum,
+                               path)
+            self._jedi_cache = temp
+            return temp
+        except:
+            return self._jedi_cache
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']
@@ -317,8 +323,7 @@ class Operate(scope_.Source_interface):
         return results
 
     def OnBufferTextChanged(self, version):
-        if version['ReturnDiagnosis']:
-            self._diagnosis(version)
+        self._diagnosis(version)
 
     def _diagnosis(self, version):
         if has_pyflake and self._deamon_queue is not None:

@@ -21,7 +21,7 @@ class Event(object):
             "g:has_ultisnips_support")
 
     def GetCurrentWorkSpace(self):
-        temp = vim_lib.CallEval("rooter#GetCurrentBufferWorkSpace()")
+        temp = vim_lib.CallEval("ECY#rooter#GetCurrentBufferWorkSpace()")
         if temp == '':
             temp = None
         return temp
