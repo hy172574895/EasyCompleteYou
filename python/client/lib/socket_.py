@@ -17,6 +17,7 @@ g_logger = logging.getLogger('ECY_client')
 class Socket_(object):
     def __init__(self, PORT, HMAC_KEY_str):
         self.ADDR = (gethostname(), PORT)
+        g_logger.debug('Server address:' + str(self.ADDR))
         self._id = 0
         self._HMAC_KEY = HMAC_KEY_str
         self.is_connected = False
@@ -33,6 +34,7 @@ class Socket_(object):
         try:
             self.tcpCliSock = socket()  # noqa
             self.tcpCliSock.connect(self.ADDR)
+            g_logger.debug('tring to connenct Server.')
             self._HMAC_KEY = bytes(str(self._HMAC_KEY), encoding='utf-8')
             self.is_connected = True
             g_logger.debug("connect successfully:")

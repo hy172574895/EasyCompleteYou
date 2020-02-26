@@ -352,7 +352,6 @@ class Operate(scope_.Source_interface):
                     reporter=reporter)
                 return_['Lists'] = reporter.GetDiagnosis()
                 self._deamon_queue.put(return_)
-                g_logger.debug(return_)
                 time.sleep(1)
             except:
                 g_logger.exception('diagnosis of python_jedi')

@@ -21,7 +21,7 @@ if g_is_debug:
     fileHandler = logging.FileHandler(
         BASE_DIR + "/ECY_client.log", mode="w", encoding="UTF-8")
     formatter = logging.Formatter(
-        '%(asctime)s %(filename)s:%(lineno)d %(message)s')
+        '%(asctime)s %(filename)s:%(lineno)d | %(message)s')
     fileHandler.setFormatter(formatter)
 global g_logger
 g_logger = logging.getLogger('ECY_client')
