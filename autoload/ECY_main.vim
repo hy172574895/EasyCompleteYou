@@ -50,7 +50,8 @@ function! s:OnSelectingMenu_vim() abort
       " v:completed_item could be none, so we try it.
       let l:item_index  = v:completed_item['user_data']
     endif
-    call ECY#completion_preview_windows#Show(s:user_data[l:item_index], &syntax)
+    call ECY#completion_preview_windows#Show(
+          \g:ECY_completion_data[l:item_index], &syntax)
   catch
   endtry
   let s:completion_text_id += 1
@@ -369,6 +370,7 @@ function! s:ShowPopup(fliter_words,list_info) abort
     call ECY#color_completion#ShowPrompt(a:list_info, a:fliter_words)
   else 
     " have no color
+    let g:ECY_current_popup_windows_info = s:show_item_list
     call ECY#utility#SendKeys( "\<C-X>\<C-U>\<C-P>" )
   endif
 
@@ -604,7 +606,7 @@ function! s:Completion_cb(msg) abort
   let s:show_item_position = a:msg['StartPosition']['Colum']
   let l:temp = g:ECY_file_type_info[&filetype]['special_position']
   if l:temp != {}
-    if l:temp['Line'] == (line('.')-1)
+    if l:temp['Line'] == (line('.') - 1)
       let s:show_item_position = l:temp['Colum']
     else
       call s:BackToLastSource(-1)
@@ -612,7 +614,7 @@ function! s:Completion_cb(msg) abort
   endif
 
   " build a format of vim's completion items
-  let s:user_data = {}
+  let g:ECY_completion_data = {}
   let s:show_item_list = []
   let l:results_list = a:msg['Lists']
   let l:i = 0
@@ -624,7 +626,7 @@ function! s:Completion_cb(msg) abort
     let l:temp['word']      = l:item['word']
     let l:temp['kind']      = l:item['kind']
     let l:temp['user_data'] = string(l:i)
-    let s:user_data[string(l:i)] = l:item
+    let g:ECY_completion_data[string(l:i)] = l:item
 
     let l:results_list[l:i]['user_data'] = string(l:i)
     if g:has_floating_windows_support == 'has_no'
@@ -780,12 +782,12 @@ function! s:ExpandSnippet() abort
       let l:user_data_index    = v:completed_item['user_data']
       let l:item_name_selected = v:completed_item['word']
     endif
-    " the user_data_index is a number that can index the s:user_data which is
+    " the user_data_index is a number that can index the g:ECY_completion_data which is
     " a dict to get more than just a string msg.
     try
       if l:user_data_index != ''
         " maybe, some item have no snippet. so we try.
-        let l:snippet   = s:user_data[l:user_data_index]['snippet']
+        let l:snippet   = g:ECY_completion_data[l:user_data_index]['snippet']
         call UltiSnips#Anon(l:snippet,l:item_name_selected,'have no desriction','w')
         return ''
       endif
