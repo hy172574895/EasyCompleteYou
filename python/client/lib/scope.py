@@ -19,6 +19,7 @@ class Event(object):
         self._trigger_len = vim_lib.GetVariableValue("g:ECY_triggering_length")
         self.has_ultisnippet_support = vim_lib.GetVariableValue(
             "g:has_ultisnips_support")
+        self._snippets_cache = None
 
     def GetCurrentWorkSpace(self):
         temp = vim_lib.CallEval("ECY#rooter#GetCurrentBufferWorkSpace()")
@@ -72,15 +73,17 @@ class Event(object):
         msg['Event'] = event_name
         return msg
 
-    def _get_snippets(self):
+    def _get_snippets(self, is_reflesh=False):
         if not self.has_ultisnippet_support:
             results = {'HasSnippetSupport': False}
         else:
             results = {'HasSnippetSupport': True}
             try:
-                vim_lib.CallEval('UltiSnips#SnippetsInCurrentScope(1)')
-                results['UltisnipsSnippets'] = vim_lib.\
-                    GetVariableValue('g:current_ulti_dict_info')
+                if is_reflesh or self._snippets_cache is None:
+                    vim_lib.CallEval('UltiSnips#SnippetsInCurrentScope(1)')
+                    self._snippets_cache =\
+                            vim_lib.GetVariableValue('g:current_ulti_dict_info')
+                results['UltisnipsSnippets'] = self._snippets_cache
             except:  # noqa
                 results = {'HasSnippetSupport': False}
         return results

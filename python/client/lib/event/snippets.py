@@ -9,6 +9,10 @@ class Operate(scope_.Event):
     def __init__(self, source_name):
         scope_.Event.__init__(self, source_name)
 
+    def OnBufferEnter(self):
+        self._get_snippets(is_reflesh=True)
+        return self._pack({}, 'OnBufferEnter')
+
     def _pack(self, msg, event_name):
         msg = self._basic(msg)
         msg['Event'] = event_name
