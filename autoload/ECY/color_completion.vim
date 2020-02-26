@@ -11,11 +11,20 @@ function ECY#color_completion#Init() abort
   if g:has_floating_windows_support == 'vim'
         \&& g:ECY_use_floating_windows_to_be_popup_windows == v:true
     " hightlight
-    hi ECY_normal_matched_word		guifg=#945596	guibg=#073642	ctermfg=red	  ctermbg=darkBlue gui=bold
-    hi ECY_normal_items		        guifg=#839496	guibg=#073642	ctermfg=white	ctermbg=darkBlue
+    if &background == 'dark'
+      hi ECY_normal_matched_word		guifg=#945596	guibg=#073642	ctermfg=red	  ctermbg=darkBlue gui=bold
+      hi ECY_normal_items		        guifg=#839496	guibg=#073642	ctermfg=white	ctermbg=darkBlue
 
-    hi ECY_selected_matched_word	guifg=#FFFF99	guibg=#586e75	ctermfg=red	ctermbg=Blue    gui=bold
-    hi ECY_selected_item	        guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
+      hi ECY_selected_matched_word	guifg=#FFFF99	guibg=#586e75	ctermfg=red	ctermbg=Blue    gui=bold
+      hi ECY_selected_item	        guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
+    else
+      " light
+      hi ECY_normal_matched_word		guifg=#282828	guibg=#689d6a	ctermfg=red	  ctermbg=darkBlue gui=bold
+      hi ECY_normal_items		        guifg=#3c3836	guibg=#689d6a	ctermfg=white	ctermbg=darkBlue
+
+      hi ECY_selected_matched_word	guifg=#FFFF99	guibg=#427b48	ctermfg=red	ctermbg=Blue
+      hi ECY_selected_item	        guifg=#eee8d5	guibg=#427b48	ctermfg=white	ctermbg=Blue
+    endif
 
     let g:ECY_highlight_normal_matched_word   = get(g:,'ECY_highlight_normal_matched_word', 'ECY_normal_matched_word')
     let g:ECY_highlight_normal_items          = get(g:,'ECY_highlight_normal_items', 'ECY_normal_items')
