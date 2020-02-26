@@ -416,9 +416,6 @@ function! s:DefaultSourcesCheck(current_sources_list) abort
       " snippet work at all filetype, so it's ok to check at here
       if item == 'snippets'
         let l:is_has = v:true
-        if g:UltiSnipsExpandTrigger == g:ECY_select_items[0]
-          let g:UltiSnipsExpandTrigger = '<F1>'
-        endif
         break
       endif
     endfor
