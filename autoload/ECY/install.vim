@@ -96,7 +96,7 @@ endfunction
 
 function! ECY#install#YCM()
 "{{{
-  if !utility#HasYCM()
+  if !ECY#utility#HasYCM()
     return {'status':'-1','description':"ECY failed to install it. You missing YCM. Please install that plugin, firstly. "}
   endif
   return {'status':'0','description':"ok",'lib':'lib.sources.youcompleteme.ycm', 'name':'youcompleteme', 'path': ''}
@@ -130,7 +130,7 @@ function! ECY#install#Install_cb(dict) abort
     " trigger events again
     call ECY_main#AfterUserChooseASource()
   endif
-  call utility#ShowMsg('[ECY]' . string(a:dict['Name']) . a:dict['Description'], 2)
+  call ECY#utility#ShowMsg('[ECY]' . string(a:dict['Name']) . a:dict['Description'], 2)
 "}}}
 endfunction
 
