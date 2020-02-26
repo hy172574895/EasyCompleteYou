@@ -25,24 +25,22 @@ function! s:SetUpEvent() abort
     autocmd InsertCharPre * call s:OnInsertChar()
 
     if g:has_floating_windows_support == 'vim'
-      if g:ECY_use_floating_windows_to_be_popup_windows != v:true
+      if !g:ECY_use_floating_windows_to_be_popup_windows
         " has floating windows, but user don't want to use it to be popup window
-        autocmd CompleteChanged * call s:OnSelectingMenu()
+        autocmd CompleteChanged * call s:OnSelectingMenu_vim()
       endif
-    elseif g:has_floating_windows_support == 'neovim'
-      " neovim
+    elseif g:has_floating_windows_support == 'nvim'
       " TODO
     endif
   augroup END
 "}}}
 endfunction
 
-function! s:OnSelectingMenu() abort 
-"{{{ 
+function! s:OnSelectingMenu_vim() abort 
+"{{{ currently, only be triggered if there are vim's floating windows supports.
   try
     call ECY#completion_preview_windows#Close()
-    if g:ECY_use_floating_windows_to_be_popup_windows == v:true 
-          \&& g:has_floating_windows_support == 'vim'
+    if g:ECY_use_floating_windows_to_be_popup_windows == v:true && g:is_vim
       let l:item_index = g:ECY_current_popup_windows_info['selecting_item']
       if l:item_index == 0
         return
@@ -52,11 +50,12 @@ function! s:OnSelectingMenu() abort
       " v:completed_item could be none, so we try it.
       let l:item_index  = v:completed_item['user_data']
     endif
-    call ECY#completion_preview_windows#Show(s:user_data[l:item_index],&filetype)
+    call ECY#completion_preview_windows#Show(s:user_data[l:item_index], &syntax)
   catch
   endtry
   let s:completion_text_id += 1
-  call timer_start(1000, function('s:CallTextChangedEventWithTimer', [s:completion_text_id]))
+  call timer_start(1000, function('s:CallTextChangedEventWithTimer',
+        \[s:completion_text_id]))
 "}}}
 endfunction
 
@@ -266,9 +265,6 @@ function! s:SetVariable() abort
   let g:ECY_file_type_info
         \= get(g:,'ECY_file_type_info',{})
 
-  let g:ycm_autoclose_preview_window_after_completion
-        \= get(g:,'ycm_autoclose_preview_window_after_completion',v:true)
-
   let g:ECY_triggering_length
         \= get(g:,'ECY_triggering_length',1)
 
@@ -368,7 +364,8 @@ function! s:ShowPopup(fliter_words,list_info) abort
     return
   endif
   if g:has_floating_windows_support == 'vim' && 
-        \g:ECY_use_floating_windows_to_be_popup_windows == v:true
+        \g:ECY_use_floating_windows_to_be_popup_windows == v:true && 
+        \g:ECY_PreviewWindows_style != 'preview_windows'
     call ECY#color_completion#ShowPrompt(a:list_info, a:fliter_words)
   else 
     " have no color
@@ -453,8 +450,7 @@ endfunction
 
 function! s:MappingSelection() abort
 "{{{ Make mapping for ECY
-  if g:has_floating_windows_support == 'has_no' || 
-        \g:ECY_use_floating_windows_to_be_popup_windows == v:false
+  if g:ECY_use_floating_windows_to_be_popup_windows == v:false
     exe 'inoremap <expr>' . g:ECY_select_items[0] .
           \ ' pumvisible() ? "\<C-n>" : "\' . g:ECY_select_items[0] .'"'
     exe 'inoremap <expr>' . g:ECY_select_items[1] .
@@ -642,7 +638,7 @@ function! s:Completion_cb(msg) abort
       let l:temp['info'] = ''
       let l:temp['menu'] = ''
     endif
-    call add(s:show_item_list,l:temp)
+    call add(s:show_item_list, l:temp)
     let l:i += 1
   endwhile
 
@@ -755,7 +751,7 @@ function! ECY_main#SelectItems(next_or_pre, send_key) abort
     call ECY#color_completion#SelectItems(a:next_or_pre,s:show_item_position)
 
     " a callback
-    call s:OnSelectingMenu()
+    call s:OnSelectingMenu_vim()
   else
     call ECY#utility#SendKeys(a:send_key)
   endif
@@ -882,7 +878,7 @@ function! s:StartClient(timer_id) abort
   else
     if s:PythonEval('ECY_Client_.socket_connection.is_connected')
       return
-    elseif s:is_connected == 3
+    elseif s:is_connected == 5
       call ECY#utility#ShowMsg("can't connect a Server. Maybe this a bug.", 2)
       return
     endif

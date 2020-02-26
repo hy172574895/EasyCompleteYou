@@ -8,8 +8,13 @@ function! ECY#completion_preview_windows#Init() abort
   let g:ECY_preview_windows_size = 
         \get(g:,'ECY_preview_windows_size',[[30, 50], [2, 14]])
   " TODO:
+  " g:ECY_PreviewWindows_style = 'append'
+  " g:ECY_PreviewWindows_style = 'preview_windows'
   let g:ECY_PreviewWindows_style = 
         \get(g:,'ECY_PreviewWindows_style','append')
+
+  let g:ycm_autoclose_preview_window_after_completion
+        \= get(g:,'ycm_autoclose_preview_window_after_completion',v:true)
 "}}}
 endfunction
 
@@ -25,8 +30,7 @@ endfunction
 
 function! ECY#completion_preview_windows#Close() abort
 "{{{
-  if g:has_floating_windows_support == 'vim' && 
-        \g:ECY_use_floating_windows_to_be_popup_windows == v:true
+  if g:has_floating_windows_support == 'vim'
     if s:preview_windows_nr != -1
       call popup_close(s:preview_windows_nr)
       let s:preview_windows_nr = -1
@@ -59,8 +63,7 @@ endfunction
 function! ECY#completion_preview_windows#Roll(up_or_down) abort
 "{{{ a:up_or_down = -1 = up; a:up_or_down = 1 = down
 "this function will be mapped, so we should return ''
-  if g:has_floating_windows_support == 'vim' && 
-        \g:ECY_use_floating_windows_to_be_popup_windows == v:true
+  if g:has_floating_windows_support == 'vim'
     if s:preview_windows_nr != -1
       " there are 'scrollbar' we can use in vim to roll preview windows
       " but it require 8.1+, we use popup_setoptions at here could work at
@@ -112,6 +115,7 @@ function s:PreviewWindows_vim(msg, using_highlight) abort
             \+ g:ECY_current_popup_windows_info['opts']['col']
       let l:line = g:ECY_current_popup_windows_info['opts']['line']
     else
+      " has floating windows, but user don't want to use it to be popup window
       let l:event = copy(v:event)
       let l:col  = l:event['col'] + l:event['width'] + 1
       let l:line = l:event['row'] + 1

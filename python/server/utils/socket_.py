@@ -31,6 +31,7 @@ class Server(object):
             self.tcpSerSock = socket(AF_INET, SOCK_STREAM)
             self.tcpSerSock.bind(self.ADDR)
             self.tcpSerSock.listen(5)
+            g_logger.debug('lisenting:' + str(self.ADDR))
 
             self.thread = threading.Thread(target=self.SocketLoop)
             # with HMAC for socket
@@ -42,11 +43,11 @@ class Server(object):
         return self._results_queue
 
     def SocketLoop(self):
-        g_logger.debug("using socket to input")
+        g_logger.debug("Using socket to input")
         while True:
             tcpCliSock, addr = self.tcpSerSock.accept()
             data_bytes = b''
-            g_logger.debug("server connect successfully.")
+            g_logger.debug("Server connect successfully.")
             # tcpCliSock.settimeout(5)
             try:
                 while True:

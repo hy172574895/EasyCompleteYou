@@ -63,6 +63,10 @@ else
   let g:has_floating_windows_support = 'has_no'
   let g:ECY_use_floating_windows_to_be_popup_windows = v:false
 endif
+if get(g:, 'ECY_PreviewWindows_style', 'append') == 'preview_windows'
+  let g:has_floating_windows_support = 'has_no'
+  let g:ECY_use_floating_windows_to_be_popup_windows = v:false
+endif
 
 command! -bar -nargs=0 ECYDiagnosisLists  call ECY#diagnosis#ShowSelecting()
 command! -bar -nargs=0 ECYToggleDiagnosis call ECY#diagnosis#Toggle()
