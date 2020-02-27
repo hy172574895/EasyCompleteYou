@@ -281,6 +281,10 @@ function! s:SetVariable() abort
 
   let g:ECY_log_msg = []
 
+  if get(g:,'UltiSnipsExpandTrigger', 'nothing') == "<tab>" 
+    let g:UltiSnipsExpandTrigger = "<F1>"
+  endif
+
   " we put this at here to accelarate the starting time
   try
     call UltiSnips#SnippetsInCurrentScope(1)
@@ -761,7 +765,7 @@ function! ECY_main#SelectItems(next_or_pre, send_key) abort
 "}}}
 endfunction
 
-function! s:ExpandSnippet() abort
+function! ECY_main#ExpandSnippet() abort
 "{{{ this function will not tirgger when there are no UltiSnips plugin.
   if ECY_main#IsECYWorksAtCurrentBuffer() && ECY#color_completion#IsPromptOpen() 
     " we can see that we require every item of completion must contain full
@@ -788,6 +792,7 @@ function! s:ExpandSnippet() abort
       if l:user_data_index != ''
         " maybe, some item have no snippet. so we try.
         let l:snippet   = g:ECY_completion_data[l:user_data_index]['snippet']
+        let g:abc = l:snippet
         call UltiSnips#Anon(l:snippet,l:item_name_selected,'have no desriction','w')
         return ''
       endif
@@ -813,13 +818,6 @@ function! s:SetMapping() abort
 
   exe 'nmap ' . g:ECY_show_switching_source_popup .
         \ ' :call ECY#choose_sources#Start()<CR>'
-
-  if g:has_ultisnips_support
-  " UltiSnips' API must be called in <C-R>
-    exe 'inoremap ' . g:ECY_expand_snippets_key.
-        \ ' <C-R>=<SID>ExpandSnippet()<CR>'
-    exe 'let g:ECY_expand_snippets_key = "\'.g:ECY_expand_snippets_key.'"'
-  endif
 
   for key in g:ECY_choose_special_source_key
     exe 'inoremap <expr>' . key['invoke_key'] . 

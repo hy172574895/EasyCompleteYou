@@ -61,10 +61,13 @@ elseif has('textprop') && has('popupwin')
   let g:has_floating_windows_support = 'vim'
 else
   let g:has_floating_windows_support = 'has_no'
-  let g:ECY_use_floating_windows_to_be_popup_windows = v:false
 endif
+
 if get(g:, 'ECY_PreviewWindows_style', 'append') == 'preview_windows'
   let g:has_floating_windows_support = 'has_no'
+endif
+
+if g:has_floating_windows_support == 'has_no'
   let g:ECY_use_floating_windows_to_be_popup_windows = v:false
 endif
 
