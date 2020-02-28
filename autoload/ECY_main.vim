@@ -280,20 +280,11 @@ function! s:SetVariable() abort
         \= get(g:,'ECY_rolling_key_of_floating_windows',['<C-h>', '<C-l>'])
 
   let g:ECY_log_msg = []
+  let g:has_ultisnips_support = v:false
 
-  if get(g:,'UltiSnipsExpandTrigger', 'nothing') == "<tab>" 
+  if get(g:,'UltiSnipsExpandTrigger', "<tab>") == "<tab>" 
     let g:UltiSnipsExpandTrigger = "<F1>"
   endif
-
-  " we put this at here to accelarate the starting time
-  try
-    call UltiSnips#SnippetsInCurrentScope(1)
-    let g:has_ultisnips_support = v:true
-    call ECY_main#Log('has UltiSnips')
-  catch
-    let g:has_ultisnips_support = v:false
-    call ECY_main#Log('has no UltiSnips')
-  endtry
 
   let  s:isSelecting          = v:false
   let  s:indentexpr           = &indentexpr
