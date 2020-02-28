@@ -838,7 +838,8 @@ function! s:StartCommunication() abort
   let s:server_exe_path = s:python_script_folder_path.'/server/Main_server.py'
   let l:start_cmd = g:ECY_python3_cmd.' '.s:server_exe_path
   if !s:is_using_stdio
-    let s:HMAC_KEY = s:PythonEval("ECY_Client_.CreateHMACKey()")
+    " let s:HMAC_KEY = s:PythonEval("ECY_Client_.CreateHMACKey()")
+    let s:HMAC_KEY = "1235"
     let s:port     = s:PythonEval("ECY_Client_.GetUnusedLocalhostPort()")
     " enable 'input with socket', yet to enable 'output with socket'
     " let l:start_cmd = 
@@ -848,7 +849,7 @@ function! s:StartCommunication() abort
   if g:ECY_debug
     let l:start_cmd .= ' --debug_log'
   endif
-
+  call ECY_main#Log(l:start_cmd)
   try
     let s:server_job_id = ECY#job#ECY_Start(l:start_cmd, {
         \ 'on_stdout': function('s:EventSort')
@@ -862,6 +863,7 @@ function! s:StartCommunication() abort
       " endif
     endif
   catch
+    call ECY_main#Log("EasyCompletion unavailable: Can not start a necessary communication server of python.")
     call s:ShowErroAndFinish("EasyCompletion unavailable: Can not start a necessary communication server of python.")
   endtry
 "}}}
@@ -874,9 +876,12 @@ function! s:StartClient(timer_id) abort
     call timer_start(1000, function('s:StartClient'))
   else
     if s:PythonEval('ECY_Client_.socket_connection.is_connected')
+      call ECY_main#Log('Connected; Starting timer end.')
       return
     elseif s:is_connected == 5
-      call ECY#utility#ShowMsg("can't connect a Server. Maybe this a bug.", 2)
+      let l:temp = "can't connect a Server. Maybe this a bug."
+      call ECY_main#Log(l:temp)
+      call ECY#utility#ShowMsg(l:temp, 2)
       return
     endif
     let s:is_connected += 1
