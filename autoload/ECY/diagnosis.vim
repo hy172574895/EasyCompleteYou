@@ -54,10 +54,10 @@ function ECY#diagnosis#Init() abort
   call s:SetUpEvent()
   call s:SetUpPython()
 
-  let g:ECY_show_diagnosis_in_normal_mode = get(g:,'ECY_show_diagnosis_in_normal_mode', 'H')
-  let g:ECY_show_next_diagnosis_in_normal_mode = get(g:,'ECY_show_next_diagnosis_in_normal_mode', '[j')
-  exe 'nmap ' . g:ECY_show_diagnosis_in_normal_mode . ' :call ECY#diagnosis#ShowCurrentLineDiagnosis(v:false)<CR>'
-  exe 'nmap ' . g:ECY_show_next_diagnosis_in_normal_mode . ' :call ECY#diagnosis#ShowNextDiagnosis(1)<CR>'
+  let g:ECY_key_to_show_current_line_diagnosis = get(g:,'ECY_key_to_show_current_line_diagnosis', 'H')
+  let g:ECY_key_to_show_next_diagnosis = get(g:,'ECY_key_to_show_next_diagnosis', '[j')
+  exe 'nmap ' . g:ECY_key_to_show_current_line_diagnosis . ' :call ECY#diagnosis#ShowCurrentLineDiagnosis(v:false)<CR>'
+  exe 'nmap ' . g:ECY_key_to_show_next_diagnosis . ' :call ECY#diagnosis#ShowNextDiagnosis(1)<CR>'
 "}}}
 endfunction
 
