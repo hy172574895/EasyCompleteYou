@@ -1,8 +1,11 @@
-import sys
-temp = sys.stdin.readline()
-# temp = input()
-print(type(temp))
-data_bytes   = bytes(temp, encoding = "UTF-8")
-part_bytes    = data_bytes.split(b'\n')
-print(part_bytes)
-print(len(data_bytes))
+def _filter_log_msg(msg):
+    """ return True means filter this msg.
+    """
+    if msg.find('no dep handle') != -1:
+        # can not find that package
+        return True
+    if msg.find('AST') != -1:
+        return True
+    return False
+print(_filter_log_msg('AdST'))
+
