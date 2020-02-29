@@ -39,9 +39,10 @@ class Operate(object):
                 or self.completion_items['Server_name'] != engine_name:
             # reflesh cache
             return_ = engine_obj.DoCompletion(version)
-            if return_ is None or 'ErroCode' in return_:
-                if 'ErroCode' in return_:
-                    return_['EngineName'] = engine_name
+            if return_ is None:
+                return None
+            if 'ErroCode' in return_:
+                return_['EngineName'] = engine_name
                 return return_
             self.completion_items = return_
             self.start_position[engine_name] = current_start_postion

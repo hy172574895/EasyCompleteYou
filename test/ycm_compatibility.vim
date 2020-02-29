@@ -4,7 +4,7 @@ let s:loop_times = -1
 let s:name = "can YCM works with ECY?"
 
 fun! ycm_compatibility#Test1()
-  if utility#HasYCM()
+  if ECY#utility#HasYCM()
     call s:T1()
     return
   endif

@@ -46,6 +46,12 @@ function! ECY#install#RegisterInstallFunction(engine_name, Installer)
   let g:ECY_available_engine_installer[a:engine_name] = a:Installer
 endfunction
 
+fun! s:ImportClientLib(dirs)
+py3 "import sys"
+let l:temp = "py3 sys.path.append('" . a:dirs . "')"
+execute l:temp
+endf
+
 function! ECY#install#RegisterUnInstallFunction(engine_name, Uninstalller)
   if !exists('g:ECY_available_engine_uninstaller')
     let g:ECY_available_engine_uninstaller = {}
@@ -53,9 +59,18 @@ function! ECY#install#RegisterUnInstallFunction(engine_name, Uninstalller)
   let g:ECY_available_engine_uninstaller[a:engine_name] = a:Uninstalller
 endfunction
 
-function! ECY#install#RegisterClient(engine_name, client_lib)
+function! ECY#install#RegisterClient(engine_name, client_lib, ...)
   if !exists('g:ECY_available_engine_lists')
     let g:ECY_available_engine_lists = {}
+  endif
+  if a:0 == 1
+    call s:ImportClientLib(a:1)
+    try
+      let l:temp = "py3 'import " . a:client_lib . "'"
+      execute l:temp
+    catch 
+      throw "[ECY-".a:engine_name."] can not import Client module."
+    endtry
   endif
   let g:ECY_available_engine_lists[a:engine_name] = a:client_lib
 endfunction

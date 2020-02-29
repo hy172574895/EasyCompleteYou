@@ -960,6 +960,15 @@ function! ECY_main#Execute(event) abort
 "}}}
 endfunction
 
+function! ECY_main#Check() abort
+"{{{
+  if exists('g:loaded_easycomplete') && g:loaded_easycomplete == v:true
+    return v:true
+  endif
+  return v:false
+"}}}
+endfunction
+
 function! ECY_main#Start() abort
   call s:SetVariable()
   call s:SetUpPython()

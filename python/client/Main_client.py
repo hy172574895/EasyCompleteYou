@@ -32,13 +32,13 @@ if g_is_debug:
 
 class _do(object):
     def __init__(self):
+        self.UpdateAvailableEngineName()
+        import lib.event.genernal as genernal
+        self.event_obj = {'genernal': genernal.GenernalEvent('genernal')}
+
+    def UpdateAvailableEngineName(self):
         self.available_engine_name_dict = vim_lib.GetVariableValue(
                 'g:ECY_available_engine_lists')
-        import lib.event.genernal as genernal
-        # import lib.event.html_lsp as html_lsp
-        # import lib.event.snippets as snippets
-        # import lib.event.vim      as vim_lsp
-        self.event_obj = {'genernal': genernal.GenernalEvent('genernal')}
 
     def GetCurrentSource(self):
         using_source = vim_lib.CallEval('ECY_main#GetCurrentUsingSourceName()')
@@ -149,6 +149,8 @@ class ECY_Client(_do):
     def _get(self, event):
         # do
         engine_name = self.GetCurrentSource()
+        if engine_name not in self.available_engine_name_dict.keys():
+            self.UpdateAvailableEngineName()
         method = None
         if engine_name in self.available_engine_name_dict.keys():
             if engine_name not in self.event_obj.keys():
