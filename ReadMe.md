@@ -215,7 +215,7 @@ variable name|default values|description
 `g:ECY_use_floating_windows_to_be_popup_windows`|v:true|**Boolean**. If your vim supports floating windows, but you don't want to use it as popup, you can set to v:false.
 `g:ECY_triggering_length`|1|**Int**. ECY show popup windows only when there are more than xx character.
 `g:ECY_disable_for_files_larger_than_kb`|1000|**Int**. Same as `g:ycm_disable_for_files_larger_than_kb` of YCM. Current buffer size more than xxx KB, then ECY won't work.
-`g:ECY_update_diagnosis_mode`|1|**Int**. 1 means update diagnosis both in Insert mode and Normal mode. 2 means only update diagnosis in Normal mode.
+`g:ECY_update_diagnosis_mode`|2|**Int**. 2 means update diagnosis both in Insert mode and Normal mode. 1 means only update diagnosis in Normal mode.
 `g:ECY_preview_windows_size`|[[30, 50], [2, 14]]|**Lists**. Available only when your vim support floating windows. Size of preview windows like: [[minwidth, maxwidth], [minheight, maxheight]]
 
 ## Style Variables
