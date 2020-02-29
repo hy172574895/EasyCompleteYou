@@ -20,22 +20,37 @@ function! ECY#install#Init() abort
          \'go_gopls': function('ECY#install#Go_gopls'),
          \'vim_lsp': function('ECY#install#HTML_LSP')
          \}
+
   for [key, lib] in items(s:ECY_buildin_engine_client)
     " if a new engine did not register a client, ECY will use the default one
     " instead.
     call ECY#install#RegisterClient(key, lib)
   endfor
+
   for [key, Fuc] in items(s:ECY_buildin_engine_installer)
     call ECY#install#RegisterInstallFunction(key, Fuc)
+  endfor
+
+  " TODO
+  let s:ECY_available_engine_uninstaller = {}
+  for [key, Fuc] in items(s:ECY_available_engine_uninstaller)
+    call ECY#install#RegisterUnInstallFunction(key, Fuc)
   endfor
 "}}}
 endfunction
 
-function! ECY#install#RegisterInstallFunction(engine_name, functions)
+function! ECY#install#RegisterInstallFunction(engine_name, Installer)
   if !exists('g:ECY_available_engine_installer')
     let g:ECY_available_engine_installer = {}
   endif
-  let g:ECY_available_engine_installer[a:engine_name] = a:functions
+  let g:ECY_available_engine_installer[a:engine_name] = a:Installer
+endfunction
+
+function! ECY#install#RegisterUnInstallFunction(engine_name, Uninstalller)
+  if !exists('g:ECY_available_engine_uninstaller')
+    let g:ECY_available_engine_uninstaller = {}
+  endif
+  let g:ECY_available_engine_uninstaller[a:engine_name] = a:Uninstalller
 endfunction
 
 function! ECY#install#RegisterClient(engine_name, client_lib)
