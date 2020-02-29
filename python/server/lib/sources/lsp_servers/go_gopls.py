@@ -92,6 +92,16 @@ class Operate(scope_.Source_interface):
             self._build_erro_msg(2,
                                  'Failed to start LSP server. Check Log file of server to get more details.')
 
+    def _filter_log_msg(self, msg):
+        """ return True means filter this msg.
+        """
+        if msg.find('no dep handle') != -1:
+            # can not find that package
+            return True
+        if msg.find('AST') != -1:
+            return True
+        return False
+
     def _handle_log_msg(self):
         g_logger.debug("started hanlde logmsg thread.")
         while 1:
@@ -99,9 +109,11 @@ class Operate(scope_.Source_interface):
                 response = self._lsp.GetResponse(
                     'window/logMessage', timeout_=-1)
                 response = response['params']
-                types = response['type']
                 msg = response['message']
-                if types == 1 or types == 2:
+                if self._filter_log_msg(msg):
+                    continue
+                types = response['type']
+                if types == 1:
                     # erro of warning
                     self._build_erro_msg(4, msg)
                 elif types == 3:
