@@ -123,6 +123,9 @@ go_gopls|golang|completion<br>diagnosis<br>snippets-expanding<br>goto-definition
 
 特别是 可以使用 leaderf 的 `ctags` 功能
 
+# 自己动手写引擎
+去看看这个轻松易懂的[例子](https://github.com/hy172574895/ECY-dictionary)吧。
+
 # 你问我答
 
 ### Q: 为什么ECY没有显示 [Snippets](https://www.techopedia.com/definition/5472/snippet-programming) 当我使用snippet引擎的时候?  
