@@ -38,7 +38,7 @@ function! s:job_supported_types() abort
     if has('nvim')
         let l:supported_types += [s:job_type_nvimjob]
     endif
-    if !has('nvim') && has('job') && has('channel') && has('lambda')
+    if !has('nvim') && has('job') && has('channel')
         let l:supported_types += [s:job_type_vimjob]
     endif
     return l:supported_types
