@@ -9,7 +9,7 @@ function! s:Integration(timer_id) abort
     call ECY_main#Log('has no UltiSnips')
   endtry
 
-  if g:has_ultisnips_support
+  if g:has_ultisnips_support && g:loaded_easycomplete
   " UltiSnips' API must be called in <C-R>
     exe 'inoremap ' . g:ECY_expand_snippets_key.
         \ ' <C-R>=ECY_main#ExpandSnippet()<CR>'
