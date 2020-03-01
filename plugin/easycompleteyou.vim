@@ -6,6 +6,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let g:ECY_starttime = reltimefloat(reltime())
+let g:loaded_easycomplete = v:false
 
 function! s:restore_cpo()
   let &cpo = s:save_cpo
@@ -15,7 +16,7 @@ endfunction
 let g:ECY_version = {'version': 12, 'tags': '1.2'}
 let g:is_vim = !has('nvim')
 
-if exists( "g:loaded_easycomplete" )
+if g:loaded_easycomplete
   finish
 elseif v:version < 800
   echohl WarningMsg |
@@ -67,8 +68,11 @@ if get(g:, 'ECY_PreviewWindows_style', 'append') == 'preview_windows'
   let g:has_floating_windows_support = 'has_no'
 endif
 
+let  g:ECY_leaderf_preview_mode = get(g:, 'ECY_leaderf_preview_mode', 'floating_windows')
+
 if g:has_floating_windows_support == 'has_no'
   let g:ECY_use_floating_windows_to_be_popup_windows = v:false
+  let g:ECY_leaderf_preview_mode = 'normal'
 endif
 
 command! -bar -nargs=0 ECYDiagnosisLists  call ECY#diagnosis#ShowSelecting()

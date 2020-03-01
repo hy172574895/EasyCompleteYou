@@ -5,35 +5,69 @@ let s:show_msg_windows_nr = -1
 let s:show_msg_windows_text_list = []
 let s:show_msg_time = 5
 let s:show_msg_timer_id = -1
+let g:ECY_buffer_preview_windows_size = [[80, 120], [30, 40]]
+let g:ECY_buffer_preview_windows_nr = -1
 
-function! ECY#utility#MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
+function! ECY#utility#MoveToBuffer(line, colum, file_path, windows_to_show) abort
 "{{{ move cursor to windows, in normal mode
 " a:colum is 0-based
 " a:line is 1-based
 " the a:windows_to_show hightly fit leaderf
+  if a:windows_to_show == 'preview' && g:ECY_leaderf_preview_mode != 'normal'
+    if g:has_floating_windows_support == 'vim'
+      call s:ShowPreview_vim(a:file_path, a:line, &syntax)
+    endif
+    return
+  endif
   if a:windows_to_show == 'h'
-    exe 'new ' . a:buffer_name
+    exe 'new ' . a:file_path
     " horizontally new a windows at current tag
   elseif a:windows_to_show == 'v'
     " vertically new a windows at current tag
-    exe 'vnew ' . a:buffer_name
+    exe 'vnew ' . a:file_path
   elseif a:windows_to_show == 't'
     " new a windows and new a tab
     exe 'tabedit '
-    silent exe "hide edit " .  a:buffer_name
+    silent exe "hide edit " .  a:file_path
   elseif a:windows_to_show == 'to'
     " new a windows and a tab that can be a previous old one.
-    silent exe 'tabedit ' . a:buffer_name
+    silent exe 'tabedit ' . a:file_path
   else
     " use current buffer's windows to open that buffer if current buffer is
     " not that buffer, and if current buffer is that buffer, it will fit
     " perfectly.
-    if ECY#utility#GetCurrentBufferPath() != a:buffer_name
-      silent exe "hide edit " .  a:buffer_name
+    if ECY#utility#GetCurrentBufferPath() != a:file_path
+      silent exe "hide edit " .  a:file_path
     endif
   endif
   call cursor(a:line, a:colum + 1)
 "}}}
+endfunction
+" call ECY#utility#MoveToBuffer(5, 1,'D:/gvim/vimfiles/myplug/ECY_new/autoload/ECY/install.vim', 'preview')
+function! ECY#utility#IsFileLoaded(file_name) abort
+  return bufnr(a:file_name)
+endfunction
+
+function! s:ShowPreview_vim(file_name, roll_line, syntaxs) abort
+  let l:bufnr = ECY#utility#IsFileLoaded(a:file_name)
+  let s:preview_cache = []
+  if l:bufnr == -1
+    let s:preview_cache = readfile(a:file_name)
+  else
+    let s:preview_cache = getbufline(l:bufnr, 1, "$")
+  endif
+  let l:opts = {
+      \ 'minwidth': g:ECY_buffer_preview_windows_size[0][0],
+      \ 'maxwidth': g:ECY_buffer_preview_windows_size[0][1],
+      \ 'minheight': g:ECY_buffer_preview_windows_size[1][0],
+      \ 'maxheight': g:ECY_buffer_preview_windows_size[1][1],
+      \ 'border': [],
+      \ 'close': 'click',
+      \ 'scrollbar': 1,
+      \ 'firstline': a:roll_line,
+      \ 'padding': [0,1,0,1],
+      \ 'zindex': 2000}
+  let g:ECY_buffer_preview_windows_nr = popup_create(s:preview_cache, l:opts)
 endfunction
 
 function! ECY#utility#GetLoadedFile() abort
@@ -122,7 +156,7 @@ function! ECY#utility#ShowMsg(msg, style) abort
   " a:style == 2 warning with no redraw
   " a:style == 3 erro with redraw
   " a:style == 4 warning with redraw
-  if g:has_floating_windows_support == 'vim'
+  if g:loaded_easycomplete && g:has_floating_windows_support == 'vim'
     let s:show_msg_time = 10
     let l:temp = 'Message Box Closing in ' . string(s:show_msg_time) . 's '
     let l:opts = {
@@ -153,7 +187,7 @@ function! ECY#utility#ShowMsg(msg, style) abort
       call popup_settext(s:show_msg_windows_nr, s:show_msg_windows_text_list)
     endif
     let s:show_msg_timer_id = timer_start(1000, function('g:ShowMsg_timer'))
-  elseif g:has_floating_windows_support == 'has_no' 
+  elseif g:loaded_easycomplete && g:has_floating_windows_support == 'has_no' 
     if type(a:msg) == 3
       let l:temp = join(a:msg, '|')
     else
