@@ -842,7 +842,7 @@ function! s:StartCommunication() abort
   endif
   call ECY_main#Log(l:start_cmd)
   try
-    let s:server_job_id = ECY#job#ECY_Start(l:start_cmd, {
+    let s:server_job_id = ECY#jobs#Create(l:start_cmd, {
         \ 'on_stdout': function('s:EventSort')
         \ })
     if !s:is_using_stdio
@@ -870,7 +870,7 @@ function! s:StartClient(timer_id) abort
       call ECY_main#Log('Connected; Starting timer end.')
       return
     elseif s:is_connected == 5
-      let l:temp = "can't connect a Server. Maybe this a bug."
+      let l:temp = "[ECY] Can't connect a Server. Maybe this a bug."
       call ECY_main#Log(l:temp)
       call ECY#utility#ShowMsg(l:temp, 2)
       return

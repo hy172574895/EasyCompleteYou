@@ -1,3 +1,5 @@
+" Author: Jimmy Huang (1902161621@qq.com)
+" License: WTFPL
 
 function! s:ChooseSource_Echoing() abort
 "{{{ the versatitle way. could be used in many versions of vim or neovim.
