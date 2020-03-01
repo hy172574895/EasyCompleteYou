@@ -260,8 +260,13 @@ function! s:SetVariable() abort
         \{'source_name':'path','invoke_key':'/', 'is_replace': v:false},
         \{'source_name':'label','invoke_key':'^', 'is_replace': v:true}])
 
-  let g:ECY_python3_cmd                               
-        \= get(g:,'ECY_python3_cmd','python')
+  if has('python')
+    let g:ECY_python3_cmd                               
+          \= get(g:,'ECY_python3_cmd','python3')
+  else
+    let g:ECY_python3_cmd                               
+          \= get(g:,'ECY_python3_cmd','python')
+  endif
 
   let g:ECY_file_type_info
         \= get(g:,'ECY_file_type_info',{})
