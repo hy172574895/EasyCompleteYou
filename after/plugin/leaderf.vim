@@ -19,7 +19,9 @@ function! s:SetUpLeaderf() abort
 endfunction
 
 try
-  call s:SetUpLeaderf()
+  if g:loaded_easycomplete
+    call s:SetUpLeaderf()
+  endif
 catch 
   call ECY#utility#ShowMsg("[ECY] You have no Leaderf.", 2)
 endtry

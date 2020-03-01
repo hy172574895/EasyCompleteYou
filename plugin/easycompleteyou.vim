@@ -37,7 +37,7 @@ elseif !has('python3')
         \ echohl None
   call s:restore_cpo()
   finish
-elseif ( g:is_vim && (!exists('*job_start') || !exists('*ch_close_in')) ) || 
+elseif ( g:is_vim && (!exists('*job_start') || !has('channel')) ) || 
       \ (!g:is_vim && !has('nvim-0.2.0'))
   echohl WarningMsg |
         \ echomsg "ECY unavailable: requires NeoVim >= 0.2.0 ".
