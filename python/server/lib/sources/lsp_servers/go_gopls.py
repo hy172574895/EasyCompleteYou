@@ -141,8 +141,7 @@ class Operate(scope_.Source_interface):
             except:
                 g_logger.exception('')
 
-    def _did_open_or_change(self, uri, text, document_id,
-                            is_return_diagnoiss=True):
+    def _did_open_or_change(self, uri, text, document_id):
         """ will ask diagnostics.
         """
         # {{{

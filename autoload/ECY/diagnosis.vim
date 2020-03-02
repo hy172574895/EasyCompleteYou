@@ -20,7 +20,7 @@ function ECY#diagnosis#Init() abort
   " 1 means ask diagnosis when there are changes not including user in insert mode, trigger by DoCompletion()
   " 2 means ask diagnosis when there are changes including user in insert mode, trigger by OnBufferTextChanged().
   let g:ECY_update_diagnosis_mode
-        \= get(g:,'ECY_update_diagnosis_mode', 2)
+        \= get(g:,'ECY_update_diagnosis_mode', 1)
   if g:ECY_update_diagnosis_mode == 2
     let g:ECY_update_diagnosis_mode = v:true
   else

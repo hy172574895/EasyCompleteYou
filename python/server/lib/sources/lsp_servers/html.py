@@ -264,6 +264,8 @@ class HtmlHint:
         self.is_available = 1
         self._cmd = " --format=json http://localhost:" + \
                 str(self.GetUnusedLocalhostPort())
+        g_logger.debug('started html diagnosis thread.')
+        g_logger.debug(self._cmd)
 
     def GetUnusedLocalhostPort(self):
         if self._port == -1:

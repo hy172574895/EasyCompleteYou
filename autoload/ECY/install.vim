@@ -18,7 +18,7 @@ function! ECY#install#Init() abort
          \'youcompleteme': function('ECY#install#YCM'),
          \'go_langserver': function('ECY#install#Go_langserver'),
          \'go_gopls': function('ECY#install#Go_gopls'),
-         \'vim_lsp': function('ECY#install#html_lsp')
+         \'vim_lsp': function('ECY#install#vim_lsp')
          \}
 
   for [key, lib] in items(s:ECY_buildin_engine_client)
@@ -53,6 +53,7 @@ execute l:temp
 endf
 
 function! ECY#install#ListEngine_cb(msg, timer_id) abort
+"{{{
   let g:abcd = a:msg
   let l:to_show = []
   call add(l:to_show, '[ECY] Engine lists:')
@@ -92,6 +93,7 @@ function! ECY#install#ListEngine_cb(msg, timer_id) abort
     let l:showing .= item . "\n"
   endfor
   echo l:showing
+"}}}
 endfunction
 
 function! ECY#install#RegisterUnInstallFunction(engine_name, Uninstalller) abort
@@ -142,12 +144,12 @@ function! ECY#install#vim_lsp() abort
 "{{{
   " options: 1. cmd for starting Server
   " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
-  if !executable('vim-language-server')
-    if !executable('npm')
-      return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
-    endif
-    call s:ExeCMD("npm i vim-language-server")
-  endif
+  " if !executable('vim-language-server')
+  "   if !executable('npm')
+  "     return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
+  "   endif
+  "   call s:ExeCMD("npm i vim-language-server")
+  " endif
   try
     call UltiSnips#SnippetsInCurrentScope(1)
   catch

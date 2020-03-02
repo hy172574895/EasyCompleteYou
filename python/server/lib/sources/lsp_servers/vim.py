@@ -16,13 +16,17 @@ class Operate(scope_.Source_interface):
         self._did_open_list = {}
         self._lsp = lsp.LSP()
         self.is_server_start = 'not_started'
-        self.DocumentVersionID = -1
         self._deamon_queue = None
 
     def GetInfo(self):
         return {'Name': self._name, 'WhiteList': ['vim'],
                 'Regex': r'[\w\#\&\:]',
                 'TriggerKey': ['.', ':', '#', '[', '&', '$', '<', '"', "'"]}
+
+    def _output_queue(self, msg):
+        if self._deamon_queue is not None and msg is not None:
+            msg['EngineName'] = self._name
+            self._deamon_queue.put(msg)
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']
@@ -38,14 +42,15 @@ class Operate(scope_.Source_interface):
         temp = {'ID': -1, 'Results': 'ok', 'ErroCode': code,
                 'Event': 'erro_code',
                 'Description':msg}
-        if self._deamon_queue is not None:
-            self._deamon_queue.put(temp)
-        return temp
+        self._output_queue(temp)
 
     def _start_server(self, starting_cmd, vimruntime="", runtimepath=""):
         try:
             if self.is_server_start == 'not_started':
                 # such as : node C:/Windows/SysWOW64/node_modules/vim-language-server/bin/index.js --stdio
+                starting_cmd = 'node C:/Windows/SysWOW64/node_modules/vim-language-server/bin/index.js --stdio'
+                capabilities = self._lsp.BuildCapabilities()
+                capabilities['workspace']['configuration'] = True
                 self._lsp.StartJob(starting_cmd)
                 init_opts = {
                     "iskeyword": "@,48-57,_,192-255,-#",
@@ -68,9 +73,8 @@ class Operate(scope_.Source_interface):
                         "fromRuntimepath": True
                     }
                 }
-                g_logger.debug(init_opts)
-                temp = self._lsp.initialize(
-                    initializationOptions=init_opts)
+                temp = self._lsp.initialize(initializationOptions=init_opts,
+                        capabilities=capabilities)
                 # if time out will raise, meanning can not start a job.
                 self._lsp.GetResponse(temp['Method'])
                 self.is_server_start = 'started'
@@ -81,8 +85,7 @@ class Operate(scope_.Source_interface):
             self._build_erro_msg(2,
                     'Failed to start LSP server. Check Log file of server to get more details.')
 
-    def _did_open_or_change(self, uri, text, DocumentVersionID,
-            is_return_diagnoiss=True):
+    def _did_open_or_change(self, uri, text):
         # {{{
         # LSP require the edit-version
         if uri not in self._did_open_list:
@@ -93,8 +96,6 @@ class Operate(scope_.Source_interface):
             self._did_open_list[uri]['change_version'] += 1
             return_id = self._lsp.didchange(
                 uri, text, version=self._did_open_list[uri]['change_version'])
-        if is_return_diagnoiss:
-            self.DocumentVersionID = DocumentVersionID
         return return_id
         # }}}
 
@@ -114,7 +115,11 @@ class Operate(scope_.Source_interface):
         # }}}
 
     def OnBufferEnter(self, version):
-        self.Diagnosis(version)
+        self._update_text(version)
+        return None
+
+    def OnBufferTextChanged(self, version):
+        self._update_text(version)
         return None
 
     def DoCompletion(self, version):
@@ -122,12 +127,9 @@ class Operate(scope_.Source_interface):
             return None
         return_ = {'ID': version['VersionID']}
         uri_ = self._lsp.PathToUri(version['FilePath'])
-        line_text = version['AllTextList']
         current_start_postion = \
             {'line': version['StartPosition']['Line'],
              'character': version['StartPosition']['Colum']}
-        self._did_open_or_change(uri_, line_text,
-                version['DocumentVersionID'], version['ReturnDiagnosis'])
         temp = self._lsp.completion(uri_, current_start_postion)
 
         # we can set this raising a erro when it is timeout.
@@ -171,12 +173,11 @@ class Operate(scope_.Source_interface):
         return_['Lists'] = results_list
         return return_
 
-    def Diagnosis(self, version):
+    def _update_text(self, version):
         if self._check(version):
             uri_ = self._lsp.PathToUri(version['FilePath'])
             line_text = version['AllTextList']
-            self._did_open_or_change(uri_, line_text, version['DocumentVersionID'])
-        return None
+            self._did_open_or_change(uri_, line_text)
 
     def _get_diagnosis(self):
         return_ = {'Event': 'diagnosis'}
@@ -186,18 +187,14 @@ class Operate(scope_.Source_interface):
                 # so(maybe) this safe Thread.
                 temp = self._lsp.GetResponse('textDocument/publishDiagnostics',
                         timeout_=-1)
-                if self._deamon_queue is not None:
-                    temp = self._diagnosis_analysis(temp['params'])
-                    return_['DocumentID'] = self.DocumentVersionID
-                    return_['Lists'] = temp
-                    self._deamon_queue.put(return_)
-                    g_logger.debug(return_)
+                temp = self._diagnosis_analysis(temp['params'])
+                return_['Lists'] = temp
+                self._output_queue(return_)
             except:
                 g_logger.exception('')
 
     def _diagnosis_analysis(self, params):
         results_list = []
-        g_logger.debug(params)
         file_path = self._lsp.UriToPath(params['uri'])
         if file_path == '':
             return results_list
