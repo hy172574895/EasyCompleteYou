@@ -143,6 +143,7 @@ cmd|params|description
 `ECYSymbols`|-| Show symbols lists with `leaderf`.
 `ECYGoTo`|1| goto somewhere, such as `:ECYGoTo reference`.
 `ECYInstall`|1| Install a new engine, such as `:ECYInstall html_lsp`.
+`ECYListEngine`|1| Show status of all ECY's engines`.
 
 # Configuration
 ## How to change the default values to you want?
