@@ -69,6 +69,8 @@ class EventHandler(object):
             temp = self.goto.Goto(engine_obj, version_dict)
         elif event_ == 'integration':
             temp = self.integration.HandleIntegration(engine_obj, version_dict)
+        elif event_ == 'GetAllEngineInfo':
+            temp = self.source_manager.GetAllEngine(version_dict)
         elif event_ == 'InstallSource':
             temp = self.source_manager.InstallSource(version_dict['EngineName'],
                     version_dict['EngineLib'],

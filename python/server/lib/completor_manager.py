@@ -6,6 +6,7 @@ import os
 import sys
 import configparser
 import logging
+from copy import deepcopy
 global g_logger
 g_logger = logging.getLogger('ECY_server')
 
@@ -216,3 +217,16 @@ class Operate(object):
             raise "[ECY] source_name you provide not in Server."
         self.SetSourceForFileType(file_type, source_name=source_name)
         return self.sources_info[source_name]['Object']
+
+    def GetAllEngine(self, version):
+        engine_info_temp = []
+        for name, values in self.sources_info.items():
+            temp = {}
+            temp['Name'] = name
+            temp['FileType'] = values['WhiteList']
+            temp['TriggerKey'] = values['TriggerKey']
+            engine_info_temp.append(temp)
+        return_ = {'ID': version['VersionID']}
+        return_['Event'] = 'all_engine_info'
+        return_['EngineInfo'] = engine_info_temp
+        return return_

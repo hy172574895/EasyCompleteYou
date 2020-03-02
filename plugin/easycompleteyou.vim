@@ -75,12 +75,13 @@ if g:has_floating_windows_support == 'has_no'
   let g:ECY_leaderf_preview_mode = 'normal'
 endif
 
-command! -bar -nargs=0 ECYDiagnosisLists  call ECY#diagnosis#ShowSelecting()
 command! -bar -nargs=0 ECYToggleDiagnosis call ECY#diagnosis#Toggle()
+command! -bar -nargs=0 ECYDiagnosisLists  call ECY#diagnosis#ShowSelecting()
+command! -bar -nargs=0 ECYListEngine      call ECY_main#Do("GetAllEngineInfo", v:true)
 command! -bar -nargs=0 ECYSymbols         call ECY_main#Execute('get_symbols')
 
-command! -bar -nargs=1 ECYGoTo            call ECY#goto#Go('<args>')
 command! -bar -nargs=1 ECYInstall         call ECY_main#Install('<args>')
+command! -bar -nargs=1 ECYGoTo            call ECY#goto#Go('<args>')
 
 let g:loaded_easycomplete = v:true
 

@@ -13,12 +13,12 @@ function! ECY#install#Init() abort
          \'vim_lsp': 'lib.event.vim'}
 
    let s:ECY_buildin_engine_installer = {
-         \'html_lsp': function('ECY#install#HTML_LSP'),
+         \'html_lsp': function('ECY#install#html_lsp'),
          \'snippets': function('ECY#install#Snippets'),
          \'youcompleteme': function('ECY#install#YCM'),
          \'go_langserver': function('ECY#install#Go_langserver'),
          \'go_gopls': function('ECY#install#Go_gopls'),
-         \'vim_lsp': function('ECY#install#HTML_LSP')
+         \'vim_lsp': function('ECY#install#html_lsp')
          \}
 
   for [key, lib] in items(s:ECY_buildin_engine_client)
@@ -39,27 +39,70 @@ function! ECY#install#Init() abort
 "}}}
 endfunction
 
-function! ECY#install#RegisterInstallFunction(engine_name, Installer)
+function! ECY#install#RegisterInstallFunction(engine_name, Installer) abort
   if !exists('g:ECY_available_engine_installer')
     let g:ECY_available_engine_installer = {}
   endif
   let g:ECY_available_engine_installer[a:engine_name] = a:Installer
 endfunction
 
-fun! s:ImportClientLib(dirs)
+fun! s:ImportClientLib(dirs) abort
 py3 "import sys"
 let l:temp = "py3 sys.path.append('" . a:dirs . "')"
 execute l:temp
 endf
 
-function! ECY#install#RegisterUnInstallFunction(engine_name, Uninstalller)
+function! ECY#install#ListEngine_cb(msg, timer_id) abort
+  let g:abcd = a:msg
+  let l:to_show = []
+  call add(l:to_show, '[ECY] Engine lists:')
+  call add(l:to_show, '-------------------')
+  call add(l:to_show, '√ installed; × disabled.')
+  call add(l:to_show, ' ')
+  let i = 1
+  for [key, lib] in items(g:ECY_available_engine_lists)
+    let l:temp  = ''
+    let l:installed = v:false
+    for item in a:msg['EngineInfo']
+      let l:temp = ' ×'
+      if item['Name'] == key
+        let l:installed = v:true
+        let l:installed_info = item
+        let l:temp = ' √'
+        break
+      endif
+    endfor
+    let l:temp .= ' ' . string(i). '.'
+    if has_key(s:ECY_buildin_engine_client, key)
+      let l:temp .= ' BuiltIn  '
+    else
+      let l:temp .= ' Plugin   '
+    endif
+    let l:temp .= key
+
+    " if l:installed
+    "   let l:temp .= key
+    " endif
+
+    call add(l:to_show, l:temp)
+    let i += 1
+  endfor
+  let l:showing = ''
+  for item in l:to_show
+    let l:showing .= item . "\n"
+  endfor
+  echo l:showing
+endfunction
+
+function! ECY#install#RegisterUnInstallFunction(engine_name, Uninstalller) abort
   if !exists('g:ECY_available_engine_uninstaller')
     let g:ECY_available_engine_uninstaller = {}
   endif
   let g:ECY_available_engine_uninstaller[a:engine_name] = a:Uninstalller
 endfunction
 
-function! ECY#install#RegisterClient(engine_name, client_lib, ...)
+function! ECY#install#RegisterClient(engine_name, client_lib, ...) abort
+"{{{
   if !exists('g:ECY_available_engine_lists')
     let g:ECY_available_engine_lists = {}
   endif
@@ -73,9 +116,10 @@ function! ECY#install#RegisterClient(engine_name, client_lib, ...)
     endtry
   endif
   let g:ECY_available_engine_lists[a:engine_name] = a:client_lib
+"}}}
 endfunction
 
-function! ECY#install#HTML_LSP()
+function! ECY#install#html_lsp() abort
 "{{{
   " options: 1. cmd for starting Server
   " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
@@ -94,7 +138,26 @@ function! ECY#install#HTML_LSP()
 "}}}
 endfunction
 
-function! ECY#install#Go_gopls()
+function! ECY#install#vim_lsp() abort
+"{{{
+  " options: 1. cmd for starting Server
+  " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
+  if !executable('vim-language-server')
+    if !executable('npm')
+      return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
+    endif
+    call s:ExeCMD("npm i vim-language-server")
+  endif
+  try
+    call UltiSnips#SnippetsInCurrentScope(1)
+  catch
+    echo "[ECY] We hightly recommend you to install UltiSnips plugin for better experience."
+  endtry
+  return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.vim', 'name':'vim_lsp', 'path': ''}
+"}}}
+endfunction
+
+function! ECY#install#Go_gopls() abort
 "{{{
   if !executable('gopls')
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
@@ -103,7 +166,7 @@ function! ECY#install#Go_gopls()
 "}}}
 endfunction
 
-function! ECY#install#Go_langserver()
+function! ECY#install#Go_langserver() abort
 "{{{
   if !executable('go-langserver')
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
@@ -112,7 +175,7 @@ function! ECY#install#Go_langserver()
 "}}}
 endfunction
 
-function! ECY#install#Snippets()
+function! ECY#install#Snippets() abort
 "{{{
   " requeirs: 1. plugin of UltiSnips
   try
@@ -124,7 +187,7 @@ function! ECY#install#Snippets()
 "}}}
 endfunction
 
-function! ECY#install#YCM()
+function! ECY#install#YCM() abort
 "{{{
   if !ECY#utility#HasYCM()
     return {'status':'-1','description':"ECY failed to install it. You missing YCM. Please install that plugin, firstly. "}
@@ -133,7 +196,7 @@ function! ECY#install#YCM()
 "}}}
 endfunction
 
-function! ECY#install#Pygment()
+function! ECY#install#Pygment() abort
 "{{{
   try
     call s:ExeCMD("pip install Pygments")

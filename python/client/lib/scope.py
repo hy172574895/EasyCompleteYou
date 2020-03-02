@@ -44,6 +44,9 @@ class Event(object):
         msg['EngineName'] = temp['EngineName']
         return self._pack(msg, 'InstallSource')
 
+    def GetAllEngineInfo(self):
+        return self._pack({}, 'GetAllEngineInfo')
+
     def OnBufferEnter(self):
         self._workspace = self.GetCurrentWorkSpace()
         return self._pack({}, 'OnBufferEnter')

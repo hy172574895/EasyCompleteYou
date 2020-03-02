@@ -727,6 +727,8 @@ function! s:EventSort(id, data, event) abort
         call ECY#diagnosis#PlaceSign(l:data_dict)
       elseif l:Event == 'goto'
         call ECY#goto#Go_cb(l:data_dict)
+      elseif l:Event == 'all_engine_info'
+        call timer_start(1, function('ECY#install#ListEngine_cb', [l:data_dict]))
       endif
     endfor
   " catch
