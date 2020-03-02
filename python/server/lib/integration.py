@@ -33,4 +33,5 @@ class Operate(object):
             return_['Event'] = 'integration'
             return_['EngineName'] = engine_name
             return_['Integration_event'] = event_
+            return_['ID'] = version['VersionID']
         return return_

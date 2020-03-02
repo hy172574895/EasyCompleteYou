@@ -18,12 +18,12 @@ let g:is_vim = !has('nvim')
 
 if g:loaded_easycomplete
   finish
-" elseif v:version < 800
-"   echohl WarningMsg |
-"         \ echomsg "ECY unavailable: requires Vim 8.0+." |
-"         \ echohl None
-"   call s:restore_cpo()
-"   finish
+elseif v:version < 800
+  echohl WarningMsg |
+        \ echomsg "ECY unavailable: requires Vim 8.0+." |
+        \ echohl None
+  call s:restore_cpo()
+  finish
 elseif &encoding !~? 'utf-\?8'
   echohl WarningMsg |
         \ echomsg "ECY unavailable: requires UTF-8 encoding. " .

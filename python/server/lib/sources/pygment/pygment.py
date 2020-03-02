@@ -39,7 +39,7 @@ class Operate(scope_.Source_interface):
     def DoCompletion(self, version):
         if not self._check(version):
             return None
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        return_ = {'ID': version['VersionID']}
         line_text = version['AllTextList']
         path = version['FilePath']
         try:

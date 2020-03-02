@@ -50,7 +50,6 @@ class Operate(scope_.Source_interface):
         g_logger.debug(msg)
         temp = {'ID': -1, 'Results': 'ok', 'ErroCode': code,
                 'Event': 'erro_code',
-                'Server_name': self._name,
                 'Description': msg}
         self._output_queue(temp)
         
@@ -225,7 +224,7 @@ class Operate(scope_.Source_interface):
     def Goto(self, version):
         if not self._check(version):
             return None
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        return_ = {'ID': version['VersionID']}
         position = \
             {'line': version['StartPosition']['Line'],
              'character': version['StartPosition']['Colum']}
@@ -302,7 +301,7 @@ class Operate(scope_.Source_interface):
     def DoCompletion(self, version):
         if not self._check(version):
             return None
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        return_ = {'ID': version['VersionID']}
         uri_ = self._lsp.PathToUri(version['FilePath'])
         current_start_postion = \
             {'line': version['StartPosition']['Line'],

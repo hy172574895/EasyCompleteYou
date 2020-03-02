@@ -105,7 +105,7 @@ class Operate(scope_.Source_interface):
     def DoCompletion(self, version):
         if not self._check(version):
             return None
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        return_ = {'ID': version['VersionID']}
         uri_ = self._lsp.PathToUri(version['FilePath'])
         line_text = version['AllTextList']
         current_start_postion = \

@@ -13,7 +13,7 @@ class Operate(object):
     def __init__(self):
         self.fuzzy_match = fm.FuzzyMatch()
         self.start_position = {}
-        self.completion_items = {'Server_name': 'nothing', 'Lists': []}
+        self.completion_items = {'EngineName': 'nothing', 'Lists': []}
 
     def DoCompletion(self, engine_obj, version, buffer_cache):
         # we get regex from instance
@@ -36,13 +36,13 @@ class Operate(object):
             self.start_position[engine_name] = {'Line': 0, 'Colum': 0}
 
         if current_start_postion != self.start_position[engine_name]\
-                or self.completion_items['Server_name'] != engine_name:
+                or self.completion_items['EngineName'] != engine_name:
             # reflesh cache
             return_ = engine_obj.DoCompletion(version)
             if return_ is None:
                 return None
+            return_['EngineName'] = engine_name
             if 'ErroCode' in return_:
-                return_['EngineName'] = engine_name
                 return return_
             self.completion_items = return_
             self.start_position[engine_name] = current_start_postion
@@ -78,7 +78,6 @@ class Operate(object):
             addtional_data = self.completion_items['AddtionalData']
         return {'Event': 'do_completion', 'Version_ID': version['VersionID'],
                 'Lists': return_, 'StartPosition': current_start_postion,
-                'Server_name': engine_name,
                 'EngineName': engine_name,
                 'AddtionalData': addtional_data,
                 'Filter_words': filter_words}

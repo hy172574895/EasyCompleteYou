@@ -561,7 +561,7 @@ endfunction
 function! s:ErroCode_cb(msg) abort
 "{{{
   if a:msg['ErroCode'] != 1
-    let l:engine_name = a:msg['Server_name']
+    let l:engine_name = a:msg['EngineName']
     let l:temp = ['[ECY] [' . l:engine_name . ' - ' . a:msg['ErroCode'] ."]"]
     if type(a:msg['Description']) == 3
       " is a list
@@ -599,7 +599,7 @@ function! s:Completion_cb(msg) abort
   endif
 
   " adjust source
-  let s:show_item_name     = a:msg['Server_name']
+  let s:show_item_name     = a:msg['EngineName']
   let s:show_item_position = a:msg['StartPosition']['Colum']
   let l:temp = g:ECY_file_type_info[&filetype]['special_position']
   if l:temp != {}
@@ -860,7 +860,7 @@ function! s:StartCommunication() abort
     endif
   catch
     call ECY_main#Log("EasyCompletion unavailable: Can not start a necessary communication server of python.")
-    call s:ShowErroAndFinish("EasyCompletion unavailable: Can not start a necessary communication server of python.")
+    call s:ShowErroAndFinish("[ECY] Can not start a necessary communication Server of python.")
   endtry
 "}}}
 endfunction

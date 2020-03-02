@@ -24,7 +24,7 @@ class Operate(scope_.Source_interface):
         return temp
 
     def DoCompletion(self, version):
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        return_ = {'ID': version['VersionID']}
         addtional_data = {}
         line_text = version['AllTextList']
         current_line_text = version['CurrentLineText']

@@ -151,7 +151,7 @@ class Operate(scope_.Source_interface):
         if not self._check(version):
             return None
 
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        return_ = {'ID': version['VersionID']}
         uri_ = self._lsp.PathToUri(version['FilePath'])
         current_start_postion = \
             {'line': version['StartPosition']['Line'],
@@ -225,7 +225,7 @@ class Operate(scope_.Source_interface):
         server = HTTPServer(address, Handler)
         threading.Thread(target=server.serve_forever).start()
         self.document_id = -1
-        return_ = {'Server_name': self._name, 'Event': 'diagnosis'}
+        return_ = {'EngineName': self._name, 'Event': 'diagnosis'}
         while 1:
             try:
                 version = self._diagnosis_queue.get()
@@ -251,7 +251,7 @@ class Operate(scope_.Source_interface):
     # def Goto(self, version):
     #     if not self._check(version):
     #         return None
-    #     # return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+    #     # return_ = {'ID': version['VersionID'], 'EngineName': self._name}
     #     temp = self._lsp.symbos('h')
     #     temp = self._lsp.GetResponse(temp['Method'])
     #     g_logger.debug(temp)

@@ -14,7 +14,7 @@ class Operate(scope_.Source_interface):
                 'Regex': r'[\w]', 'TriggerKey': []}
 
     def DoCompletion(self, version):
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        return_ = {'ID': version['VersionID']}
         # ECY will show nothing when the list is None
         results_list = []
         

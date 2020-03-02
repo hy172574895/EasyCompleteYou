@@ -19,7 +19,7 @@ class Source_interface(object):
 
         return {'ID': _id, 'Results': 'ok', 'ErroCode': erro_code,
                 'Event': 'erro_code',
-                'Server_name': self._name,
+                'EngineName': self._name,
                 'Description': content}
 
     def GetInfo(self):

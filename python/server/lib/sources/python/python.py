@@ -176,7 +176,7 @@ class Operate(scope_.Source_interface):
         if not self._check(version):
             return None
 
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        return_ = {'ID': version['VersionID']}
         current_colum = version['StartPosition']['Colum']
         current_line = version['CurrentLineText']
         if self.IsInsideQuotation(current_line, current_colum)\
@@ -225,7 +225,7 @@ class Operate(scope_.Source_interface):
     def GetSymbol(self, version):
         if not self._check(version):
             return None
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        return_ = {'ID': version['VersionID']}
         try:
             # in embed python, some of this can not find module path.
             # So we try
@@ -264,7 +264,7 @@ class Operate(scope_.Source_interface):
     def Goto(self, version):
         if not self._check(version):
             return None
-        return_ = {'ID': version['VersionID'], 'Server_name': self._name}
+        return_ = {'ID': version['VersionID']}
         result_lists = []
         for item in version['GotoLists']:
             try:
@@ -340,8 +340,7 @@ class Operate(scope_.Source_interface):
                     g_logger.debug(version['DocumentVersionID'])
                     continue
                 self.document_id = version['DocumentVersionID']
-                return_ = {'ID': version['VersionID'],
-                           'Server_name': self._name}
+                return_ = {'ID': version['VersionID']}
                 return_['Event'] = 'diagnosis'
                 return_['EngineName'] = self._name
                 return_['DocumentID'] = self.document_id

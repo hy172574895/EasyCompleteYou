@@ -15,5 +15,6 @@ class Operate(object):
         engine_name = source_info['Name']
         if results is not None and 'ErroCode' not in results:
             results['Event'] = 'goto'
+            results['ID'] = version['VersionID']
             results['EngineName'] = engine_name
         return results

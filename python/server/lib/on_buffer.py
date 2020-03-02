@@ -11,7 +11,7 @@ class Operate(object):
         engine_name = source_info['Name']
         if results_ is not None:
             results_['Event'] = version['Event']
-            results_['Version_ID'] = version['VersionID']
+            results_['ID'] = version['VersionID']
             results_['EngineName'] = engine_name
         return results_
 
@@ -21,7 +21,7 @@ class Operate(object):
         engine_name = source_info['Name']
         if results_ is not None:
             results_['Event'] = version['Event']
-            results_['Version_ID'] = version['VersionID']
+            results_['ID'] = version['VersionID']
             results_['EngineName'] = engine_name
         return results_
 
@@ -31,6 +31,6 @@ class Operate(object):
         engine_name = source_info['Name']
         if results_ is not None:
             results_['Event'] = version['Event']
-            results_['Version_ID'] = version['VersionID']
+            results_['ID'] = version['VersionID']
             results_['EngineName'] = engine_name
         return results_
