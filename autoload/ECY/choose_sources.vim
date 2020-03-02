@@ -81,7 +81,7 @@ function! s:ChooseSource_vim() abort
     \ 'padding': [0,1,0,1],
     \ 'callback': 'g:ChooseSource_cb_vim',
     \ })
-  call setbufvar(winbufnr(l:floating_win_nr), '&filetype','vim')
+  call setbufvar(winbufnr(l:floating_win_nr), '&syntax','vim')
 "}}}
 endfunction
 
