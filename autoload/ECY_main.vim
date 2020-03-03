@@ -839,9 +839,6 @@ function! s:StartCommunication() abort
     " let s:HMAC_KEY = s:PythonEval("ECY_Client_.CreateHMACKey()")
     let s:HMAC_KEY = "1235"
     let s:port     = s:PythonEval("ECY_Client_.GetUnusedLocalhostPort()")
-    " enable 'input with socket', yet to enable 'output with socket'
-    " let l:start_cmd = 
-    "       \l:start_cmd.' --input_with_socket --hmac '.s:HMAC_KEY.' --port '.s:port
     let l:start_cmd = l:start_cmd . ' --hmac ' . s:HMAC_KEY . ' --port ' . s:port 
   endif
   if g:ECY_debug

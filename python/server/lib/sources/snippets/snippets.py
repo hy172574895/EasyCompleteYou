@@ -22,11 +22,13 @@ class Operate(scope_.Source_interface):
             snippets = version['Additional']['UltisnipsSnippets'].items()
             for trigger, snippet in snippets:
                 results_format = {'abbr': '', 'word': '', 'kind': '',
-                        'menu': '', 'info': '','user_data':''}
+                        'menu': '', 'info': '', 'user_data':''}
                 results_format['word'] = trigger
                 results_format['abbr'] = trigger
                 results_format['kind'] = '[Snippet]'
-                results_format['menu'] = snippet['description']
+                description = snippet['description'].split('\n')
+                if not snippet['description'] == '':
+                    results_format['info'] = description
                 results_list.append(results_format)
         return_['Lists'] = results_list
         return return_
