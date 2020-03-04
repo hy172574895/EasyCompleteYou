@@ -5,6 +5,7 @@
 function! ECY#completion_preview_windows#Init() abort
 "{{{ 
   let s:preview_windows_nr = get(s:,'preview_windows_nr',-1)
+  let g:ECY_enable_preview_snippet = get(g:,'ECY_enable_preview_snippet', v:true)
   let g:ECY_preview_windows_size = 
         \get(g:,'ECY_preview_windows_size',[[30, 50], [2, 14]])
   " TODO:
@@ -88,8 +89,30 @@ function s:PreviewWindows_neovim(items,using_highlight) abort
 " TODO
 endfunction
 
+function s:InsertKey(timer_id) abort
+  call UltiSnips#ExpandSnippet()
+  let l:temp = getbufline(bufnr(),1, "$")
+  execute 'close!'
+  " call feedkeys("\<ESC>". a:name, 'i')
+  let g:abc = l:temp
+endfunction
+
+function ECY#completion_preview_windows#GetPreviewSnippet(name, file_type) abort
+  execute 'new'
+  let &filetype = a:file_type
+  " call timer_start(100, function('s:InsertKey', ['i']))
+  " call timer_start(1, function('s:InsertKey', [a:name]))
+  call feedkeys('i'. a:name, 'i')
+  call timer_start(1, function('s:InsertKey'))
+endfunction
+
 function s:PreviewWindows_vim(msg, using_highlight) abort
 "{{{ return a floating_win_nr
+
+  " TODO
+  " if a:msg['kind'] == '[Snippet]' && g:ECY_enable_preview_snippet
+  "   call ECY#completion_preview_windows#GetPreviewSnippet(a:msg['word'], &filetype)
+  " endif
 
 "{{{ this two keys will be contained in the formmat whether it's None or not.
   let l:item_info   = a:msg['info']

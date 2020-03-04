@@ -176,7 +176,7 @@ class ECYDiagnosisManager(Manager):
         for i in self._match_ids:
             lfCmd("silent! call matchdelete(%d)" % i)
         self._match_ids = []
-        self._callback_to_vim('beforeExit', None, None)
+        self._callback_to_vim('beforeExit', None, 'beforeExit')
 
     def _previewResult(self, preview):
         if not self._needPreview(preview):
@@ -189,7 +189,7 @@ class ECYDiagnosisManager(Manager):
         vim.options['eventignore'] = 'BufLeave,WinEnter,BufEnter'
         try:
             vim.current.tabpage, vim.current.window = orig_pos[:2]
-            self._callback_to_vim('previewResult', str(line), None)
+            self._callback_to_vim('previewResult', str(line), 'preview')
         finally:
             vim.current.tabpage, vim.current.window, vim.current.buffer = cur_pos
             vim.options['eventignore'] = saved_eventignore

@@ -47,6 +47,9 @@ class Event(object):
     def GetAllEngineInfo(self):
         return self._pack({}, 'GetAllEngineInfo')
 
+    def OnDocumentHelp(self):
+        return self._pack({}, 'OnDocumentHelp')
+
     def OnBufferEnter(self):
         self._workspace = self.GetCurrentWorkSpace()
         return self._pack({}, 'OnBufferEnter')

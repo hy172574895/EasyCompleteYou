@@ -14,6 +14,7 @@ class Operate(object):
         self.fuzzy_match = fm.FuzzyMatch()
         self.start_position = {}
         self.completion_items = {'EngineName': 'nothing', 'Lists': []}
+        self.version_id = -1
 
     def DoCompletion(self, engine_obj, version, buffer_cache):
         # we get regex from instance
@@ -74,6 +75,7 @@ class Operate(object):
                                                        isindent=isIndent)
 
         addtional_data = None
+        self.version_id = version['VersionID']
         if 'AddtionalData' in self.completion_items.keys():
             addtional_data = self.completion_items['AddtionalData']
         return {'Event': 'do_completion', 'Version_ID': version['VersionID'],

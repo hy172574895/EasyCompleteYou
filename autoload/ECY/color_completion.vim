@@ -10,8 +10,10 @@ function ECY#color_completion#Init() abort
 
   if g:has_floating_windows_support == 'vim'
         \&& g:ECY_use_floating_windows_to_be_popup_windows == v:true
+
+    let g:ECY_completion_color_style = get(g:,'ECY_completion_color_style', '1')
     " hightlight
-    if &background == 'dark'
+    if g:ECY_completion_color_style == '1'
       hi ECY_normal_matched_word		guifg=#945596	guibg=#073642	ctermfg=red	  ctermbg=darkBlue gui=bold
       hi ECY_normal_items		        guifg=#839496	guibg=#073642	ctermfg=white	ctermbg=darkBlue
 

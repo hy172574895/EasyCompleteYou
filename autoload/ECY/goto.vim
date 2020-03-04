@@ -34,10 +34,10 @@ endfunction
 
 function! s:MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
 "{{{
-  " we do this maybe it's a bug of leaderf
-  " there no same problem in goto.vim
   let l:windows_to_show = 'nothing'
   if a:windows_to_show == 't'
+    " we do this maybe it's a bug of leaderf
+    " there no same problem in goto.vim
     let l:windows_to_show = 't'
   endif
   call ECY#utility#ShowMsg("[ECY] You had gone to : " . ECY#utility#FormatPosition(a:line, a:colum) , 2)

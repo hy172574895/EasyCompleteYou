@@ -241,7 +241,7 @@ function! s:SetVariable() abort
   " this debug option will start another server with socket port 1234 and
   " HMAC_KEY 1234, and output logging to file where server dir is. 
   let g:ECY_debug
-        \= get(g:, 'ECY_debug', v:true)
+        \= get(g:, 'ECY_debug', v:false)
 
   let g:ECY_select_items
         \= get(g:, 'ECY_select_items',['<Tab>','<S-TAB>'])
@@ -727,6 +727,8 @@ function! s:EventSort(id, data, event) abort
         call ECY#diagnosis#PlaceSign(l:data_dict)
       elseif l:Event == 'goto'
         call ECY#goto#Go_cb(l:data_dict)
+      elseif l:Event == 'document_help'
+        call ECY#document_help#cb(l:data_dict)
       elseif l:Event == 'all_engine_info'
         call timer_start(1, function('ECY#install#ListEngine_cb', [l:data_dict]))
       endif

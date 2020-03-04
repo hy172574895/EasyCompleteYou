@@ -40,6 +40,9 @@ class Source_interface(object):
     def OnBufferTextChanged(self, version):
         return self._return(version['VersionID'])
 
+    def OnDocumentHelp(self, version):
+        return self._return(version['VersionID'])
+
     def OnInsertModeLeave(self, version):
         return self._return(version['VersionID'])
 
