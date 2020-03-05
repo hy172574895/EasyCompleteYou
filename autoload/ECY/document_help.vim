@@ -1,5 +1,7 @@
 function! ECY#document_help#Init() abort
 "{{{
+  let g:ECY_show_doc_key = get(g:,'ECY_show_doc_key', '<C-n>')
+  exe 'nmap ' . g:ECY_show_doc_key . ' :ECYDocHelp<CR>'
 "}}}
 endfunction
 

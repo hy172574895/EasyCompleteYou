@@ -171,12 +171,13 @@ For Example:
 
 variable name|default values|description
 --|:--:|--:
-`g:ECY_show_switching_source_popup`|\<Tab\>|**String**. Show a prompting board for current buffer's available engines in normal mode .
+`g:ECY_show_switching_source_popup`|\<Tab\>|**String, Normal mode**. Show a prompting board for current buffer's available engines in normal mode .
 `g:ECY_expand_snippets_key`|\<CR\> a.k.a \<Enter\>|**String**. Expand a snippet in Insert mode by ultsnippes while the popup is showing and there are snippet that can be expanded. 
-`g:ECY_select_items`|['\<Tab\>','\<S-TAB\>']|**String**. Must be a list containing 2 items, the first value is shifting down a candidate, the second one is shifting up a candidate.
-`g:ECY_rolling_key_of_floating_windows`|['\<C-h\>', '\<C-l\>']|**String**. Available only when your vim supports floating windows (popup windows). the first one is rolling down text in floating widnows, the second one is rolling up text in floating windows.
-`g:ECY_key_to_show_current_line_diagnosis`|H|**String**. Show current line's diagnosis.
-`g:ECY_key_to_show_next_diagnosis`|[j|**String**. Show next diagnosis.
+`g:ECY_select_items`|['\<Tab\>','\<S-TAB\>']|**String, Insert mode**. Must be a list containing 2 items, the first value is shifting down a candidate, the second one is shifting up a candidate.
+`g:ECY_rolling_key_of_floating_windows`|['\<C-h\>', '\<C-l\>']|**String, Normal mode**. Available only when your vim supports floating windows (popup windows). the first one is rolling down text in floating widnows, the second one is rolling up text in floating windows.
+`g:ECY_key_to_show_current_line_diagnosis`|H|**String, Normal mode**. Show current line's diagnosis.
+`g:ECY_key_to_show_next_diagnosis`|[j|**String, Normal mode**. Show next diagnosis.
+`g:ECY_show_doc_key`|'\<C-n\>'|**String, Normal mode**. Show next diagnosis.
 
 ## String&Int&Boolean Variables(part, check engine document for more)
 For Example:   
