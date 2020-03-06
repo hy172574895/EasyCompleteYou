@@ -249,7 +249,7 @@ plugins.
 # Q&A
 
 ### Q: Why there are a few of [Snippets](https://www.techopedia.com/definition/5472/snippet-programming) options to complete? I need more.  
-A: ECY rely on `Ultisnips` which is a engine that fill in the snippets fragment. What snippets you provide to `Ultisnips`, what completion options you got in ECY.
+A: ECY relies on `Ultisnips` which is a engine that fill in the snippets fragment. What snippets you provide to `Ultisnips`, what completion options you got in ECY.
 So there are so many nice and mature snippets that made by other fellows such as  
  [honza/vim-snippets](https://github.com/honza/vim-snippets) or [CoreyMSchafer/code_snippets](https://github.com/CoreyMSchafer/code_snippets). If you want more, install the snippets you admire and `Ultisnips` will analize that snippets then provide to ECY and last to users.  
 
@@ -262,7 +262,7 @@ which is one of ECY's principles, that `LeaderF` hightly fit with ECY.
 **Importance**: ECY will not support any plugin that functions resemble with `LeaderF` and `ultisnips` unless there are critical demands.  
   
 ### Q: I only need a engine for python, why ECY install all engine's code in my computer?
-A: For out of the box, better.  You should no worry about ECY code in you computer, because it is python script(totally open source) and its size is not big and even small.
+A: For outing of the box, better.  You should no worry about ECY code in you computer, because it is python script(totally open source) and its size is not big and even small.
 
 ### Q: Why not use Ale to do diagnosis?
 A: Ale use job(channel) feature to send data to linter, but ECY use python3 instead.
