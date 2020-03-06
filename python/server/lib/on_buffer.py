@@ -5,6 +5,9 @@
 class Operate(object):
     """ most of these are notification
     """
+    def __init__(self):
+        self.document_version_id = -1
+
     def OnBufferEnter(self, engine_obj, version):
         results_ = engine_obj.OnBufferEnter(version)
         source_info = engine_obj.GetInfo()
@@ -16,6 +19,10 @@ class Operate(object):
         return results_
 
     def OnBufferTextChanged(self, engine_obj, version):
+        if self.document_version_id > version['DocumentVersionID'] :
+            return None
+        self.document_version_id = version['DocumentVersionID']
+
         results_ = engine_obj.OnBufferTextChanged(version)
         source_info = engine_obj.GetInfo()
         engine_name = source_info['Name']
