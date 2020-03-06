@@ -17,6 +17,10 @@ class Operate(object):
         self.version_id = -1
 
     def DoCompletion(self, engine_obj, version, buffer_cache):
+        if self.version_id > version['VersionID']:
+            g_logger.debug('filter a completion request.')
+            return None
+        self.version_id = version['VersionID']
         # we get regex from instance
         source_info = engine_obj.GetInfo()
 
@@ -75,7 +79,6 @@ class Operate(object):
                                                        isindent=isIndent)
 
         addtional_data = None
-        self.version_id = version['VersionID']
         if 'AddtionalData' in self.completion_items.keys():
             addtional_data = self.completion_items['AddtionalData']
         return {'Event': 'do_completion', 'Version_ID': version['VersionID'],
