@@ -20,27 +20,6 @@ class Operate(scope_.Event):
                 "get(g:,'ECY_golangserver_starting_cmd','go-langserver')")
         return self._starting_server_cmd
 
-    def _get_HTMLHint_cmd(self):
-        if self._HTMLHint_cmd is None:
-            self._HTMLHint_cmd = vim_lib.CallEval(
-                "get(g:,'ECY_html_lsp_HtmlHint_cmd','htmlhint')")
-        return self._HTMLHint_cmd
-
-    def OnBufferEnter(self):
-        self._workspace = self.GetCurrentWorkSpace()
-        msg = {}
-        return self._pack(msg, 'OnBufferEnter')
-
-    def DoCompletion(self):
-        msg = {}
-        msg['TriggerLength'] = self._trigger_len
-        msg['ReturnMatchPoint'] = self._is_return_match_point
-        return self._pack(msg, 'DoCompletion')
-
     def _pack(self, msg, event_name):
-        msg = self._basic(msg)
-        msg['Event'] = event_name
-        # msg['Additional'] = self._get_snippets()
-        msg['HTMLHintCMD'] = self._get_HTMLHint_cmd()
         msg['StartingCMD'] = self._get_starting_cmd()
-        return msg
+        return self._generate(msg, event_name)

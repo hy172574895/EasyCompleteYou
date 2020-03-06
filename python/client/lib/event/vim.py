@@ -31,11 +31,13 @@ class Operate(scope_.Event):
                 "get(g:,'ECY_vim_lsp_starting_cmd','vim-language-server --stdio')")
         return self._starting_server_cmd
 
-    def _pack(self, msg, event_name):
-        msg = self._basic(msg)
-        msg['Event'] = event_name
+    def DoCompletion(self):
+        msg = {}
         msg['Additional'] = self._get_snippets()
+        return self._pack(msg, 'DoCompletion')
+
+    def _pack(self, msg, event_name):
         msg['Vimruntime'] = self._get_vimruntime()
         msg['StartingCMD'] = self._get_starting_cmd()
         msg['Runtimepath'] = self._get_runtimepath()
-        return msg
+        return self._generate(msg, event_name)

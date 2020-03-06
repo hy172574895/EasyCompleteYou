@@ -13,8 +13,7 @@ class Operate(scope_.Event):
         self._get_snippets(is_reflesh=True)
         return self._pack({}, 'OnBufferEnter')
 
-    def _pack(self, msg, event_name):
-        msg = self._basic(msg)
-        msg['Event'] = event_name
+    def DoCompletion(self):
+        msg = {}
         msg['Additional'] = self._get_snippets()
-        return msg
+        return self._pack(msg, 'DoCompletion')

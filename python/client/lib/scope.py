@@ -30,19 +30,18 @@ class Event(object):
     def ChangeSourceName(self, source_name):
         self.source_name = source_name
 
-    def DoCompletion(self):
-        msg = {}
-        msg['TriggerLength'] = self._trigger_len
-        msg['ReturnMatchPoint'] = self._is_return_match_point
-        return self._pack(msg, 'DoCompletion')
-
     def InstallSource(self):
+        """ user should not rewrite this method
+        """
         msg = {}
         temp = vim_lib.GetVariableValue('g:ecy_source_name_2_install')
         msg['EngineLib'] = temp['EngineLib']
         msg['EnginePath'] = temp['EnginePath']
         msg['EngineName'] = temp['EngineName']
         return self._pack(msg, 'InstallSource')
+
+    def DoCompletion(self):
+        return self._pack({}, 'DoCompletion')
 
     def GetAllEngineInfo(self):
         return self._pack({}, 'GetAllEngineInfo')
@@ -51,7 +50,6 @@ class Event(object):
         return self._pack({}, 'OnDocumentHelp')
 
     def OnBufferEnter(self):
-        self._workspace = self.GetCurrentWorkSpace()
         return self._pack({}, 'OnBufferEnter')
 
     def OnBufferTextChanged(self):
@@ -61,23 +59,31 @@ class Event(object):
         return self._pack({}, 'OnInsertModeLeave')
 
     def Goto(self):
-        msg = {}
-        msg['GotoLists'] = vim_lib.GetVariableValue('g:ECY_goto_info')
-        return self._pack(msg, 'Goto')
+        return self._pack({}, 'Goto')
 
     def Integration(self):
-        msg = {}
-        msg['Integration_event'] = vim_lib.GetVariableValue(
-            'g:ECY_do_something_event')
-        return self._pack(msg, 'integration')
+        return self._pack({}, 'Integration')
 
     def GetAvailableSources(self):
         return self._pack({}, 'GetAvailableSources')
 
-    def _pack(self, msg, event_name):
+    def _generate(self, msg, event_name):
         msg = self._basic(msg)
+        if event_name == 'DoCompletion':
+            msg['TriggerLength'] = self._trigger_len
+            msg['ReturnMatchPoint'] = self._is_return_match_point
+        if event_name == 'Goto':
+            msg['GotoLists'] = vim_lib.GetVariableValue('g:ECY_goto_info')
+        if event_name == 'OnBufferEnter':
+            self._workspace = self.GetCurrentWorkSpace()
+        if event_name == 'Integration':
+            msg['Integration_event'] = vim_lib.GetVariableValue(
+                'g:ECY_do_something_event')
         msg['Event'] = event_name
         return msg
+
+    def _pack(self, msg, event_name):
+        return self._generate(msg, event_name)
 
     def _get_snippets(self, is_reflesh=False):
         if not self.has_ultisnippet_support:
