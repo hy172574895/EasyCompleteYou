@@ -260,7 +260,7 @@ function! s:SetVariable() abort
         \{'source_name':'path','invoke_key':'/', 'is_replace': v:false},
         \{'source_name':'label','invoke_key':'^', 'is_replace': v:true}])
 
-  if has('python')
+  if has('python2')
     let g:ECY_python3_cmd                               
           \= get(g:,'ECY_python3_cmd','python3')
   else
@@ -291,12 +291,12 @@ function! s:SetVariable() abort
     let g:UltiSnipsExpandTrigger = "<F1>"
   endif
 
-  let  s:isSelecting          = v:false
-  let  s:indentexpr           = &indentexpr
-  let  s:completeopt_temp     = &completeopt
-  let  s:back_to_source_key   = get(s:,'back_to_source_key',['<Space>'])
-  let  s:completion_text_id   = 0
-  let  s:completeopt_fuc_temp = &completefunc
+  let s:isSelecting          = v:false
+  let s:indentexpr           = &indentexpr
+  let s:completeopt_temp     = &completeopt
+  let s:back_to_source_key   = get(s:,'back_to_source_key',['<Space>'])
+  let s:completion_text_id   = 0
+  let s:completeopt_fuc_temp = &completefunc
   " we suggest to use socket, because we the results of testing the job is 
   " too slow.
   let  s:is_using_stdio = v:false
