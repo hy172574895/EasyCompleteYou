@@ -13,7 +13,7 @@ function! s:restore_cpo()
   unlet s:save_cpo
 endfunction
 
-let g:ECY_version = {'version': 12, 'tags': '1.2'}
+let g:ECY_version = {'version': 13, 'tags': '1.3'}
 let g:is_vim = !has('nvim')
 
 if g:loaded_easycomplete
@@ -84,8 +84,6 @@ command! -bar -nargs=0 ECYDocHelp         call ECY_main#Do("OnDocumentHelp", v:t
 command! -bar -nargs=1 ECYInstall         call ECY_main#Install('<args>')
 command! -bar -nargs=1 ECYGoTo            call ECY#goto#Go('<args>')
 
-let g:loaded_easycomplete = v:true
-
 " main:
 call ECY#diagnosis#Init()
 call ECY#completion_preview_windows#Init()
@@ -97,5 +95,6 @@ call ECY_main#Start()
 let g:ECY_endtime = reltimefloat(reltime())
 let g:ECY_start_time = g:ECY_endtime - g:ECY_starttime
 
+let g:loaded_easycomplete = v:true
 " This is basic vim plugin boilerplate
 call s:restore_cpo()
