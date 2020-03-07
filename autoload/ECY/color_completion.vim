@@ -10,6 +10,7 @@ function ECY#color_completion#Init() abort
 
   if g:has_floating_windows_support == 'vim'
         \&& g:ECY_use_floating_windows_to_be_popup_windows == v:true
+        \&& g:loaded_easycomplete == v:false
 
     let g:ECY_completion_color_style = get(g:,'ECY_completion_color_style', '1')
     " hightlight
