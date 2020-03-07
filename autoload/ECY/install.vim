@@ -5,37 +5,88 @@ function! ECY#install#Init() abort
 "{{{ must be called before setupPython()
    " put buildin engine name into Client
    " when Client finding no Clent event will omit it to genernal
-   let s:ECY_buildin_engine_client = {
-         \'html_lsp': 'lib.event.html_lsp',
-         \'go_langserver': 'lib.event.go_langserver',
-         \'go_gopls': 'lib.event.go_gopls',
-         \'snippets': 'lib.event.snippets',
-         \'vim_lsp': 'lib.event.vim'}
+  call ECY#install#AddEngineInfo('html_lsp',
+        \'lib.event.html_lsp','lib.sources.lsp_servers.html',
+        \function('ECY#install#html_lsp'), '', 'buildin')
 
-   let s:ECY_buildin_engine_installer = {
-         \'html_lsp': function('ECY#install#html_lsp'),
-         \'snippets': function('ECY#install#Snippets'),
-         \'youcompleteme': function('ECY#install#YCM'),
-         \'go_langserver': function('ECY#install#Go_langserver'),
-         \'go_gopls': function('ECY#install#Go_gopls'),
-         \'vim_lsp': function('ECY#install#vim_lsp')
-         \}
+  call ECY#install#AddEngineInfo('snippets',
+        \'lib.event.vim','lib.sources.snippets.snippets',
+        \function('ECY#install#Snippets'), '', 'buildin')
 
-  for [key, lib] in items(s:ECY_buildin_engine_client)
-    " if a new engine did not register a client, ECY will use the default one
-    " instead.
-    call ECY#install#RegisterClient(key, lib)
-  endfor
+  call ECY#install#AddEngineInfo('youcompleteme',
+        \'','lib.sources.youcompleteme.ycm',
+        \function('ECY#install#YCM'), '', 'buildin')
 
-  for [key, Fuc] in items(s:ECY_buildin_engine_installer)
-    call ECY#install#RegisterInstallFunction(key, Fuc)
-  endfor
+  call ECY#install#AddEngineInfo('go_langserver',
+        \'lib.event.go_langserver','lib.sources.lsp_servers.go_langserver',
+        \function('ECY#install#Go_langserver'), '', 'buildin')
 
-  " TODO
-  let s:ECY_available_engine_uninstaller = {}
-  for [key, Fuc] in items(s:ECY_available_engine_uninstaller)
-    call ECY#install#RegisterUnInstallFunction(key, Fuc)
-  endfor
+  call ECY#install#AddEngineInfo('go_gopls',
+        \'lib.event.go_gopls','lib.sources.lsp_servers.go_gopls',
+        \function('ECY#install#Go_gopls'), '', 'buildin')
+
+  call ECY#install#AddEngineInfo('vim_lsp',
+        \'lib.event.vim','lib.sources.lsp_servers.vim',
+        \function('ECY#install#vim_lsp'), '', 'buildin')
+"}}}
+endfunction
+
+function! ECY#install#AddEngineInfo(engine_name, client_module_path,
+      \server_module_path, install_fuc, uninstall_fuc, ...) abort
+"{{{
+  if !exists('g:ECY_all_engine_info')
+    let g:ECY_all_engine_info = {}
+  endif
+  if a:server_module_path == ''
+    throw '[ECY] server module can not be empty.'
+  endif
+  if a:0 == 1 " a:0 means length of param.
+    " buildin engine
+    call ECY#install#RegisterClient(a:engine_name, a:client_module_path)
+    call ECY#install#RegisterServer(a:engine_name, a:server_module_path)
+  else
+    " plugin, client_module_path is full path
+    if a:client_module_path != ''
+      let l:client = s:ParseModuleInfo(a:client_module_path)
+      call ECY#install#RegisterClient(a:engine_name, l:client['lib'], l:client['path'])
+    else
+      " user can dertermine to use the default client.
+      call ECY#install#RegisterClient(a:engine_name, '')
+    endif
+    " server module can not be empty
+    let l:server = s:ParseModuleInfo(a:server_module_path)
+    call ECY#install#RegisterServer(a:engine_name, l:server['lib'], l:server['path'])
+  endif
+  call ECY#install#RegisterInstallFunction(a:engine_name, a:install_fuc)
+  call ECY#install#RegisterUnInstallFunction(a:engine_name, a:uninstall_fuc)
+
+  let g:ECY_all_engine_info[a:engine_name]                 = {}
+  let g:ECY_all_engine_info[a:engine_name]['name']         = a:engine_name
+  let g:ECY_all_engine_info[a:engine_name]['client']       = a:client_module_path
+  let g:ECY_all_engine_info[a:engine_name]['server']       = a:server_module_path
+  let g:ECY_all_engine_info[a:engine_name]['install_fuc']  = a:install_fuc
+  let g:ECY_all_engine_info[a:engine_name]['unintall_fuc'] = a:uninstall_fuc
+  if a:0 == 1
+    let g:ECY_all_engine_info[a:engine_name]['is_buildin'] = v:true
+  else
+    let g:ECY_all_engine_info[a:engine_name]['is_buildin'] = v:false
+  endif
+"}}}
+endfunction
+
+function! s:ParseModuleInfo(module_full_path) abort
+"{{{
+  let l:module_full_path = tr(a:module_full_path, '\', '/')
+  " remove '.py'
+  let l:module_full_path = fnamemodify(l:module_full_path, ':r')
+  let l:lib = fnamemodify(l:module_full_path, ':t')
+  let l:module_full_path = fnamemodify(l:module_full_path, ':h')
+  let l:lib = fnamemodify(l:module_full_path, ':t') . '.' .l:lib
+  let l:module_full_path = fnamemodify(l:module_full_path, ':h')
+  let l:lib = fnamemodify(l:module_full_path, ':t') . '.' .l:lib
+  let l:module_full_path = fnamemodify(l:module_full_path, ':h')
+  let l:module_full_path .= '/'
+  return {'path': l:module_full_path, 'lib': l:lib}
 "}}}
 endfunction
 
@@ -61,7 +112,7 @@ function! ECY#install#ListEngine_cb(msg, timer_id) abort
   call add(l:to_show, '√ installed; × disabled.')
   call add(l:to_show, ' ')
   let i = 1
-  for [key, lib] in items(g:ECY_available_engine_lists)
+  for [key, info] in items(g:ECY_all_engine_info)
     let l:temp  = ''
     let l:installed = v:false
     for item in a:msg['EngineInfo']
@@ -74,7 +125,7 @@ function! ECY#install#ListEngine_cb(msg, timer_id) abort
       endif
     endfor
     let l:temp .= ' ' . string(i). '.'
-    if has_key(s:ECY_buildin_engine_client, key)
+    if info['is_buildin']
       let l:temp .= ' BuiltIn  '
     else
       let l:temp .= ' Plugin   '
@@ -103,11 +154,24 @@ function! ECY#install#RegisterUnInstallFunction(engine_name, Uninstalller) abort
   let g:ECY_available_engine_uninstaller[a:engine_name] = a:Uninstalller
 endfunction
 
+function! ECY#install#RegisterServer(engine_name, server_lib, ...) abort
+  if !exists('g:ECY_server_info')
+    let g:ECY_server_info = {}
+  endif
+  let g:ECY_server_info[a:engine_name] = {}
+  if a:0 == 1
+    let g:ECY_server_info[a:engine_name] = {'lib': a:server_lib, 'path': a:1}
+  else
+    let g:ECY_server_info[a:engine_name] = {'lib': a:server_lib, 'path': ''}
+  endif
+endfunction
+
 function! ECY#install#RegisterClient(engine_name, client_lib, ...) abort
 "{{{
-  if !exists('g:ECY_available_engine_lists')
-    let g:ECY_available_engine_lists = {}
+  if !exists('g:ECY_engine_client_info')
+    let g:ECY_engine_client_info = {}
   endif
+
   if a:0 == 1
     call s:ImportClientLib(a:1)
     try
@@ -116,8 +180,11 @@ function! ECY#install#RegisterClient(engine_name, client_lib, ...) abort
     catch 
       throw "[ECY-".a:engine_name."] can not import Client module."
     endtry
+    let g:ECY_engine_client_info[a:engine_name] = {'lib': a:client_lib, 'path': a:1}
+  else
+    " buildin engine
+    let g:ECY_engine_client_info[a:engine_name] = {'lib': a:client_lib, 'path': ''}
   endif
-  let g:ECY_available_engine_lists[a:engine_name] = a:client_lib
 "}}}
 endfunction
 

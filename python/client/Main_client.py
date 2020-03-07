@@ -12,9 +12,9 @@ from socket import *  # noqa
 # local lib
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
-from lib.event import *
 from lib import socket_
 from lib import vim_or_neovim_support as vim_lib
+import lib.event.genernal as genernal
 
 g_is_debug = vim_lib.GetVariableValue('g:ECY_debug')
 if g_is_debug:
@@ -32,13 +32,12 @@ if g_is_debug:
 
 class _do(object):
     def __init__(self):
-        self.UpdateAvailableEngineName()
-        import lib.event.genernal as genernal
+        self.UpdateClientModule()
         self.event_obj = {'genernal': genernal.GenernalEvent('genernal')}
 
-    def UpdateAvailableEngineName(self):
+    def UpdateClientModule(self):
         self.available_engine_name_dict = vim_lib.GetVariableValue(
-                'g:ECY_available_engine_lists')
+                'g:ECY_engine_client_info')
 
     def GetCurrentSource(self):
         using_source = vim_lib.CallEval('ECY_main#GetCurrentUsingSourceName()')
@@ -150,11 +149,12 @@ class ECY_Client(_do):
         # do
         engine_name = self.GetCurrentSource()
         if engine_name not in self.available_engine_name_dict.keys():
-            self.UpdateAvailableEngineName()
+            self.UpdateClientModule()
         method = None
         if engine_name in self.available_engine_name_dict.keys():
-            if engine_name not in self.event_obj.keys():
-                client_lib = self.available_engine_name_dict[engine_name]
+            if engine_name not in self.event_obj.keys() \
+                    and self.available_engine_name_dict[engine_name]['lib'] != '':
+                client_lib = self.available_engine_name_dict[engine_name]['lib']
                 method = self._import_client_event(engine_name, client_lib, event)
             else:
                 method = getattr(self.event_obj[engine_name], event, None)
