@@ -917,7 +917,7 @@ function! ECY_main#Install(name) abort
 "{{{
 "check source's requires
   if !exists("g:ECY_available_engine_installer[a:name]")
-    call ECY#utility#ShowMsg('[ECY] have no "'.a:name.'" supported.', 3)
+    call ECY#utility#ShowMsg('[ECY] have no "'.a:name.'" support.', 3)
     return
   endif
   let l:Fuc = g:ECY_available_engine_installer[a:name]
@@ -925,18 +925,18 @@ function! ECY_main#Install(name) abort
   if l:install_return['status'] == 0
     " refleshing all the running completor to make new completor work at every
     " where.
-    let l:engine_name = l:install_return['name']
-    call ECY#utility#ShowMsg('[ECY] checked the requires of "'.l:engine_name.'" successfully.', 3)
+    call ECY#utility#ShowMsg('[ECY] checked the requires of "'.a:name.'" successfully.', 3)
   else
     "failed while check.
     call ECY#utility#ShowMsg(l:install_return['description'], 3)
     return
   endif
-  let g:ecy_source_name_2_install = {'EngineLib': l:install_return['lib'],
-        \'EnginePath': l:install_return['path'],
-        \'EngineName': l:engine_name}
+  let l:engine_info = g:ECY_server_info[a:name]
+  let g:ecy_source_name_2_install = {'EngineLib': l:engine_info['lib'],
+        \'EnginePath': l:engine_info['path'],
+        \'EngineName': a:name}
   call ECY_main#Do("InstallSource", v:true)
-  call ECY#utility#ShowMsg('[ECY] installing "'.l:engine_name.'".', 3)
+  " call ECY#utility#ShowMsg('[ECY] installing "'.l:engine_name.'".', 3)
 "}}}
 endfunction
 
