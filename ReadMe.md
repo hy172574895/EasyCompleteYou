@@ -103,6 +103,14 @@ vim_lsp|vimL|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|node
 go_langserver|golang|completion<br>snippets-expanding|[go-langserver](https://github.com/sourcegraph/go-langserver)|
 go_gopls|golang|completion<br>diagnosis<br>snippets-expanding<br>goto-definition<br>goto-reference|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|
 
+### Plugins of ECY.
+Totally like above list of engines, but just as one repo.
+
+name|programming language|abilities|dependence|link
+--|:--:|--:|--:|--:
+dictionary|all|completion|-|[Home](https://github.com/hy172574895/ECY-latex)|
+latex|latex|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|[TexLab](https://texlab.netlify.com/)<br> [vimtex](https://github.com/lervag/vimtex)|[Home](https://github.com/hy172574895/ECY-latex)|
+
 
 ## Cooperate with [Ultisnips](https://github.com/SirVer/ultisnips)
 `Ultisnips` is a separate plugin, so you have to install it separately.
@@ -276,7 +284,7 @@ Put `let g:ECY_debug = v:true` into your vimrc and restart Vim.
 Reproduce the bug, then you can find a log file of `./python/client/ECY_client.log` and `./python/server/ECY_server.log`
 
 ## Report bug.
-Thanks, and go [here]()
+Thanks, and go [here](https://github.com/hy172574895/EasyCompleteYou/issues)
 
 ## How to PR?
 Before pulling a request to ECY's master, make sure you had discussed that with a issuse `what your code can do for ECY`?  

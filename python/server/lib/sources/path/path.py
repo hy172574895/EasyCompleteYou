@@ -49,7 +49,7 @@ class Operate(scope_.Source_interface):
                         path_temp = workspace + path
                     else:
                         path_temp = workspace + "/" + path
-        except Exception as e:
+        except:
             # the path is uncertain, so will we try at here
             pass
         # if not using WorkSpace, we set it None
@@ -60,14 +60,14 @@ class Operate(scope_.Source_interface):
             file_list = os.listdir(os.curdir)
             addtional_data['Path'] = path_temp
             addtional_data['UsingWorkSpace'] = workspace + '/'
-        except Exception as e:
+        except:
             try:
                 path_temp = path
                 os.chdir(path)
                 file_list = os.listdir(os.curdir)
                 addtional_data['Path'] = path
                 addtional_data['UsingWorkSpace'] = os.getcwd()
-            except Exception as e:
+            except:
                 is_id = True
                 file_list = list(set(re.findall(r'\w+', line_text)))
                 addtional_data['Path'] = None
