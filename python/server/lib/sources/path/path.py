@@ -5,6 +5,9 @@
 import sys
 import re
 import os
+import logging
+global g_logger
+g_logger = logging.getLogger('ECY_server')
 # local lib
 import utils.interface as scope_
 # from utils import vim_or_neovim_support as vim_lib
@@ -13,6 +16,7 @@ import utils.interface as scope_
 class Operate(scope_.Source_interface):
     def __init__(self):
         self._name = 'path'
+        self._ignore_regex = None
 
     def GetInfo(self):
         # the key of 'Regex' is the regular of filter
@@ -23,6 +27,31 @@ class Operate(scope_.Source_interface):
             temp['TriggerKey'] = ['/','\\',':']
         return temp
 
+    def _ignore(self, item, regexs):
+        if type(regexs) != dict or regexs is None:
+            return False
+
+        if not 'dir' in regexs:
+            regexs['dir'] = []
+        if not 'file' in regexs:
+            regexs['file'] = []
+
+        if os.path.isfile(item):
+            regex = regexs['file']
+        else:
+            regex = regexs['dir']
+
+        if type(regex) != list:
+            return False
+
+        for line in regex:
+            try:
+                if re.search(line, item) != None:
+                    return True
+            except:
+                pass
+        return False
+
     def DoCompletion(self, version):
         return_ = {'ID': version['VersionID']}
         addtional_data = {}
@@ -30,7 +59,10 @@ class Operate(scope_.Source_interface):
         current_line_text = version['CurrentLineText']
         current_colum = version['Filter_start_position']['Colum']
         workspace = version['WorkSpace']
+        g_logger.debug(workspace)
         pre_words = current_line_text[:current_colum]
+        self._ignore_regex = version['Ignore']
+        g_logger.debug(self._ignore_regex)
         temp = r'[\w\-\.\~\/\\]'
         is_id = False
         if self._current_system() == 'Windows':
@@ -38,20 +70,23 @@ class Operate(scope_.Source_interface):
         # only return 2 values
         current_colum, path = self.FindStart(pre_words, temp)
 
-        try:
-            if workspace is not None :
-                if path[0] in ['~', '.']:
-                    # most of the language like "~/gvim" ro ".\gvim"
-                    path_temp = workspace + path[1:]
+        if workspace is not None and len(path) > 0:
+            # temp = workspace[len(workspace)]
+            # if self._current_system == 'Windows':
+            #     if temp != '\\':
+            #         workspace += '\\'
+            # else:
+            #     if temp != '/':
+            #         workspace += '/'
+            if path[0] in ['~', '.']:
+                # most of the language like "~/gvim" ro ".\gvim"
+                path_temp = workspace + path[1:]
+            else:
+                # such as html
+                if path[0] in ['\\','/']:
+                    path_temp = workspace + path
                 else:
-                    # such as html
-                    if path[0] in ['\\','/']:
-                        path_temp = workspace + path
-                    else:
-                        path_temp = workspace + "/" + path
-        except:
-            # the path is uncertain, so will we try at here
-            pass
+                    path_temp = workspace + "/" + path
         # if not using WorkSpace, we set it None
         addtional_data['UsingWorkSpace'] = None
         try:
@@ -66,7 +101,7 @@ class Operate(scope_.Source_interface):
                 os.chdir(path)
                 file_list = os.listdir(os.curdir)
                 addtional_data['Path'] = path
-                addtional_data['UsingWorkSpace'] = os.getcwd()
+                addtional_data['UsingWorkSpace'] = os.getcwd() + '/'
             except:
                 is_id = True
                 file_list = list(set(re.findall(r'\w+', line_text)))
@@ -82,6 +117,9 @@ class Operate(scope_.Source_interface):
             if is_id:
                 results_format['kind'] = '[ID]'
             else:
+                if self._ignore(item, self._ignore_regex):
+                    g_logger.debug('ignore')
+                    continue
                 if os.path.isfile(item):
                     results_format['kind'] = '[File]'
                 elif os.path.isdir(item):

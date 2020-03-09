@@ -28,6 +28,10 @@ function! ECY#install#Init() abort
   call ECY#install#AddEngineInfo('vim_lsp',
         \'lib.event.vim','lib.sources.lsp_servers.vim',
         \function('ECY#install#vim_lsp'), '', 'buildin')
+
+  call ECY#install#AddEngineInfo('path',
+        \'lib.event.path','lib.sources.path.path',
+        \'', '', 'buildin')
 "}}}
 endfunction
 

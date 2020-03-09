@@ -68,19 +68,19 @@ class Event(object):
         return self._pack({}, 'GetAvailableSources')
 
     def _generate(self, msg, event_name):
-        msg = self._basic(msg)
+        msg['Event'] = event_name
         if event_name == 'DoCompletion':
             msg['TriggerLength'] = self._trigger_len
             msg['ReturnMatchPoint'] = self._is_return_match_point
         if event_name == 'Goto':
             msg['GotoLists'] = vim_lib.GetVariableValue('g:ECY_goto_info')
         if event_name == 'OnBufferEnter':
+            # update WorkSpace
             self._workspace = self.GetCurrentWorkSpace()
         if event_name == 'Integration':
             msg['Integration_event'] = vim_lib.GetVariableValue(
                 'g:ECY_do_something_event')
-        msg['Event'] = event_name
-        return msg
+        return self._basic(msg)
 
     def _pack(self, msg, event_name):
         return self._generate(msg, event_name)
@@ -115,4 +115,6 @@ class Event(object):
         msg['StartPosition'] = start_position
         msg['SourceName'] = self.source_name
         msg['WorkSpace'] = self._workspace
+        g_logger.debug("current buffer WorkSpace:")
+        g_logger.debug(msg['WorkSpace'])
         return msg

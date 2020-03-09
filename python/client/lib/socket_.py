@@ -69,11 +69,12 @@ class Socket_(object):
         send_data = bytes(json.dumps(send_data), encoding='utf-8')
         # there are no '\n' in json's string, so we use that to split the text.
         self.tcpCliSock.sendall(send_data+b'\n')
+        # g_logger.debug(send_data)
 
     def Send(self, msg):
         try:
             if not self.is_connected:
-                # g_logger.debug('msg abandomed.')
+                g_logger.debug('msg abandomed.')
                 return
             g_logger.debug('sended a msg')
             self.BuildMsg(msg)
