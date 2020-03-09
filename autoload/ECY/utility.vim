@@ -13,12 +13,15 @@ function! ECY#utility#MoveToBuffer(line, colum, file_path, windows_to_show) abor
 " a:colum is 0-based
 " a:line is 1-based
 " the a:windows_to_show hightly fit leaderf
-  if a:windows_to_show == 'preview' && g:ECY_leaderf_preview_mode != 'normal'
-    if g:has_floating_windows_support == 'vim'
-      call s:ShowPreview_vim(a:file_path, a:line, &syntax)
-    endif
-    return
-  endif
+
+  "TODO
+  " if a:windows_to_show == 'preview' && g:ECY_leaderf_preview_mode != 'normal'
+  "   if g:has_floating_windows_support == 'vim'
+  "     call s:ShowPreview_vim(a:file_path, a:line, &syntax)
+  "   endif
+  "   return
+  " endif
+
   if a:windows_to_show == 'h'
     exe 'new ' . a:file_path
     " horizontally new a windows at current tag
@@ -43,12 +46,13 @@ function! ECY#utility#MoveToBuffer(line, colum, file_path, windows_to_show) abor
   call cursor(a:line, a:colum + 1)
 "}}}
 endfunction
-" call ECY#utility#MoveToBuffer(5, 1,'D:/gvim/vimfiles/myplug/ECY_new/autoload/ECY/install.vim', 'preview')
+
 function! ECY#utility#IsFileLoaded(file_name) abort
   return bufnr(a:file_name)
 endfunction
 
 function! s:ShowPreview_vim(file_name, roll_line, syntaxs) abort
+"{{{
   let l:bufnr = ECY#utility#IsFileLoaded(a:file_name)
   let s:preview_cache = []
   if l:bufnr == -1
@@ -68,6 +72,7 @@ function! s:ShowPreview_vim(file_name, roll_line, syntaxs) abort
       \ 'padding': [0,1,0,1],
       \ 'zindex': 2000}
   let g:ECY_buffer_preview_windows_nr = popup_create(s:preview_cache, l:opts)
+"}}}
 endfunction
 
 function! ECY#utility#GetLoadedFile() abort
