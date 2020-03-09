@@ -67,7 +67,7 @@ function! leaderf_ECY#items_selecting#LeaderF_cb(line, event, index, nodes, call
     let l:Fuc = function(a:callback_name)
     call l:Fuc(a:line, a:event, a:index, a:nodes)
   catch 
-    call utility#ShowMsg("[ECY] something wrong with selecting, maybe this is a bug.", 2)
+    call ECY#utility#ShowMsg("[ECY] something wrong with selecting, maybe this is a bug.", 2)
   endtry
 "}}}
 endfunction
