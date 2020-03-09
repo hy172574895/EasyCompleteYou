@@ -47,14 +47,14 @@ function! ECY#install#AddEngineInfo(engine_name, client_module_path,
   else
     " plugin, client_module_path is full path
     if a:client_module_path != ''
-      let l:client = s:ParseModuleInfo(a:client_module_path)
+      let l:client = ECY#install#ParseModuleInfo(a:client_module_path)
       call ECY#install#RegisterClient(a:engine_name, l:client['lib'], l:client['path'])
     else
       " user can dertermine to use the default client.
       call ECY#install#RegisterClient(a:engine_name, '')
     endif
     " server module can not be empty
-    let l:server = s:ParseModuleInfo(a:server_module_path)
+    let l:server = ECY#install#ParseModuleInfo(a:server_module_path)
     call ECY#install#RegisterServer(a:engine_name, l:server['lib'], l:server['path'])
   endif
   call ECY#install#RegisterInstallFunction(a:engine_name, a:install_fuc)
@@ -74,17 +74,24 @@ function! ECY#install#AddEngineInfo(engine_name, client_module_path,
 "}}}
 endfunction
 
-function! s:ParseModuleInfo(module_full_path) abort
+function! ECY#install#ParseModuleInfo(module_full_path) abort
 "{{{
   let l:module_full_path = tr(a:module_full_path, '\', '/')
   " remove '.py'
   let l:module_full_path = fnamemodify(l:module_full_path, ':r')
-  let l:lib = fnamemodify(l:module_full_path, ':t')
-  let l:module_full_path = fnamemodify(l:module_full_path, ':h')
-  let l:lib = fnamemodify(l:module_full_path, ':t') . '.' .l:lib
-  let l:module_full_path = fnamemodify(l:module_full_path, ':h')
-  let l:lib = fnamemodify(l:module_full_path, ':t') . '.' .l:lib
-  let l:module_full_path = fnamemodify(l:module_full_path, ':h')
+
+  let i = 0
+  let l:lib = ''
+  while i < 3
+    if i == 0
+      let l:lib = fnamemodify(l:module_full_path, ':t')
+    else
+      let l:lib = fnamemodify(l:module_full_path, ':t') . '.' . l:lib
+    endif
+    let l:module_full_path = fnamemodify(l:module_full_path, ':h')
+    let i += 1
+  endw
+
   let l:module_full_path .= '/'
   return {'path': l:module_full_path, 'lib': l:lib}
 "}}}
@@ -131,10 +138,6 @@ function! ECY#install#ListEngine_cb(msg, timer_id) abort
       let l:temp .= ' Plugin   '
     endif
     let l:temp .= key
-
-    " if l:installed
-    "   let l:temp .= key
-    " endif
 
     call add(l:to_show, l:temp)
     let i += 1
