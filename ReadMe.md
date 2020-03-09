@@ -108,7 +108,7 @@ Totally like above list of engines, but just as one repo.
 
 name|programming language|abilities|dependence|link
 --|:--:|--:|--:|--:
-dictionary|all|completion|-|[Home](https://github.com/hy172574895/ECY-latex)|
+dictionary|all|completion|-|[Home](https://github.com/hy172574895/ECY-dictionary)|
 latex|latex|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|[TexLab](https://texlab.netlify.com/)<br> [vimtex](https://github.com/lervag/vimtex)|[Home](https://github.com/hy172574895/ECY-latex)|
 
 
@@ -227,6 +227,7 @@ variable name|default values|description
 `g:ECY_disable_for_files_larger_than_kb`|1000|**Int**. Same as `g:ycm_disable_for_files_larger_than_kb` of YCM. Current buffer size more than xxx KB, then ECY won't work.
 `g:ECY_update_diagnosis_mode`|2|**Int**. 2 means update diagnosis both in Insert mode and Normal mode. 1 means only update diagnosis in Normal mode.
 `g:ECY_preview_windows_size`|[[30, 50], [2, 14]]|**Lists**. Available only when your vim support floating windows. Size of preview windows like: [[minwidth, maxwidth], [minheight, maxheight]]
+`g:ECY_file_path_ignore`|{'dir': ['.svn','.git','.hg'],'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]','~$','swp$']}|**Dict**. Must containing two keys named 'dir' and 'file'. Values of that two keys is a list of regex.
 
 ## Style Variables
 For Example:   
