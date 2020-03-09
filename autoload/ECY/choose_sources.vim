@@ -91,9 +91,6 @@ endfunction
 
 function! ECY#choose_sources#Start() abort
 "{{{
-  if !ECY_main#IsECYWorksAtCurrentBuffer()
-    return
-  endif
   call ECY_main#Log('user start a windows of selecting source')
   if exists("g:ECY_file_type_info[".string(&filetype)."]")
     if g:has_floating_windows_support == 'has_no'
