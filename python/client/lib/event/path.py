@@ -22,4 +22,6 @@ class Operate(scope_.Event):
 
     def _pack(self, msg, event_name):
         msg['Ignore'] = self._get_ignore()
+        if self._workspace is None:
+            self._workspace = self.GetCurrentWorkSpace()
         return self._generate(msg, event_name)
