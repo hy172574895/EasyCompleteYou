@@ -38,6 +38,7 @@ class EventHandler(object):
         source_name = version_dict['SourceName']
 
         results_ = []
+        temp = None
         # all the request must choose a source, when it's omit, we will give it
         # one
         if event_ == 'GetAvailableSources':
@@ -69,7 +70,7 @@ class EventHandler(object):
             temp = self.on_buffer.OnBufferTextChanged(engine_obj, version_dict)
         elif event_ == 'Goto':
             temp = self.goto.Goto(engine_obj, version_dict)
-        elif event_ == 'integration':
+        elif event_ == 'Integration':
             temp = self.integration.HandleIntegration(engine_obj, version_dict)
         elif event_ == 'GetAllEngineInfo':
             temp = self.source_manager.GetAllEngine(version_dict)
