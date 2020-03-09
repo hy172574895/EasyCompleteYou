@@ -13,6 +13,7 @@ function! ECY#goto#Init() abort
                         \'references']
   let g:ECY_goto_info = []
   let s:goto_lists = []
+  let g:ECY_show_goto_hint = get(g:, 'ECY_show_goto_hint', v:false)
 "}}}
 endfunction
 
@@ -40,7 +41,9 @@ function! s:MoveToBuffer(line, colum, buffer_name, windows_to_show) abort
     " there no same problem in goto.vim
     let l:windows_to_show = 't'
   endif
-  call ECY#utility#ShowMsg("[ECY] You had gone to : " . ECY#utility#FormatPosition(a:line, a:colum) , 2)
+  if g:ECY_show_goto_hint
+    call ECY#utility#ShowMsg("[ECY] You had gone to : " . ECY#utility#FormatPosition(a:line, a:colum) , 2)
+  endif
   call ECY#utility#MoveToBuffer(a:line, a:colum, a:buffer_name,l:windows_to_show)
 "}}}
 endfunction
@@ -93,7 +96,9 @@ function! ECY#goto#Go(...) abort
       call add(g:ECY_goto_info, l:temp)
     endw
   endif
-  call ECY#utility#ShowMsg("[ECY] Going to ....", 2)
+  if g:ECY_show_goto_hint
+    call ECY#utility#ShowMsg("[ECY] Going to ....", 2)
+  endif
   call ECY_main#ChangeVersionID()
   call ECY_main#Do('Goto', v:true)
 "}}}
