@@ -17,7 +17,7 @@ class Operate(scope_.Event):
     def _get_ignore(self):
         if self._ignore_dict is None:
             self._ignore_dict = vim_lib.CallEval(
-                "get(g:,'ECY_file_path_ignore',{'dir': ['.svn','.git','.hg'],'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]','~$','swp$']})")
+                "get(g:,'ECY_file_path_ignore',{'dir': ['.svn','.git','.hg', '__pycache__'],'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]','~$','swp$']})")
         return self._ignore_dict
 
     def _pack(self, msg, event_name):
