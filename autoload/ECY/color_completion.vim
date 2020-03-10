@@ -35,15 +35,18 @@ function ECY#color_completion#Init() abort
     let g:ECY_highlight_selected_matched_word = get(g:,'ECY_highlight_selected_matched_word','ECY_selected_matched_word')
     let g:ECY_highlight_selected_item         = get(g:,'ECY_highlight_selected_item', 'ECY_selected_item')
 
-    call prop_type_add('item_normal_matched', {'highlight': g:ECY_highlight_normal_matched_word})
-    call prop_type_add('item_normal', {'highlight': g:ECY_highlight_normal_items})
-    call prop_type_add('item_selected_matched', {'highlight': g:ECY_highlight_selected_matched_word})
-    call prop_type_add('item_selected', {'highlight': g:ECY_highlight_selected_item})
+    try
+      call prop_type_add('item_normal_matched', {'highlight': g:ECY_highlight_normal_matched_word})
+      call prop_type_add('item_normal', {'highlight': g:ECY_highlight_normal_items})
+      call prop_type_add('item_selected_matched', {'highlight': g:ECY_highlight_selected_matched_word})
+      call prop_type_add('item_selected', {'highlight': g:ECY_highlight_selected_item})
 
-    call prop_type_add('symbol_matched', {'highlight': 'DiffAdd'})
-    call prop_type_add('symbol_name', {'highlight': 'Keyword'})
-    call prop_type_add('symbol_position', {'highlight': 'NonText'})
-    call prop_type_add('symbol_kind', {'highlight': 'Normal'})
+      call prop_type_add('symbol_matched', {'highlight': 'DiffAdd'})
+      call prop_type_add('symbol_name', {'highlight': 'Keyword'})
+      call prop_type_add('symbol_position', {'highlight': 'NonText'})
+      call prop_type_add('symbol_kind', {'highlight': 'Normal'})
+    catch 
+    endtry
   endif
 "}}}
 endfunction
