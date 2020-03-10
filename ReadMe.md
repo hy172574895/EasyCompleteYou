@@ -19,7 +19,7 @@
 ---
 
 # Brief Introduction
-1. Automatically compatible with [YCM](https://github.com/ycm-core/YouCompleteMe), can be a extension for YCM.
+1. Automatically compatible with [YCM](https://github.com/ycm-core/YouCompleteMe), can be an extension for YCM.
 2. Fluent completion.
 3. Wrote with Python3.
 4. Fuzzy-find support like YCM.
@@ -32,11 +32,11 @@
 
 ### Requires
 
-1. Python >= 3.0 with standerd library.  
-strongly suggest to use python3.6+  
+1. Python >= 3.0 with standard library.  
+strongly recommend to use python3.6+  
 [How to get python support for vim?](https://vi.stackexchange.com/questions/11526/how-to-enable-python-feature-in-vim)
 2. Vim >= 8.0 with `timer` and `job` .  
-strongly suggest to use the newest one(Vim 8.2).  
+strongly recommend to use the newest one(Vim 8.2).  
 
 ### Install  
 
@@ -63,19 +63,19 @@ Check [here](https://vi.stackexchange.com/questions/613/how-do-i-install-a-plugi
 
 # Usage  
 
-After successfully installed ECY, there are 3 buildin completion engine that
+After successfully installed ECY, there are 3 buildin completion engines that
 is `label`, `path` and `python`. 
 
 Firstly ECY will detect the filetype of your buffer that you are using. Knowing the filetype, then ECY asks the server what engines are available on this filetype.  
 
-So if you want a specific engine works on a buffer, you can change the filetype by the vim that `:set &filetype=java` on the buffer you want to change.
+So if you want a specific engine works on a buffer, you can change the filetype by the vim that `:set &filetype=java` or `:let &filetype='java'` on the buffer you want to change.
 
-You can also check available engine of ECY by pressing `<Tab>` in normal mode.
-It will show a floating windows containing all the engine you can use in current buffera. Change `<Tab>`  by `g:ECY_show_switching_source_popup`.
+You can also check available engines of ECY by pressing `<Tab>` in normal mode.
+It will show a floating windows containing all the engine you can use in current buffer. Also, you can change `<Tab>`  by `g:ECY_show_switching_source_popup`.
 
 ## Enable more.
 
-there only three buildin engine which is `label`,`python` and `path` after you installed ECY. If you want ECY work on `HTML`, you can activate that engine with its name by: `:ECYInstall html_lsp` in vim.  
+there only three buildin engines which is `label`,`python` and `path` after you installed ECY. If you want ECY works on `HTML`, you can activate that engine with its name by: `:ECYInstall html_lsp` in vim.  
 
 **Importance**: There are might dependence while you installing a engine of ECY
 So check out the following lists carefully and install the dependence before you install it.
@@ -114,7 +114,7 @@ latex|latex|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|[TexL
 
 ## Cooperate with [Ultisnips](https://github.com/SirVer/ultisnips)
 `Ultisnips` is a separate plugin, so you have to install it separately.
-We are strongly suggest you to install `Ultisnips` to get better experience.
+We are strongly recommend you to install `Ultisnips` to get better experience.
 ---
 Check out the doc of ultisnips, to change some default mappings such as expanding a snippet. the default values of ultisnips for `g:UltiSnipsExpandTrigger` is '\<Tab\>', but this values conflict with ECY that `g:ECY_select_items`.  
 
@@ -126,9 +126,9 @@ Some useful default mappings of Ultisnips. Check doc of ultisnips for more.
 
 ## Cooperate with [LeaderF](https://github.com/Yggdroot/LeaderF)
 `LeaderF` is a separate plugin, so you have to install it separately.
-We are strongly suggest you to install `LeaderF` to get better experience.
+We are strongly recommend you to install `LeaderF` to get better experience.
 ---
-What `LeaderF` can do for ECY? To help ECY to locate a position and provide selecting to users. So if you have no 
+What `LeaderF` can do for ECY? To help ECY to locate a position and provide selecting UI. So if you have no 
 `LeaderF` you can not use some functions of ECY such as `Goto-definition`.
 
 Some useful command of `LeaderF` are follow.  
@@ -227,7 +227,7 @@ variable name|default values|description
 `g:ECY_disable_for_files_larger_than_kb`|1000|**Int**. Same as `g:ycm_disable_for_files_larger_than_kb` of YCM. Current buffer size more than xxx KB, then ECY won't work.
 `g:ECY_update_diagnosis_mode`|2|**Int**. 2 means update diagnosis both in Insert mode and Normal mode. 1 means only update diagnosis in Normal mode.
 `g:ECY_preview_windows_size`|[[30, 50], [2, 14]]|**Lists**. Available only when your vim support floating windows. Size of preview windows like: [[minwidth, maxwidth], [minheight, maxheight]]
-`g:ECY_file_path_ignore`|{'dir': ['.svn','.git','.hg'],'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]','~$','swp$']}|**Dict**. Must containing two keys named 'dir' and 'file'. Values of that two keys is a list of regex.
+`g:ECY_file_path_ignore`|{'dir': ['.svn','.git','.hg'],'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]','~$','swp$']}|**Dict**. Must containing two keys named 'dir' and 'file'. Value of that two keys is a list of regex.
 
 ## Style Variables
 For Example:   
@@ -271,7 +271,8 @@ which is one of ECY's principles, that `LeaderF` hightly fit with ECY.
 **Importance**: ECY will not support any plugin that functions resemble with `LeaderF` and `ultisnips` unless there are critical demands.  
   
 ### Q: I only need a engine for python, why ECY install all engine's code in my computer?
-A: For outing of the box, better.  You should no worry about ECY code in you computer, because it is python script(totally open source) and its size is not big and even small.
+### Q: Why not sperate every engine into respective repo?
+A: For outing of the box, better.  You should no worry about ECY code in you computer, because it is python script(totally open source) and its size is not big and even smaller than a photo.
 
 ### Q: Why not use Ale to do diagnosis?
 A: Ale use job(channel) feature to send data to linter, but ECY use python3 instead.
