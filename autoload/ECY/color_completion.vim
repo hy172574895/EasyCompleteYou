@@ -15,18 +15,25 @@ function ECY#color_completion#Init() abort
     let g:ECY_completion_color_style = get(g:,'ECY_completion_color_style', '1')
     " hightlight
     if g:ECY_completion_color_style == '1'
-      hi ECY_normal_matched_word		guifg=#945596	guibg=#073642	ctermfg=red	  ctermbg=darkBlue gui=bold
+      hi ECY_normal_matched_word		guifg=#945596	guibg=#073642	ctermfg=red	  ctermbg=darkBlue
       hi ECY_normal_items		        guifg=#839496	guibg=#073642	ctermfg=white	ctermbg=darkBlue
 
-      hi ECY_selected_matched_word	guifg=#FFFF99	guibg=#586e75	ctermfg=red	ctermbg=Blue    gui=bold
+      hi ECY_selected_matched_word	guifg=#FFFF99	guibg=#586e75	ctermfg=red	ctermbg=Blue
       hi ECY_selected_item	        guifg=#eee8d5	guibg=#586e75	ctermfg=white	ctermbg=Blue
-    else
+    elseif g:ECY_completion_color_style == '2'
       " light
       hi ECY_normal_matched_word		guifg=#282828	guibg=#689d6a	ctermfg=red	  ctermbg=darkBlue gui=bold
       hi ECY_normal_items		        guifg=#3c3836	guibg=#689d6a	ctermfg=white	ctermbg=darkBlue
 
       hi ECY_selected_matched_word	guifg=#FFFF99	guibg=#427b48	ctermfg=red	ctermbg=Blue
       hi ECY_selected_item	        guifg=#eee8d5	guibg=#427b48	ctermfg=white	ctermbg=Blue
+    else
+      " vscode
+      hi ECY_normal_items        ctermfg=7 guifg=#2980B9 ctermbg=0 guibg=#154360 cterm=NONE gui=NONE
+      hi ECY_normal_matched_word ctermfg=7 guifg=#5499C7 ctermbg=0 guibg=#154360 cterm=NONE gui=NONE
+
+      hi ECY_selected_matched_word ctermfg=7 guifg=#154360 ctermbg=4 guibg=#5499C7 cterm=NONE gui=NONE
+      hi ECY_selected_item ctermfg=7 guifg=#EAF2F8 ctermbg=4 guibg=#5499C7 cterm=NONE gui=NONE
     endif
 
     let g:ECY_highlight_normal_matched_word   = get(g:,'ECY_highlight_normal_matched_word', 'ECY_normal_matched_word')
