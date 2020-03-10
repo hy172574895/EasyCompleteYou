@@ -34,6 +34,7 @@ class Operate(object):
             {'Line': version['StartPosition']['Line'], 'Colum': current_colum}
         version['Filter_words'] = filter_words
         version['Filter_start_position'] = current_start_postion
+        pre_words = current_line_text[:current_colum]
 
         engine_name = source_info['Name']
         if engine_name not in self.start_position:
@@ -84,6 +85,7 @@ class Operate(object):
         return {'Event': 'do_completion', 'Version_ID': version['VersionID'],
                 'Lists': return_, 'StartPosition': current_start_postion,
                 'EngineName': engine_name,
+                'PreviousWords': pre_words,
                 'AddtionalData': addtional_data,
                 'Filter_words': filter_words}
 

@@ -600,7 +600,8 @@ function! s:Completion_cb(msg) abort
 
   " adjust source
   let s:show_item_name     = a:msg['EngineName']
-  let s:show_item_position = a:msg['StartPosition']['Colum']
+  " let s:show_item_position = a:msg['StartPosition']['Colum']
+  let s:show_item_position = strlen(a:msg['PreviousWords'])
   let l:temp = g:ECY_file_type_info[&filetype]['special_position']
   if l:temp != {}
     if l:temp['Line'] == (line('.') - 1)
