@@ -10,7 +10,7 @@ function! ECY#install#Init() abort
         \function('ECY#install#html_lsp'), '', 'buildin')
 
   call ECY#install#AddEngineInfo('snippets',
-        \'lib.event.vim','lib.sources.snippets.snippets',
+        \'lib.event.snippets','lib.sources.snippets.snippets',
         \function('ECY#install#Snippets'), '', 'buildin')
 
   call ECY#install#AddEngineInfo('youcompleteme',

@@ -17,8 +17,6 @@ class Event(object):
         self._is_return_match_point = vim_lib.GetVariableValue(
             "g:ECY_use_floating_windows_to_be_popup_windows")
         self._trigger_len = vim_lib.GetVariableValue("g:ECY_triggering_length")
-        self.has_ultisnippet_support = vim_lib.GetVariableValue(
-            "g:has_ultisnips_support")
         self._snippets_cache = None
 
     def GetCurrentWorkSpace(self):
@@ -86,18 +84,16 @@ class Event(object):
         return self._generate(msg, event_name)
 
     def _get_snippets(self, is_reflesh=False):
-        if not self.has_ultisnippet_support:
+        results = {'HasSnippetSupport': True}
+        try:
+            if is_reflesh or self._snippets_cache is None:
+                vim_lib.CallEval('UltiSnips#SnippetsInCurrentScope(1)')
+                self._snippets_cache =\
+                        vim_lib.GetVariableValue('g:current_ulti_dict_info')
+            results['UltisnipsSnippets'] = self._snippets_cache
+        except:
             results = {'HasSnippetSupport': False}
-        else:
-            results = {'HasSnippetSupport': True}
-            try:
-                if is_reflesh or self._snippets_cache is None:
-                    vim_lib.CallEval('UltiSnips#SnippetsInCurrentScope(1)')
-                    self._snippets_cache =\
-                            vim_lib.GetVariableValue('g:current_ulti_dict_info')
-                results['UltisnipsSnippets'] = self._snippets_cache
-            except:  # noqa
-                results = {'HasSnippetSupport': False}
+            g_logger.exception("Failed to load snippets.")
         return results
 
     def _is_return_diagnosis(self):

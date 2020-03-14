@@ -1,5 +1,8 @@
 # Author: Jimmy Huang (1902161621@qq.com)
 # License: WTFPL
+import logging
+global g_logger
+g_logger = logging.getLogger('ECY_server')
 
 # local lib
 import utils.interface as scope_
@@ -17,7 +20,7 @@ class Operate(scope_.Source_interface):
         return_ = {'ID': version['VersionID']}
         # ECY will show nothing when the list is None
         results_list = []
-        
+        preview = version['SnippetsPreview']
         if version['Additional']['HasSnippetSupport']:
             snippets = version['Additional']['UltisnipsSnippets'].items()
             for trigger, snippet in snippets:
@@ -26,9 +29,11 @@ class Operate(scope_.Source_interface):
                 results_format['word'] = trigger
                 results_format['abbr'] = trigger
                 results_format['kind'] = '[Snippet]'
-                description = snippet['description'].split('\n')
+                description = snippet['description']
                 if not snippet['description'] == '':
-                    results_format['info'] = description
+                    results_format['menu'] = description
+                if trigger in preview.keys():
+                    results_format['info'] = preview[trigger]['preview']
                 results_list.append(results_format)
         return_['Lists'] = results_list
         return return_
