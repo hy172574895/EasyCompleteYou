@@ -110,6 +110,7 @@ name|programming language|abilities|dependence|link
 --|:--:|--:|--:|--:
 dictionary|all|completion|-|[Home](https://github.com/hy172574895/ECY-dictionary)|
 latex|latex|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|[TexLab](https://texlab.netlify.com/)<br> [vimtex](https://github.com/lervag/vimtex)|[Home](https://github.com/hy172574895/ECY-latex)|
+snippets_preview|all|-|-|[Home](https://github.com/hy172574895/ECY-SnippetsPreview)|
 
 
 ## Cooperate with [Ultisnips](https://github.com/SirVer/ultisnips)
