@@ -20,7 +20,6 @@ class Operate(scope_.Source_interface):
         return_ = {'ID': version['VersionID']}
         # ECY will show nothing when the list is None
         results_list = []
-        preview = version['SnippetsPreview']
         if version['Additional']['HasSnippetSupport']:
             snippets = version['Additional']['UltisnipsSnippets'].items()
             for trigger, snippet in snippets:
@@ -32,8 +31,8 @@ class Operate(scope_.Source_interface):
                 description = snippet['description']
                 if not snippet['description'] == '':
                     results_format['menu'] = description
-                if trigger in preview.keys():
-                    results_format['info'] = preview[trigger]['preview']
+                results_format['info'] = snippet['preview']
                 results_list.append(results_format)
         return_['Lists'] = results_list
+        g_logger.debug(return_)
         return return_

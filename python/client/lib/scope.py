@@ -1,5 +1,7 @@
 # Author: Jimmy Huang (1902161621@qq.com)
 # License: WTFPL
+import os
+import json
 import logging
 global g_logger
 g_logger = logging.getLogger('ECY_client')
@@ -18,6 +20,10 @@ class Event(object):
             "g:ECY_use_floating_windows_to_be_popup_windows")
         self._trigger_len = vim_lib.GetVariableValue("g:ECY_triggering_length")
         self._snippets_cache = None
+
+        self.preview_file_dir = None
+        self.preview_file_list = []
+        self.preview_content = {}
 
     def GetCurrentWorkSpace(self):
         temp = vim_lib.CallEval("ECY#rooter#GetCurrentBufferWorkSpace()")
@@ -90,11 +96,55 @@ class Event(object):
                 vim_lib.CallEval('UltiSnips#SnippetsInCurrentScope(1)')
                 self._snippets_cache =\
                         vim_lib.GetVariableValue('g:current_ulti_dict_info')
+                preview = self._get_preview_content()
+                for key in self._snippets_cache:
+                    if key in preview.keys():
+                        self._snippets_cache[key]['preview'] = preview[key]['preview']
+                    else:
+                        self._snippets_cache[key]['preview'] = []
             results['UltisnipsSnippets'] = self._snippets_cache
         except:
             results = {'HasSnippetSupport': False}
             g_logger.exception("Failed to load snippets.")
         return results
+
+    def _list_preview_file(self):
+        if self.preview_file_dir is None:
+            try:
+                self.preview_file_dir = vim_lib.GetVariableValue("g:snippets_preview_dir")
+                os.chdir(self.preview_file_dir)
+                file_list = os.listdir(os.curdir)
+                for item in file_list:
+                    if os.path.isfile(item):
+                        self.preview_file_list.append(item)
+                g_logger.debug(self.preview_file_list)
+            except:
+                g_logger.exception("have no preview file path.")
+                self.preview_file_dir = 'failed to get variable.'
+                self.preview_file_list = []
+        return self.preview_file_list
+
+    def _read_preview_file(self, file_path):
+        try:
+            f = open(file_path, 'r', encoding='utf-8')
+            txt = f.read()
+            dicts = json.loads(txt)
+            f.close()
+            return dicts
+        except:
+            g_logger.exception("Failed to load preview file.")
+            return {}
+
+    def _get_preview_content(self):
+        file_type = vim_lib.GetCurrentBufferType()
+        if  file_type not in self.preview_content.items():
+            self.preview_content[file_type] = {}
+            for item in self._list_preview_file():
+                if item == file_type:
+                    dicts = self._read_preview_file(self.preview_file_dir + file_type)
+                    self.preview_content[file_type] = dicts
+                    break
+        return self.preview_content[file_type]
 
     def _is_return_diagnosis(self):
         return vim_lib.GetVariableValue("g:ECY_enable_diagnosis")
