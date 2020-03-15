@@ -146,6 +146,23 @@ class Operate(scope_.Source_interface):
             self._did_open_or_change(uri_, line_text)
         self._diagnosis(version)
 
+    def _return_snippets(self, items, preview_dict):
+        results_list = []
+        for trigger, snippet in items:
+            results_format = {'abbr': '', 'word': '', 'kind': '',
+                              'menu': '', 'info': '', 'user_data': ''}
+            results_format['word'] = trigger
+            # results_format['abbr'] = trigger + ' ~'
+            results_format['abbr'] = trigger
+            results_format['kind'] = '[Snippet]'
+            description = snippet['description']
+            if not snippet['description'] == '':
+                results_format['menu'] = description
+            results_format['info'] = snippet['preview']
+            results_list.append(results_format)
+        return results_list
+            # return snippets
+
     def DoCompletion(self, version):
 # {{{
         if not self._check(version):
@@ -174,16 +191,8 @@ class Operate(scope_.Source_interface):
             if version['Additional']['HasSnippetSupport']\
                     and not self.IsInsideQuotation(current_line, current_colum):
                 snippets = version['Additional']['UltisnipsSnippets'].items()
-                for trigger, snippet in snippets:
-                    results_format = {'abbr': '', 'word': '', 'kind': '',
-                                      'menu': '', 'info': '', 'user_data': ''}
-                    results_format['word'] = trigger
-                    # results_format['abbr'] = trigger + ' ~'
-                    results_format['abbr'] = trigger
-                    results_format['kind'] = '[Snippet]'
-                    results_format['menu'] = snippet['description']
-                    results_list.append(results_format)
-                    # return snippets
+                results_list = self._return_snippets(snippets,
+                        version['SnippetsPreview'])
             else:
                 # return ID(buffers)
                 results_list = []
