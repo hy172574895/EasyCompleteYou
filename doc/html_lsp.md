@@ -2,10 +2,12 @@
 
 ## Installation
 ### Requires:
-  1.LSP of HTML              **necessary**  
-  2.nodejs (for LSP server)  **necessary**  
-  3.npm (for nodejs)         **necessary**  
-  4.HTMLHint (for diagnosis) **optional**  
+| Name            | Kind          | WebSite                                                         |
+| -------------   | ------------- | -------                                                         |
+| Language Server | Necessary     | [->](https://www.npmjs.com/package/vscode-html-languageservice) |
+| Nodejs          | Necessary     | [->](https://nodejs.org/en/)                                    |
+| npm             | Necessary     | [->](https://www.npmjs.com/)                                    |
+| HTMLHint        | Optional      | [->](https://www.npmjs.com/package/htmlhint)                    |
 
 ### Quickly install
 Execute the following command in normal mode in vim.
@@ -28,12 +30,14 @@ are missing.
 
 #### 1. g:ECY_html_lsp_starting_cmd  
 default value: "html-languageserver --stdio"  
+Command to bin of Html Language server.
 
 for example, put the code into your vimrc:  
 `let g:ECY_html_lsp_starting_cmd = 'nodejs /home/xxx/yyyy/zzz/bin/html --stdio'`
 
 #### 2. g:ECY_html_lsp_HtmlHint_cmd
 default value: "htmlhint"
+Command to bin of htmlhint.
 
 for example, put the code into your vimrc:  
 `let g:ECY_html_lsp_HtmlHint_cmd = 'nodejs /home/xxx/node_modules/.bin/htmlhint`
