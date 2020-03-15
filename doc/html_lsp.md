@@ -10,7 +10,7 @@
 ### Quickly install
 Execute the following command in normal mode in vim.
 
-`:call ECY_main#Install('html_lsp')`
+`:ECYInstall html_lsp`
 
 ECY will check that all, and will ask user to install when one of them 
 are missing.
@@ -20,7 +20,7 @@ are missing.
   2.make sure you have `npm` in your OS; [help](https://www.google.com/search?q=how%20to%20install%20nodejs)  
   3.make sure you have `html_lsp` in your OS, install `html_lsp` with npm; [help](https://www.npmjs.com/package/vscode-html-languageservice)  
   4.optionally install `HTMLHint` to your OS, for diagnosis; [help](https://www.npmjs.com/package/htmlhint)  
-  5.Execute `:call ECY_main#Install('html_lsp')`  
+  5.Execute `:ECYInstall html_lsp`  
 
 ## Customized
 
