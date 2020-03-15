@@ -110,20 +110,23 @@ class Event(object):
 
     def _list_preview_file(self):
         if self.preview_file_dir is None:
-            try:
-                self.preview_file_dir = vim_lib.CallEval("get(g:, 'snippets_preview_dir', '1')")
-                if self.preview_file_dir == '1':
-                    raise
-                os.chdir(self.preview_file_dir)
-                file_list = os.listdir(os.curdir)
-                for item in file_list:
-                    if os.path.isfile(item):
-                        self.preview_file_list.append(item)
-                g_logger.debug(self.preview_file_list)
-            except:
-                g_logger.exception("have no preview file path.")
+            self.preview_file_dir = vim_lib.CallEval("get(g:, 'snippets_preview_dir', '1')")
+            if self.preview_file_dir == '1':
+                g_logger.exception("Not install plugin of preview.")
                 self.preview_file_dir = 'failed to get variable.'
                 self.preview_file_list = []
+            else:
+                try:
+                    os.chdir(self.preview_file_dir)
+                    file_list = os.listdir(os.curdir)
+                    for item in file_list:
+                        if os.path.isfile(item):
+                            self.preview_file_list.append(item)
+                    g_logger.debug(self.preview_file_list)
+                except:
+                    g_logger.exception("have no preview file path.")
+                    self.preview_file_dir = 'failed to get variable.'
+                    self.preview_file_list = []
         return self.preview_file_list
 
     def _read_preview_file(self, file_path):
