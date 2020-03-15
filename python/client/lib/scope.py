@@ -111,7 +111,7 @@ class Event(object):
     def _list_preview_file(self):
         if self.preview_file_dir is None:
             try:
-                self.preview_file_dir = vim_lib.CallEval("get(g, 'snippets_preview_dir', '1')")
+                self.preview_file_dir = vim_lib.CallEval("get(g:, 'snippets_preview_dir', '1')")
                 if self.preview_file_dir == '1':
                     raise
                 os.chdir(self.preview_file_dir)
