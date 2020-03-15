@@ -112,7 +112,7 @@ class Event(object):
         if self.preview_file_dir is None:
             self.preview_file_dir = vim_lib.CallEval("get(g:, 'snippets_preview_dir', '1')")
             if self.preview_file_dir == '1':
-                g_logger.exception("Not install plugin of preview.")
+                g_logger.debug("Not install plugin of preview.")
                 self.preview_file_dir = 'failed to get variable.'
                 self.preview_file_list = []
             else:
