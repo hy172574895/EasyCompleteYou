@@ -146,7 +146,7 @@ class Operate(scope_.Source_interface):
             self._did_open_or_change(uri_, line_text)
         self._diagnosis(version)
 
-    def _return_snippets(self, items, preview_dict):
+    def _return_snippets(self, items):
         results_list = []
         for trigger, snippet in items:
             results_format = {'abbr': '', 'word': '', 'kind': '',
@@ -161,7 +161,6 @@ class Operate(scope_.Source_interface):
             results_format['info'] = snippet['preview']
             results_list.append(results_format)
         return results_list
-            # return snippets
 
     def DoCompletion(self, version):
 # {{{
@@ -191,8 +190,7 @@ class Operate(scope_.Source_interface):
             if version['Additional']['HasSnippetSupport']\
                     and not self.IsInsideQuotation(current_line, current_colum):
                 snippets = version['Additional']['UltisnipsSnippets'].items()
-                results_list = self._return_snippets(snippets,
-                        version['SnippetsPreview'])
+                results_list = self._return_snippets(snippets)
             else:
                 # return ID(buffers)
                 results_list = []

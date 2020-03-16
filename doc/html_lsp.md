@@ -36,7 +36,7 @@ for example, put the code into your vimrc:
 `let g:ECY_html_lsp_starting_cmd = 'nodejs /home/xxx/yyyy/zzz/bin/html --stdio'`
 
 #### 2. g:ECY_html_lsp_HtmlHint_cmd
-default value: "htmlhint"
+default value: "htmlhint"  
 Command to bin of htmlhint.
 
 for example, put the code into your vimrc:  
