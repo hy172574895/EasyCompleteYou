@@ -9,14 +9,19 @@ function! s:Integration(timer_id) abort
     call ECY_main#Log('has no UltiSnips')
   endtry
 
-  if g:has_ultisnips_support
-  " UltiSnips' API must be called in <C-R>
-    exe 'inoremap ' . g:ECY_expand_snippets_key.
-        \ ' <C-R>=ECY_main#ExpandSnippet()<CR>'
-    exe 'let g:ECY_expand_snippets_key = "\'.g:ECY_expand_snippets_key.'"'
-  endif
+  " if g:has_ultisnips_support
+  " " UltiSnips' API must be called in <C-R>
+  "   exe 'inoremap <silent> ' . g:ECY_expand_snippets_key.
+  "       \ ' <C-R>=ECY_main#ExpandSnippet()<cr>'
+  "   " imap <CR>  <C-R>=ECY_main#ExpandSnippet()<CR>
+  "   exe 'let g:ECY_expand_snippets_key = "\'.g:ECY_expand_snippets_key.'"'
+  " endif
 endfunction
 
 if g:loaded_easycomplete
   call timer_start(2000, function('s:Integration'))  
+  exe 'inoremap <silent> ' . g:ECY_expand_snippets_key.
+      \ ' <C-R>=ECY_main#ExpandSnippet()<cr>'
+  " imap <CR>  <C-R>=ECY_main#ExpandSnippet()<CR>
+  exe 'let g:ECY_expand_snippets_key = "\'.g:ECY_expand_snippets_key.'"'
 endif
