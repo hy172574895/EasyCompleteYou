@@ -260,7 +260,8 @@ function! s:SetVariable() abort
         \{'source_name':'path','invoke_key':'/', 'is_replace': v:false},
         \{'source_name':'label','invoke_key':'^', 'is_replace': v:true}])
 
-  if has('python2')
+  if executable('python2')
+    " user have python2
     let g:ECY_python3_cmd                               
           \= get(g:,'ECY_python3_cmd','python3')
   else
