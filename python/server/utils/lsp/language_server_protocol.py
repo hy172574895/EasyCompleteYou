@@ -152,6 +152,7 @@ class LSP(conec.Operate):
         self.SendData(self.server_id, message.encode(encoding="utf-8"))
         return True
 
+ 
     def BuildCapabilities(self):
 # {{{
         WorkspaceClientCapabilities = {
@@ -169,7 +170,8 @@ class LSP(conec.Operate):
                     },
                 "symbol": {
                     "dynamicRegistration": False,
-                    "symbolKind": {"valueSet": []}
+                    "symbolKind": {"valueSet": [1,2,3,4,5,6,7,8,9,
+                        10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]}
                     },
                 "executeCommand": {
                     "dynamicRegistration": False
@@ -355,7 +357,13 @@ class LSP(conec.Operate):
                   'position':     position}
         return self._build_send(params, 'textDocument/completion')
 
-    def symbos(self, query=""):
+    def documentSymbos(self, uri):
+        # query == "" means returning all symbols.
+        params = {'textDocument': {'uri': uri}}
+        return self._build_send(params, 'textDocument/documentSymbol')
+
+    def workspaceSymbos(self, query=""):
+        # query == "" means returning all symbols.
         params = {'query': query}
         return self._build_send(params, 'workspace/symbol')
 

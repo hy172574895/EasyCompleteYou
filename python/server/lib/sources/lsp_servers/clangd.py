@@ -63,7 +63,7 @@ class Operate(scope_.Source_interface):
             if self.is_server_start == 'not_started':
                 if starting_cmd == "":
                     starting_cmd = 'clangd'
-                # starting_cmd = 'C:/Users/qwe/Downloads/clangd-windows-10rc3/clangd_10rc3/bin/clangd.exe'
+                starting_cmd = 'C:/Users/qwe/Downloads/clangd-windows-10rc3/clangd_10rc3/bin/clangd.exe'
                 g_logger.debug(starting_cmd)
                 self._lsp.StartJob(starting_cmd)
                 rooturi = self._lsp.PathToUri(workspace)
@@ -77,7 +77,7 @@ class Operate(scope_.Source_interface):
                                             rootUri=rooturi,
                                             capabilities=capabilities)
                 # if time out will raise, meanning can not start a job.
-                self._lsp.GetResponse(temp['Method'], timeout_=10)
+                self._lsp.GetResponse(temp['Method'], timeout_=5)
                 self.is_server_start = 'started'
                 threading.Thread(target=self._get_diagnosis,
                                  daemon=True).start()
@@ -220,6 +220,38 @@ class Operate(scope_.Source_interface):
                     'position': position}
             results_list.append(temp)
         return results_list
+
+    def GetSymbol(self, version):
+        if not self._check(version):
+            return None
+        return_ = {'ID': version['VersionID']}
+        uri_ = self._lsp.PathToUri(version['FilePath'])
+        temp = self._lsp.documentSymbos(uri_)
+        try:
+            symbos = self._lsp.GetResponse(temp['Method'])
+            symbos = symbos['result']
+        except:
+            symbos = []
+        lists = []
+        for item in symbos:
+            kind = self._lsp.GetSymbolsKindByNumber(item['kind'])
+            start_line = item['range']['start']['line'] + 1
+            start_column = item['range']['start']['character']
+            pos = self._genarate_position(start_line, start_column)
+            position = {'line': start_line, 'colum': start_column,
+                        'path': version['FilePath']}
+            items = [{'name': '1', 'content': {'abbr': item['name']}},
+                     {'name': '2', 'content': {'abbr': kind}},
+                     {'name': '3', 'content': {'abbr': pos}}]
+            temp = {'items': items,
+                    'type': 'symbol',
+                    'position': position}
+            lists.append(temp)
+        return_['Results'] = lists
+        return return_
+
+    def _genarate_position(self, line, colum):
+        return '[' + str(line) + ', ' + str(colum)+']'
 
     def Goto(self, version):
         if not self._check(version):
