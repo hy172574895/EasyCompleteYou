@@ -82,8 +82,6 @@ class Operate(scope_.Source_interface):
                 full_path = prefix + item
                 if results_format['kind'] == '[Dir]':
                     full_path += '/'
-                full_path = full_path.replace("\\\\",'/')
-                full_path = full_path.replace("\\",'/')
                 full_path = full_path.split('\n')
                 results_format['info'] = full_path
             results_list.append(results_format)
@@ -132,6 +130,8 @@ class Operate(scope_.Source_interface):
             except:
                 return return_
 
+        prefix = prefix.replace("\\\\",'/')
+        prefix = prefix.replace("\\",'/')
         # we have file_list
         return_['Lists'] = self._return_path(file_list, prefix)
         return return_
