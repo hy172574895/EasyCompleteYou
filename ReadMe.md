@@ -102,6 +102,7 @@ html_lsp      | html, xhtml          | completion<br> diagnosis<br> snippet-expa
 vim_lsp       | vimL                 | completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
 go_langserver | golang               | completion<br>snippets-expanding|[go-langserver](https://github.com/sourcegraph/go-langserver)|
 go_gopls      | golang               | completion<br>diagnosis<br>snippets-expanding<br>goto-definition<br>goto-reference|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|
+clangd        | C/C++/C-family       | completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding|[clangd](https://github.com/clangd/clangd/releases)|
 
 ### Plugins of ECY.
 Totally like above list of engines, but just as one repo.
