@@ -481,7 +481,7 @@ class LSP(conec.Operate):
             return "Method"
         if kindNr == 7:
             return "Property"
-        if kindNr == 7:
+        if kindNr == 8:
             return "Field"
         if kindNr == 9:
             return "Constructor"
@@ -519,6 +519,7 @@ class LSP(conec.Operate):
             return "Operator"
         if kindNr == 26:
             return "TypeParameter"
+        return 'Unkonw'
 # }}}
 
     def _current_system(self):
