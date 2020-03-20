@@ -128,17 +128,3 @@ class Operate(object):
                 last_key = text[0]
         return start_position, match_words, last_key
 # }}}
-
-    def _return_buffer_cache(self, reg=r'[\w\-]+'):
-        items_list = list(set(re.findall(reg, all_text)))
-        results_list = []
-        for item in items_list:
-            # the results_format must at least contain the following keys.
-            results_format = {'abbr': '', 'word': '', 'kind': '',
-                    'menu': '', 'info': '','user_data':''}
-            results_format['abbr'] = item
-            results_format['word'] = item
-            results_format['kind'] = '[Buffer]'
-            results_list.append(results_format)
-        return results_list
-
