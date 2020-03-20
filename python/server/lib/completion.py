@@ -15,8 +15,25 @@ class Operate(object):
         self.start_position = {}
         self.completion_items = {'EngineName': 'nothing', 'Lists': []}
         self.version_id = -1
+        self.buffer_cache_list = []
+        self.buffer_cache_item = []
 
-    def DoCompletion(self, engine_obj, version, buffer_cache):
+    def UpdateBufferCache(self, version, reg=r'[\w\-]+'):
+        items_list = version['AllTextList']
+        items_list = list(set(re.findall(reg, items_list)))
+        items_list.extend(self.buffer_cache_list)
+        self.buffer_cache_list = list(set(items_list))
+        self.buffer_cache_item = []
+        for item in self.buffer_cache_list:
+            # the results_format must at least contain the following keys.
+            results_format = {'abbr': '', 'word': '', 'kind': '',
+                    'menu': '', 'info': '','user_data':''}
+            results_format['abbr'] = item
+            results_format['word'] = item
+            results_format['kind'] = '[Buffer]'
+            self.buffer_cache_item.append(results_format)
+
+    def DoCompletion(self, engine_obj, version):
         if self.version_id > version['VersionID']:
             g_logger.debug('filter a completion request.')
             return None
@@ -69,13 +86,9 @@ class Operate(object):
                                                    isreturn_match_point=isIndent,
                                                    isindent=isIndent)
             if return_ == []:
-                all_text = ''
-                for key, content in buffer_cache.items():
-                    all_text += content
-                all_text = self._return_label(all_text)
-                g_logger.debug('using _return_label')
+                g_logger.debug('using _return_buffer_cache')
                 return_ = self.fuzzy_match.FilterItems(filter_words,
-                                                       all_text,
+                                                       self.buffer_cache_item,
                                                        isreturn_match_point=isIndent,
                                                        isindent=isIndent)
 
@@ -116,8 +129,8 @@ class Operate(object):
         return start_position, match_words, last_key
 # }}}
 
-    def _return_label(self, all_text_list, reg=r'[\w\-]+'):
-        items_list = list(set(re.findall(reg, all_text_list)))
+    def _return_buffer_cache(self, reg=r'[\w\-]+'):
+        items_list = list(set(re.findall(reg, all_text)))
         results_list = []
         for item in items_list:
             # the results_format must at least contain the following keys.
