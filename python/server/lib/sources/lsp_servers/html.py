@@ -227,6 +227,41 @@ class Operate(scope_.Source_interface):
             self._build_erro_msg(4, "Failed to call HtmlHint.")
         return None
 
+    def _genarate_position(self, line, colum):
+        return '[' + str(line) + ', ' + str(colum)+']'
+
+    def GetSymbol(self, version):
+        if not self._check(version):
+            return None
+        return_ = {'ID': version['VersionID']}
+        uri_ = self._lsp.PathToUri(version['FilePath'])
+        temp = self._lsp.documentSymbos(uri_)
+        try:
+            symbos = self._lsp.GetResponse(temp['Method'])
+            symbos = symbos['result']
+        except:
+            symbos = []
+        lists = []
+        for item in symbos:
+            kind = self._lsp.GetSymbolsKindByNumber(item['kind'])
+            ranges = item['location']
+            start_line = ranges['range']['start']['line'] + 1
+            start_column = ranges['range']['start']['character']
+            pos = self._genarate_position(start_line, start_column)
+            position = {'line': start_line, 'colum': start_column,
+                        'path': version['FilePath']}
+            name = item['name']
+            items = [{'name': '1', 'content': {'abbr': name}},
+                     {'name': '2', 'content': {'abbr': kind}},
+                     {'name': '3', 'content': {'abbr': pos}}]
+            g_logger.debug(items)
+            temp = {'items': items,
+                    'type': 'symbol',
+                    'position': position}
+            lists.append(temp)
+        return_['Results'] = lists
+        return return_
+        
     def _handle_diagnosis(self):
         address = ('localhost', self._htmlHint.GetUnusedLocalhostPort())
         server = HTTPServer(address, Handler)
@@ -343,7 +378,7 @@ class HtmlHint:
                         'position': position}
                 results_list.append(temp)
         return results_list
-        
+
 
 class Handler(BaseHTTPRequestHandler):
 
