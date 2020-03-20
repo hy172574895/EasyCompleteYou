@@ -189,7 +189,7 @@ class LSP(conec.Operate):
                     "dynamicRegistration": False,
                     "completionItem": {
                         "snippetSupport": True,
-                        "commitCharactersSupport": True,
+                        "commitCharactersSupport": False,
                         "documentationFormat": [],
                         "deprecatedSupport": True,
                         "preselectSupport": True
@@ -337,13 +337,18 @@ class LSP(conec.Operate):
         return self._build_send(params, 'textDocument/didChange',
                 isNotification=True)
 
+    def completionItem_resolve(self, completion_item):
+        params = {'CompletionItem': completion_item}
+        return self._build_send(params, 'completionItem/resolve')
+
     def completion(self, uri, position,
                    triggerKind=1,
                    triggerCharacter=None):
         TextDocumentIdentifier = {'uri': uri}
 
-        CompletionContext = {'triggerKind': triggerKind,
-                             'triggerCharacter':         triggerCharacter}
+        CompletionContext = {'triggerKind': triggerKind}
+        if triggerCharacter is not None:
+            CompletionContext['triggerCharacters'] = triggerCharacter
 
         params = {'context':    CompletionContext,
                   'textDocument': TextDocumentIdentifier,

@@ -23,7 +23,8 @@ class Operate(scope_.Source_interface):
         self._workspace_list = []
 
     def GetInfo(self):
-        return {'Name': self._name, 'WhiteList': ['c', 'cpp'],
+        return {'Name': self._name,
+                'WhiteList': ['c', 'cpp', 'objc', 'objcpp', 'cuda'],
                 'Regex': r'[\w]',
                 'TriggerKey': [".",">",":"]}
 
