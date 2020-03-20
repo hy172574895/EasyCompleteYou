@@ -13,7 +13,7 @@ function! s:restore_cpo()
   unlet s:save_cpo
 endfunction
 
-let g:ECY_version = {'version': 13, 'tags': '1.3'}
+let g:ECY_version = {'version': 14, 'tags': '1.3'}
 let g:is_vim = !has('nvim')
 
 if g:loaded_easycomplete
