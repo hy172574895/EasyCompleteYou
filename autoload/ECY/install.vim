@@ -32,6 +32,14 @@ function! ECY#install#Init() abort
   call ECY#install#AddEngineInfo('path',
         \'lib.event.path','lib.sources.path.path',
         \'', '', 'buildin')
+
+  call ECY#install#AddEngineInfo('typescript_lsp',
+        \'lib.event.typescript','lib.sources.lsp_servers.typescript',
+        \function('ECY#install#typescript_lsp'), '', 'buildin')
+
+  call ECY#install#AddEngineInfo('clangd',
+        \'lib.event.clangd','lib.sources.lsp_servers.clangd',
+        \function('ECY#install#typescript_lsp'), '', 'buildin')
 "}}}
 endfunction
 
@@ -211,6 +219,31 @@ function! ECY#install#html_lsp() abort
     echo "[Suggestion] We hightly recommend you to install UltiSnips plugin for better experience of HTML's source."
   endtry
   return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.html', 'name':'html_lsp', 'path': ''}
+"}}}
+endfunction
+
+function! ECY#install#clangd() abort
+"{{{
+  " options: 1. cmd for starting Server
+  " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
+  if !executable('clangd')
+    return {'status':'-1','description':"You missing 'clangd'."}
+  endif
+  return {'status':'0','description':"ok"}
+"}}}
+endfunction
+
+function! ECY#install#typescript_lsp() abort
+"{{{
+  " options: 1. cmd for starting Server
+  " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
+  if !executable('typescript-language-server')
+    if !executable('npm')
+      return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
+    endif
+    call s:ExeCMD("npm install -g typescript typescript-language-server")
+  endif
+  return {'status':'0','description':"ok"}
 "}}}
 endfunction
 
