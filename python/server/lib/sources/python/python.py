@@ -389,16 +389,19 @@ class PyflakesDiagnosticReport(object):
                 'position': position}
         self.results_list.append(temp)
 
+    def _genarate_position(self, line, colum):
+        return '[' + str(line) + ', ' + str(colum)+']'
+
     def syntaxError(self, file_path, diagnosis, lineno, offset, text):
         # We've seen that lineno and offset can sometimes be None
         lineno = lineno or 1
         offset = offset or 0
 
-        erro_line_nr = lineno - 1
+        erro_line_nr = lineno
         position = {'line': erro_line_nr, 'range': {
             'start': {'line': erro_line_nr, 'colum': offset},
             'end': {'line': erro_line_nr, 'colum': offset + len(text)}}}
-        pos_string = '[' + str(erro_line_nr) + ', ' + str(offset)+']'
+        pos_string = self._genarate_position(erro_line_nr, offset)
         kind = 1
         kind_name = 'syntaxError1'
         temp = [{'name': '1', 'content': {'abbr': diagnosis}},
@@ -423,7 +426,7 @@ class PyflakesDiagnosticReport(object):
             'end': {
                 'line': erro_line_nr,
                 'colum': message.col}}}
-        pos_string = '[' + str(erro_line_nr) + ', ' + str(message.col)+']'
+        pos_string = self._genarate_position(erro_line_nr, message.col)
 
         kind_name = 'syntaxWarning'
         kind = 2
