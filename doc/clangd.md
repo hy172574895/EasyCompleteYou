@@ -1,6 +1,7 @@
 # Document for `python_jedi`
 ## Installation
-This engine is buildin. And will install automatically.  
+Download `clangd` and put it into your [OS's global variable](https://en.wikipedia.org/wiki/Global_variable).
+Make sure you can index clangd in your PC's shell.
 
 ### Requires:
 | Name          | Kind          | WebSite                                     |

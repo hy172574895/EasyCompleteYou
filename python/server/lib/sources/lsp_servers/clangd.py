@@ -91,7 +91,7 @@ class Operate(scope_.Source_interface):
             self.is_server_start = 'started_error'
             g_logger.exception(': can not start Sever.')
             self._build_erro_msg(2,
-                                 'Failed to start LSP server. Check Log file of server to get more details.')
+                                 'Failed to start LSP server. You will need Clangd 7.0+. Check Log file of server to get more details.')
 
     def _filter_log_msg(self, msg):
         """ return True means filter this msg.
