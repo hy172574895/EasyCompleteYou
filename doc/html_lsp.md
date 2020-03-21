@@ -30,7 +30,7 @@ are missing.
 
 #### 1. g:ECY_html_lsp_starting_cmd  
 default value: "html-languageserver --stdio"  
-Command to bin of Html Language server.
+Command to run bin of Html Language server.
 
 for example, put the code into your vimrc:  
 `let g:ECY_html_lsp_starting_cmd = 'nodejs /home/xxx/yyyy/zzz/bin/html --stdio'`
