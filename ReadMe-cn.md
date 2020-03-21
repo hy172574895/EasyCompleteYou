@@ -84,14 +84,24 @@
 
 名字|编程语言|可用特性|运行依赖|详细文档
 --|:--:|--:|--:|--:
-label|all|completion|-|
-snippet|all|completion<br>snippets-expanding|-|
-path|all|completion|-|
-python_jedi|python|completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding|[jedi](https://pypi.org/project/jedi/)<br>[pyflakes](https://pypi.org/project/pyflakes/)|
-html_lsp|html, xhtml|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[html-LSP](https://www.npmjs.com/package/vscode-html-languageservice) <br> [HTMLHint](https://www.npmjs.com/package/htmlhint)|
-vim_lsp|vimL|completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
-go_langserver|golang|completion<br>snippets-expanding|[go-langserver](https://github.com/sourcegraph/go-langserver)|
-go_gopls|golang|completion<br>diagnosis<br>snippets-expanding<br>goto-definition<br>goto-reference|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|
+label         | all                  | completion|-|
+snippet       | all                  | completion<br>snippets-expanding|-|
+path          | all                  | completion|-|
+python_jedi   | python               | completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding|[jedi](https://pypi.org/project/jedi/)<br>[pyflakes](https://pypi.org/project/pyflakes/)|
+html_lsp      | html, xhtml          | completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[html-LSP](https://www.npmjs.com/package/vscode-html-languageservice) <br> [HTMLHint](https://www.npmjs.com/package/htmlhint)|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/html_lsp.md)
+vim_lsp       | vimL                 | completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
+go_langserver | golang               | completion<br>snippets-expanding|[go-langserver](https://github.com/sourcegraph/go-langserver)|
+go_gopls      | golang               | completion<br>diagnosis<br>snippets-expanding<br>goto-definition<br>goto-reference|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|
+clangd        | C/C++/C-family       | completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding|[clangd](https://github.com/clangd/clangd/releases)|
+
+### ECY的插件.
+跟上面的引擎其实是一样，只不过单独开一个仓库来管理而已。
+
+name             | programming language | abilities|dependence|link
+--               | :--:                 | --:|--:|--:
+dictionary       | all                  | completion|-|[Home](https://github.com/hy172574895/ECY-dictionary)|
+latex            | latex                | completion<br> diagnosis<br> snippet-expanding<br>find-symbols|[TexLab](https://texlab.netlify.com/)<br> [vimtex](https://github.com/lervag/vimtex)|[Home](https://github.com/hy172574895/ECY-latex)|
+snippets_preview | all                  | -|-|[Home](https://github.com/hy172574895/ECY-SnippetsPreview)|
 
 ## 配合 [Ultisnips](https://github.com/SirVer/ultisnips) 使用
 `Ultisnips` 是一个单独开发和维护的插件，所以你必须要单独地安装它.  
@@ -122,6 +132,115 @@ go_gopls|golang|completion<br>diagnosis<br>snippets-expanding<br>goto-definition
 > :LeaderfFile or \<leader\>f  
 
 特别是 可以使用 leaderf 的 `ctags` 功能
+
+# 命令
+在命令模式下执行，例如：
+```
+ :ECYDiagnosisLists
+```
+cmd|params|description
+--|:--:|--:
+`ECYDiagnosisLists`|-| 用leaderf显示诊断内容.
+`ECYToggleDiagnosis`|-| 开关诊断功能.
+`ECYSymbols`|-| 用leaderf显示symbols.
+`ECYGoTo`|1| 跳转到某处, 例如 `:ECYGoTo reference`.
+`ECYInstall`|1| 安装引擎，例如： `:ECYInstall html_lsp`.
+`ECYListEngine`|1| 显示引擎状态.
+
+# 定制
+## 怎么修改?
+全部的可定制内容，都有相应的变量，所以你只需修改变量，例如：把代码
+`let g:ECY_expand_snippets_key = '<F7>'` 放进你的 [vimrc](https://stackoverflow.com/questions/10921441/where-is-my-vimrc-file).  
+
+## 按键
+例如:   
+```vim
+  let g:ECY_show_switching_source_popup = '<C-g>'    √
+
+  let g:ECY_show_switching_source_popup = "<C-g>"    √
+
+  let g:ECY_show_switching_source_popup = "\<C-g>"   ×
+
+  let g:ECY_show_switching_source_popup = "\<C-g\>"  ×
+
+
+  let g:ECY_select_items = ['<C-j>', '<C-k>']         √
+
+  let g:ECY_select_items = [<C-j>, <C-k>]             ×
+```
+
+variable name|default values|description
+--|:--:|--:
+`g:ECY_show_switching_source_popup`|\<Tab\>|**String, Normal mode**. 显示引擎选择面板.
+`g:ECY_expand_snippets_key`|\<CR\> a.k.a \<Enter\>|**String**. 展开一个snippet，只能在补全窗口显示的时候才能使用. 
+`g:ECY_select_items`|['\<Tab\>','\<S-TAB\>']|**String, Insert mode**. 必须是一个包含两个item的列表，第一个item是向下滚动，第二个选项是向上滚动.
+`g:ECY_rolling_key_of_floating_windows`|['\<C-h\>', '\<C-l\>']|**String, Normal mode**. 当有预览窗口的时候才可以使用，也是必须包含两个item的列表，第一个选项是向下滚动，第二个选项是向上滚动.
+`g:ECY_key_to_show_current_line_diagnosis`|H|**String, Normal mode**. 显示当前行的 诊断内容.
+`g:ECY_key_to_show_next_diagnosis`|[j|**String, Normal mode**. 显示下一个诊断的内容.
+`g:ECY_show_doc_key`|'\<C-n\>'|**String, Normal mode**. 显示 当前文档.
+
+## 杂项(并不是全部，请查看对应插件的文档)
+例如:   
+```vim
+  let g:ECY_python3_cmd = '/home/python38/python.exe'           √
+
+  let g:ECY_python3_cmd = '/home/python38/python.exe --debug'   ×
+
+
+  let g:ECY_preview_windows_size = [[30, 50], [2, 14]]     √
+
+  let g:ECY_preview_windows_size = [30, 50, 2, 14]         ×
+
+
+  let g:ECY_use_floating_windows_to_be_popup_windows = v:false    √
+
+  let g:ECY_use_floating_windows_to_be_popup_windows = v:true     √
+
+  let g:ECY_use_floating_windows_to_be_popup_windows = false      ×
+
+  let g:ECY_use_floating_windows_to_be_popup_windows = 'v:false'  ×
+
+
+  let g:ECY_disable_for_files_larger_than_kb = 200     √
+
+  let g:ECY_disable_for_files_larger_than_kb = -1      ×
+
+  let g:ECY_disable_for_files_larger_than_kb = 0       ×
+
+
+```
+variable name|default values|description
+--|:--:|--:
+`g:ECY_python3_cmd`|'python'|**String**. 如何运行 python.
+`g:ycm_autoclose_preview_window_after_completion`|v:true|**Boolean**. 跟YCM一样，完成补全后，是否要关闭预览窗口.
+`g:ECY_disable_diagnosis`|v:false|**Boolean**. 是否启动 代码诊断.
+`g:ECY_use_floating_windows_to_be_popup_windows`|v:true|**Boolean**. 如果你的vim有floating windows 这个特性，但你又只想让ECY使用原始的补全方式.
+`g:ECY_triggering_length`|1|**Int**. 当超过多少个字符时，ECY才显示补全提示.
+`g:ECY_disable_for_files_larger_than_kb`|1000|**Int**. 跟 `g:ycm_disable_for_files_larger_than_kb` 一样. 当前buffer大小超过某个阈值就不启动ECY.
+`g:ECY_update_diagnosis_mode`|2|**Int**. 更新诊断的频率，值为 2 时 意味着：只当在 normal mode 中才更新诊断，值为 1 时，在任何时候都更新诊断.
+`g:ECY_preview_windows_size`|[[30, 50], [2, 14]]|**Lists**. 当你有floating windows 特性时，才能使用。 [[minwidth, maxwidth], [minheight, maxheight]]
+`g:ECY_file_path_ignore`|{'dir': ['.svn','.git','.hg'],'file': ['*.sw?','~$*','*.bak','*.exe','*.o','*.so','*.py[co]','~$','swp$']}|**Dict**. 必须包含两个字段，‘dir’ 和 ‘file’。 过滤某些不需要显示的文件 的规则。
+
+## 外观
+例如:   
+```vim
+  hi your_highlight1  guifg=#945596	guibg=#073642	ctermfg=red	ctermbg=darkBlue gui=bold
+  let g:ECY_normal_matched_word  = 'your_highlight1'  √
+
+  let g:ECY_normal_matched_word  = 'a_hightlight_does_not_exits'  ×
+```
+
+variable name|default values|description
+--|:--:|--:
+`g:ECY_highlight_normal_matched_word`|'ECY_normal_matched_word'|**String**. Only available when you have floating windows.
+`g:ECY_highlight_normal_items`|'ECY_normal_items'|**String**. Only available when you have floating windows.
+`g:ECY_highlight_selected_matched_word`|'ECY_selected_matched_word'|**String**. Only available when you have floating windows.
+`g:ECY_highlight_selected_item`|'ECY_selected_item'|**String**. Only available when you have floating windows.
+`g:ECY_diagnosis_erro`|'ECY_diagnosis_erro'|**String**. Color or Styles of diagnosis error.
+`g:ECY_diagnosis_warn`|'ECY_diagnosis_warn'|**String**. Color or Styles of diagnosis warning.
+`g:ECY_diagnosis_highlight`|'ECY_diagnosis_highlight'|**String**. Color or Styles of diagnostic underline hint.
+`g:ECY_erro_sign_highlight`|'ECY_erro_sign_highlight'|**String**. Color of error sign.
+`g:ECY_warn_sign_highlight`|'ECY_warn_sign_highlight'|**String**. Color of warning sign.
 
 # 自己动手写引擎
 去看看这个轻松易懂的[例子](https://github.com/hy172574895/ECY-dictionary)吧。
