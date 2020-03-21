@@ -17,7 +17,7 @@ class Operate(scope_.Event):
         '''
         if self._starting_server_cmd is None:
             self._starting_server_cmd = vim_lib.CallEval(
-                "get(g:,'ECY_gopls_starting_cmd','clangd')")
+                "get(g:,'ECY_clangd_starting_cmd','clangd')")
         return self._starting_server_cmd
 
     def _pack(self, msg, event_name):
