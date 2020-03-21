@@ -94,10 +94,10 @@ For Example:
 
 name          | programming language | abilities|dependence|doc link
 --            | :--:                 | --:|--:|--:
-label         | all                  | completion|-|
-snippet       | all                  | completion<br>snippets-expanding|-|
-path          | all                  | completion|-|
-python_jedi   | python               | completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding|[jedi](https://pypi.org/project/jedi/)<br>[pyflakes](https://pypi.org/project/pyflakes/)|
+label         | all                  | completion|-|-
+snippet       | all                  | completion<br>snippets-expanding|-|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/snippet.md)
+path          | all                  | completion|-|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/path.md)
+python_jedi   | python               | completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding|[jedi](https://pypi.org/project/jedi/)<br>[pyflakes](https://pypi.org/project/pyflakes/)|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/python.md)
 html_lsp      | html, xhtml          | completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[html-LSP](https://www.npmjs.com/package/vscode-html-languageservice) <br> [HTMLHint](https://www.npmjs.com/package/htmlhint)|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/html_lsp.md)
 vim_lsp       | vimL                 | completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
 go_langserver | golang               | completion<br>snippets-expanding|[go-langserver](https://github.com/sourcegraph/go-langserver)|
@@ -258,11 +258,6 @@ If you wrote a new plugin for ECY, please let me konw; I'll put it into lists of
 plugins.
 
 # Q&A
-
-### Q: Why there are a few of [Snippets](https://www.techopedia.com/definition/5472/snippet-programming) options to complete? I need more.  
-A: ECY relies on `Ultisnips` which is a engine that fill in the snippets fragment. What snippets you provide to `Ultisnips`, what completion options you got in ECY.
-So there are so many nice and mature snippets that made by other fellows such as  
- [honza/vim-snippets](https://github.com/honza/vim-snippets) or [CoreyMSchafer/code_snippets](https://github.com/CoreyMSchafer/code_snippets). If you want more, install the snippets you admire and `Ultisnips` will analize that snippets then provide to ECY and last to users.  
 
 ### Q: Why I need to install [LeaderF](https://github.com/Yggdroot/LeaderF), and only `LeaderF`?    
 A: There are so many tools like `LeaderF` such as `fzf-vim` `ctrlP`, that's true. And the answer is same as "Why ECY only supports ultisnips"? Firstly, they are all rely on python same as ECY. Secondly, according to me, they are the best solutions in vim. Thirdly, supporting so many different plugins could be a disadvantage of ECY, that make ECY so heavy.  
