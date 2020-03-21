@@ -120,10 +120,10 @@ function! s:OnBufferEnter() abort
   if !ECY_main#IsECYWorksAtCurrentBuffer()
     return
   endif
-  let  s:indentexpr           = &indentexpr
-  let  s:completeopt_temp     = &completeopt
-  let  s:completeopt_fuc_temp = &completefunc
-  call ECY_main#ChangeDocumentVersionID()
+  let s:indentexpr           = &indentexpr
+  let s:completeopt_temp     = &completeopt
+  let s:completeopt_fuc_temp = &completefunc
+  " call ECY_main#ChangeDocumentVersionID()
   call ECY#diagnosis#CleanAllSignHighlight()
   call s:SetUpCompleteopt()
   " OnBufferEnter will trigger Diagnosis

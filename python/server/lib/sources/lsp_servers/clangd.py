@@ -21,6 +21,7 @@ class Operate(scope_.Source_interface):
         self.DocumentVersionID = -1
         self._deamon_queue = None
         self._workspace_list = []
+        self._diagnosis_cache = None
 
     def GetInfo(self):
         return {'Name': self._name,
@@ -155,6 +156,10 @@ class Operate(scope_.Source_interface):
             self._did_open_list[uri]['change_version'] += 1
             return_id = self._lsp.didchange(
                 uri, text, version=self._did_open_list[uri]['change_version'])
+        if self.DocumentVersionID == document_id:
+            # to compat clangd
+            self._output_queue(self._diagnosis_cache)
+        self.DocumentVersionID = document_id
         return return_id
         # }}}
 
@@ -182,6 +187,7 @@ class Operate(scope_.Source_interface):
                         timeout_=-1)
                 return_['DocumentID'] = self.DocumentVersionID
                 return_['Lists'] = self._diagnosis_analysis(temp['params'])
+                self._diagnosis_cache = return_
                 self._output_queue(return_)
             except:
                 g_logger.exception('')
@@ -316,8 +322,7 @@ class Operate(scope_.Source_interface):
                 # current_start_postion = {'line': 0,'character': 0}
                 # self._lsp.completion(uri_, current_start_postion)
 
-            line_text = version['AllTextList']
-            self._did_open_or_change(uri_, line_text,
+            self._did_open_or_change(uri_, version['AllTextList'],
                                      version['DocumentVersionID'])
         # every event must return something. 'None' means send nothing to client
         return None
