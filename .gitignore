@@ -1,0 +1,21 @@
+# Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+__pycache__
+
+# Session
+Session.vim
+Sessionx.vim
+ECY_config.ini
+ECY_server.log
+
+# Temporary
+.netrwhist
+*~
+# Auto-generated tag files
+tags
+# Persistent undo
+[._]*.un~
