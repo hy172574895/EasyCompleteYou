@@ -34,5 +34,4 @@ class Operate(scope_.Source_interface):
                 results_format['info'] = snippet['preview']
                 results_list.append(results_format)
         return_['Lists'] = results_list
-        g_logger.debug(return_)
         return return_

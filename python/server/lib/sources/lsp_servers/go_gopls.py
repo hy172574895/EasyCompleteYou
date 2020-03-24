@@ -56,20 +56,18 @@ class Operate(scope_.Source_interface):
 
     def _start_server(self, starting_cmd="", workspace="",
             is_enable_diagnosis=True):
+        if is_enable_diagnosis:
+            is_enable_diagnosis = True
         try:
             if self.is_server_start == 'not_started':
                 if starting_cmd == "":
                     starting_cmd = 'gopls'
                 self._lsp.StartJob(starting_cmd)
-                # init_opts = {'gocodeCompletionEnabled':True}
-                # g_logger.debug(init_opts)
                 rooturi = self._lsp.PathToUri(workspace)
                 workspace = self._lsp.PathToUri(workspace)
                 workspace = {'uri': workspace, 'name': 'init'}
                 capabilities = self._lsp.BuildCapabilities()
                 capabilities['workspace']['configuration'] = True
-                if is_enable_diagnosis:
-                    is_enable_diagnosis = True
                 capabilities['textDocument']['publishDiagnostics']\
                         ['relatedInformation'] = is_enable_diagnosis
                 temp = self._lsp.initialize(workspaceFolders=[workspace],
