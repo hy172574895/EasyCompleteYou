@@ -1,4 +1,4 @@
-# Document for `python_jedi`
+# Document for `clangd`
 ## Installation
 Download `clangd` and put it into your [OS's global variable](https://en.wikipedia.org/wiki/Global_variable).
 Make sure you can index clangd in your PC's shell.
