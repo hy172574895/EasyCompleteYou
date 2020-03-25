@@ -42,7 +42,7 @@ endfunction
 
 function! s:BuildLoopingList(info) abort
 "{{{return a list with '>>' inside the items.
-  let l:text = ["",'Press j/k to toggle item']
+  let l:text = ['Press j/k to switch item', ""]
   let l:list = a:info['list']
   let l:current_using = a:info['current']
   let l:i             = 0
@@ -72,9 +72,10 @@ function! s:ChooseSource_vim() abort
   endfor
 
   let s:using_source = {'list':l:info['available_sources'],'current': l:i}
+  let l:title = 'Detected: ' . l:filetype
   let l:floating_win_nr = popup_create(s:BuildLoopingList(s:using_source),{
     \ 'filter': 'g:ChooseSource_cb_vim',
-    \ 'title': 'Available Sources Lists',
+    \ 'title': l:title,
     \ 'zindex': 300,
     \ 'border': [],
     \ 'close': 'click',
