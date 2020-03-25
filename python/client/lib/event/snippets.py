@@ -14,4 +14,6 @@ class Operate(scope_.Event):
     def DoCompletion(self):
         msg = {}
         msg['Additional'] = self._get_snippets()
-        return self._pack(msg, 'DoCompletion')
+        temp = self._pack(msg, 'DoCompletion')
+        temp['AllTextList'] = []
+        return temp
