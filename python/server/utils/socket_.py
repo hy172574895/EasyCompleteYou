@@ -16,7 +16,8 @@ g_logger = logging.getLogger('ECY_server')
 
 class Server(object):
     def __init__(self, port, hmac_str, is_use_socket_to_get_msg=True):
-        self._results_queue = queue.LifoQueue()
+        # self._results_queue = queue.LifoQueue()
+        self._results_queue = queue.Queue()
         if not is_use_socket_to_get_msg:
             pass
             # TODO

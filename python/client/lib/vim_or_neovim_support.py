@@ -10,6 +10,10 @@ def CallEval(arg1):
     return vim.eval(arg1)
 
 
+def Command(arg1):
+    return vim.command(arg1)
+
+
 def CurrentLineContents():
     return ToUnicode(vim.current.line)
 

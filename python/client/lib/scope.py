@@ -3,6 +3,9 @@
 import os
 import json
 import logging
+# TODO
+# import difflib
+# from difflib import SequenceMatcher
 global g_logger
 g_logger = logging.getLogger('ECY_client')
 
@@ -19,11 +22,14 @@ class Event(object):
         self._is_return_match_point = vim_lib.GetVariableValue(
             "g:ECY_use_floating_windows_to_be_popup_windows")
         self._trigger_len = vim_lib.GetVariableValue("g:ECY_triggering_length")
+        self._is_debugging = vim_lib.GetVariableValue("g:ECY_debug")
         self._snippets_cache = None
 
         self.preview_file_dir = None
         self.preview_file_list = []
         self.preview_content = {}
+        # self._get_difference = MyDiffer()
+        self.buffer_cache = {}
 
     def GetCurrentWorkSpace(self):
         temp = vim_lib.CallEval("ECY#rooter#GetCurrentBufferWorkSpace()")
@@ -155,10 +161,12 @@ class Event(object):
         return vim_lib.GetVariableValue("g:ECY_enable_diagnosis")
 
     def _basic(self, msg):
-        msg['AllTextList'] = vim_lib.CurrenBufferText()
+        # msg['AllTextList'] = vim_lib.CurrenBufferText()
+        file_path = vim_lib.GetCurrentBufferFilePath()
+        # msg['TextLists'] = self._return_buffer(file_path)
+        msg['FilePath'] = file_path
         msg['CurrentLineText'] = vim_lib.CurrentLineContents()
         msg['FileType'] = vim_lib.GetCurrentBufferType()
-        msg['FilePath'] = vim_lib.GetCurrentBufferFilePath()
         msg['ReturnDiagnosis'] = self._is_return_diagnosis()
         # vim_lib.CurrentColumn is 0-based, and also CurrenLineNr()
         start_position = {
@@ -167,5 +175,93 @@ class Event(object):
         msg['SourceName'] = self.source_name
         msg['WorkSpace'] = self._workspace
         g_logger.debug("current buffer WorkSpace:")
-        g_logger.debug(msg['WorkSpace'])
+        return self._return_buffer(msg, file_path)
+
+    def _parse_differ_commands(self):
+        infos = vim_lib.GetVariableValue('g:ECY_buffer_need_to_update')
+        buffer_info = vim_lib.GetVariableValue('g:ECY_cached_buffer_nr_to_path')
+        vim_lib.Command('let g:ECY_buffer_need_to_update = {}')
+        commands = {}
+        g_logger.debug(infos)
+        for buffer_nr in infos:
+            info = infos[buffer_nr]
+            buffer_path = buffer_info[buffer_nr]
+            commands[buffer_path] = []
+            # last_command = None
+            for item in info:
+                kind = item[0]
+                start_line = int(item[1])
+                end_line = int(item[2])
+                # if last_command == item:
+                #     continue
+                # last_command = item
+                deleted_line = 0
+                for line in range(start_line, end_line + 1):
+                    temp = {'kind': kind, 'line': line}
+                    if kind != 'delete':
+                        try:
+                            evals = 'getbufline({0}, {1})'.format(buffer_nr, line + 1)
+                            temp['newtext'] = vim_lib.CallEval(evals)[0]
+                        except:
+                            continue
+                    else:
+                        temp['line'] -= deleted_line
+                        deleted_line += 1
+                    commands[buffer_path].append(temp)
+        g_logger.debug(commands)
+        return commands
+
+    def _return_buffer(self, msg, file_path):
+        """ return current buffer difference text.
+        """
+        msg['IsFullList'] = False
+        msg['IsDebugging'] = self._is_debugging
+        use_differ = vim_lib.CallEval('ECY_main#UsingTextDifferEvent()')
+        cached_buffer = vim_lib.GetVariableValue('g:ECY_server_cached_buffer')
+
+        if self._is_debugging and False:
+            current_buffer = vim_lib.CallEval('getbufline(bufnr(), 1, "$")')
+            msg['AllTextList'] = current_buffer
+
+        # TODO, there are bug in vim, check
+        # https://github.com/vim/vim/issues/5840
+        if use_differ and file_path in cached_buffer and False:
+            msg['Commands'] = self._parse_differ_commands()
+        else:
+            current_buffer = vim_lib.CallEval('getbufline(bufnr(), 1, "$")')
+            msg['IsFullList'] = True
+            msg['AllTextList'] = current_buffer
+
         return msg
+
+# TODO, using python's difflib
+
+# class MyDiffer(difflib.Differ):
+#     """docstring for MyDiffer"""
+#     # def __init__(self):
+#     #     super(MyDiffer, self).__init__()
+
+#     def _dump(self, tag, x, lo, hi):
+#         for i in range(lo, hi):
+#             return_ = {'index': i , 'kind': tag}
+#             if tag != 'delete':
+#                 return_['newline'] = x[i]
+#             yield return_
+
+#     def compare(self, a, b):
+#         cruncher = SequenceMatcher(self.linejunk, a, b)
+#         for tag, alo, ahi, blo, bhi in cruncher.get_opcodes():
+#             if tag == 'replace':
+#                 g = self._dump(tag, b, blo, bhi)
+#             elif tag == 'delete':
+#                 g = self._dump(tag, a, alo, ahi)
+#             elif tag == 'insert':
+#                 g = self._dump(tag, b, blo, bhi)
+#             elif tag == 'equal':
+#                 # g = self._dump(' ', a, alo, ahi)
+#                 continue
+#             else:
+#                 raise ValueError('unknown tag %r' % (tag,))
+
+#             yield from g
+

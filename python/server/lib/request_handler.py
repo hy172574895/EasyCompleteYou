@@ -1,5 +1,6 @@
 import os
 import sys
+import copy
 import logging
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
@@ -18,6 +19,8 @@ import document_help
 class EventHandler(object):
     def __init__(self, results_queue):
         self._pass_results_queue = results_queue
+        self._buffer_cache = {}
+        self._is_debug = False
         try:
             self.completion = completion.Operate()
             self.source_manager = completor_manager.Operate()
@@ -35,6 +38,7 @@ class EventHandler(object):
         event_ = version_dict['Event']
         file_type = version_dict['FileType']
         source_name = version_dict['SourceName']
+        self._is_debug = version_dict['IsDebugging']
 
         results_ = []
         temp = None
@@ -51,6 +55,11 @@ class EventHandler(object):
         version_dict['DeamonQueue'] = self._pass_results_queue
         engine_obj = self.source_manager.GetSourceObjByName(
             source_name, file_type)
+
+        lists = self.BufferHanlder(version_dict)
+        if lists is None:
+            return results_
+        version_dict['AllTextList'] = "\n".join(lists)
 
         # all the event must return something, if returning None
         # means returning nothing that do not need to send back to vim's side.
@@ -82,3 +91,67 @@ class EventHandler(object):
             temp = self.source_manager.GetAvailableSourceForFiletype(file_type)
         results_.append(temp)
         return results_
+
+    def ApplyDiffer(self, commands):
+        for buffer_path in commands:
+            if buffer_path not in self._buffer_cache:
+                continue
+            # g_logger.debug("original:"+ str(self._buffer_cache[buffer_path]))
+            for item in commands[buffer_path]:
+                index = item['line']
+                kind = item['kind']
+                if kind == 'delete':
+                    del self._buffer_cache[buffer_path][index]
+                if kind == 'insert':
+                    self._buffer_cache[buffer_path].insert(index, item['newtext'])
+                if kind == 'replace':
+                    if index == 0 and self._buffer_cache[buffer_path] == []:
+                        self._buffer_cache[buffer_path] = ['']
+                    self._buffer_cache[buffer_path][index] = item['newtext']
+                # g_logger.debug("setp:"+ str(self._buffer_cache[buffer_path]))
+
+    def OutputCachedBuffer(self, delete_buffer_path=None):
+        """ send to the client
+        """
+        if delete_buffer_path is not None:
+            if delete_buffer_path in self._buffer_cache:
+                self._buffer_cache.pop(delete_buffer_path)
+        buffer_lists = []
+        for file_path in self._buffer_cache:
+            buffer_lists.append(file_path)
+        temp = {'Event': 'CachedBufferList', 'Lists': buffer_lists}
+        self._pass_results_queue.put(temp)
+
+    def BufferHanlder(self, version):
+        file_path = version['FilePath']
+        file_type = version['FileType']
+        if version['IsFullList']:
+            # not cache
+            lists = version['AllTextList']
+            if lists != ['']:
+                self._buffer_cache[file_path] = lists
+            else:
+                self._buffer_cache[file_path] = []
+            self.OutputCachedBuffer()
+            return lists
+        else:
+            if file_type in ['nothing', 'leaderf']:
+                return None
+            # cached
+            try:
+                command = version['Commands']
+                if self._is_debug:
+                    original = copy.copy(self._buffer_cache[file_path])
+                self.ApplyDiffer(command)
+                lists = self._buffer_cache[file_path]
+                if self._is_debug and lists != []:
+                    if lists != version['AllTextList'] and version['AllTextList'] != ['']:
+                        g_logger.debug('original:' + str(original))
+                        g_logger.debug('commands:' + str(command))
+                        g_logger.debug('wrongs.' + str(lists))
+                        g_logger.debug('correct:' + str(version['AllTextList']))
+                return lists
+            except:
+                g_logger.exception(str(command))
+                self.OutputCachedBuffer(delete_buffer_path=file_path)
+        return None

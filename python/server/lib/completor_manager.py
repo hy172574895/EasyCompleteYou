@@ -52,10 +52,12 @@ class Operate(object):
             installed_engine_lib = \
                 {'label': 'lib.sources.label.Label',
                  'path': 'lib.sources.path.path',
+                 'disabled': 'lib.sources.youcompleteme.disable',
                  'python_jedi': 'lib.sources.python.python'}
             installed_engine_path = \
                 {'label': '',
                  'path': '',
+                 'disabled': '',
                  'python_jedi': ''}
             self.conf['installed_engine_lib'] = installed_engine_lib
             self.conf['installed_engine_path'] = installed_engine_path

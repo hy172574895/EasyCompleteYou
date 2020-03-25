@@ -15,13 +15,15 @@ function! s:SetUpEvent() abort
     autocmd FileType      * call s:OnBufferEnter()
     autocmd BufEnter      * call s:OnBufferEnter()
     autocmd BufLeave      * call s:OnBufferLeave()
-    autocmd InsertLeave   * call s:OnInsertModeLeave()
-    autocmd TextChanged   * call s:OnTextChangedNormalMode()
     autocmd VimLeavePre   * call s:OnVIMLeave()
 
+    " will send full buffer data to the server.
     " invoked after typing a character into the buffer or user sept in insert mode  
-    autocmd InsertEnter   * call s:OnInsertMode()
+    autocmd TextChanged   * call s:OnTextChangedNormalMode()
     autocmd TextChangedI  * call s:OnTextChangedInsertMode()
+
+    autocmd InsertLeave   * call s:OnInsertModeLeave()
+    autocmd InsertEnter   * call s:OnInsertMode()
     autocmd InsertCharPre * call s:OnInsertChar()
 
     if g:has_floating_windows_support == 'vim'
@@ -33,6 +35,47 @@ function! s:SetUpEvent() abort
       " TODO
     endif
   augroup END
+"}}}
+endfunction
+
+function ECY_main#UsingTextDifferEvent()
+  if !g:has_text_prop_event
+    return v:false
+  endif
+  return v:true
+endfunction
+
+function ECY_main#TextDifferEvent(bufnr, start, end, added, changes)
+"{{{
+  let l:line_need_to_update = []
+  " let l:line_need_to_update = [a, b ,c]
+  " a is the kind of operations.
+  " b should > c
+  for item in a:changes
+    let l:index = item['lnum'] - 1
+    if item['lnum'] == item['end'] && item['col'] == 1 && item['added'] > 0
+      let l:range = ['insert', l:index, l:index - 1 + item['added']]
+    elseif item['added'] != 0
+      let l:deleted_line = item['added'] * -1
+      let l:range = ['delete', l:index, l:index - 1 + l:deleted_line]
+    else
+      let l:range = ['replace', l:index, l:index]
+    endif
+    call add(l:line_need_to_update, l:range)
+  endfor
+  if exists('g:ECY_buffer_need_to_update[a:bufnr]')
+    call extend(g:ECY_buffer_need_to_update[a:bufnr], l:line_need_to_update)
+  else
+    let g:ECY_buffer_need_to_update[a:bufnr] = l:line_need_to_update
+  endif
+  if ECY#color_completion#IsPromptOpen()
+    return
+  endif
+  if mode() == 'i'
+    call s:OnTextChangedInsertMode()
+  else
+    call s:OnTextChangedNormalMode()
+  endif
 "}}}
 endfunction
 
@@ -119,6 +162,10 @@ function! s:OnBufferEnter() abort
   "{{{
   if !ECY_main#IsECYWorksAtCurrentBuffer()
     return
+  endif
+  if ECY_main#UsingTextDifferEvent() && !has_key(g:ECY_cached_buffer_nr_to_path, bufnr())
+    call listener_add('ECY_main#TextDifferEvent')
+    let g:ECY_cached_buffer_nr_to_path[bufnr()] = ECY#utility#GetCurrentBufferPath()
   endif
   let s:indentexpr           = &indentexpr
   let s:completeopt_temp     = &completeopt
@@ -279,7 +326,7 @@ function! s:SetVariable() abort
     let g:ECY_disable_for_files_larger_than_kb = g:ycm_disable_for_files_larger_than_kb
   else
     let g:ECY_disable_for_files_larger_than_kb
-          \= get(g:,'ECY_disable_for_files_larger_than_kb',1000)
+          \= get(g:,'ECY_disable_for_files_larger_than_kb', 300000)
   endif
 
   let g:ECY_rolling_key_of_floating_windows
@@ -292,12 +339,20 @@ function! s:SetVariable() abort
     let g:UltiSnipsExpandTrigger = "<F1>"
   endif
 
+  let g:has_text_prop_event
+        \= get(g:,'has_text_prop_event', exists('*listener_add'))
+
   let s:isSelecting          = v:false
   let s:indentexpr           = &indentexpr
   let s:completeopt_temp     = &completeopt
   let s:back_to_source_key   = get(s:,'back_to_source_key',['<Space>'])
   let s:completion_text_id   = 0
   let s:completeopt_fuc_temp = &completefunc
+  if g:has_text_prop_event
+    let g:ECY_server_cached_buffer     = []
+    let g:ECY_buffer_need_to_update    = {}
+    let g:ECY_cached_buffer_nr_to_path = {}
+  endif
   " we suggest to use socket, because we the results of testing the job is 
   " too slow.
   let  s:is_using_stdio = v:false
@@ -481,6 +536,9 @@ function! ECY_main#IsECYWorksAtCurrentBuffer() abort
     "if user have no ycm, so ecy will work at that file
     return v:false
   endif
+  if l:current_source == 'disabled'
+    return v:false
+  endif
   return v:true
 "}}}
 endfunction
@@ -589,6 +647,12 @@ function! s:SetFileTypeSource_cb(msg) abort
   call ECY_main#AfterUserChooseASource()
 
   call s:DefaultSourcesCheck(l:available_sources)
+"}}}
+endfunction
+
+function! s:CachedBufferList_cb(msg) abort
+"{{{
+  let g:ECY_server_cached_buffer = a:msg['Lists']
 "}}}
 endfunction
 
@@ -733,6 +797,8 @@ function! s:EventSort(id, data, event) abort
         call ECY#document_help#cb(l:data_dict)
       elseif l:Event == 'all_engine_info'
         call timer_start(1, function('ECY#install#ListEngine_cb', [l:data_dict]))
+      elseif l:Event == 'CachedBufferList'
+        call s:CachedBufferList_cb(l:data_dict)
       endif
     endfor
   " catch
