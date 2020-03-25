@@ -72,7 +72,7 @@ function! s:ChooseSource_vim() abort
   endfor
 
   let s:using_source = {'list':l:info['available_sources'],'current': l:i}
-  let l:title = 'Detected: ' . l:filetype
+  let l:title = ' Detected: ' . l:filetype. ' '
   let l:floating_win_nr = popup_create(s:BuildLoopingList(s:using_source),{
     \ 'filter': 'g:ChooseSource_cb_vim',
     \ 'title': l:title,
