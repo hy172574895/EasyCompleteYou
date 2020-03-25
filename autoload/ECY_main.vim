@@ -39,7 +39,7 @@ function! s:SetUpEvent() abort
 endfunction
 
 function ECY_main#UsingTextDifferEvent()
-  if !g:has_text_prop_event
+  if !g:ECY_use_text_differ || !g:has_text_prop_event
     return v:false
   endif
   return v:true
@@ -339,8 +339,16 @@ function! s:SetVariable() abort
     let g:UltiSnipsExpandTrigger = "<F1>"
   endif
 
-  let g:has_text_prop_event
-        \= get(g:,'has_text_prop_event', exists('*listener_add'))
+  let g:ECY_use_text_differ
+        \= get(g:,'ECY_use_text_differ', v:false)
+  if g:ECY_use_text_differ
+    let g:has_text_prop_event = exists('*listener_add')
+    if g:has_text_prop_event
+      let g:ECY_server_cached_buffer     = []
+      let g:ECY_buffer_need_to_update    = {}
+      let g:ECY_cached_buffer_nr_to_path = {}
+    endif
+  endif
 
   let s:isSelecting          = v:false
   let s:indentexpr           = &indentexpr
@@ -348,11 +356,7 @@ function! s:SetVariable() abort
   let s:back_to_source_key   = get(s:,'back_to_source_key',['<Space>'])
   let s:completion_text_id   = 0
   let s:completeopt_fuc_temp = &completefunc
-  if g:has_text_prop_event
-    let g:ECY_server_cached_buffer     = []
-    let g:ECY_buffer_need_to_update    = {}
-    let g:ECY_cached_buffer_nr_to_path = {}
-  endif
+
   " we suggest to use socket, because we the results of testing the job is 
   " too slow.
   let  s:is_using_stdio = v:false

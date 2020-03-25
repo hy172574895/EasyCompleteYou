@@ -23,6 +23,7 @@ class Event(object):
             "g:ECY_use_floating_windows_to_be_popup_windows")
         self._trigger_len = vim_lib.GetVariableValue("g:ECY_triggering_length")
         self._is_debugging = vim_lib.GetVariableValue("g:ECY_debug")
+        self._use_textdiffer = vim_lib.CallEval('ECY_main#UsingTextDifferEvent()')
         self._snippets_cache = None
 
         self.preview_file_dir = None
@@ -216,16 +217,20 @@ class Event(object):
         """
         msg['IsFullList'] = False
         msg['IsDebugging'] = self._is_debugging
-        use_differ = vim_lib.CallEval('ECY_main#UsingTextDifferEvent()')
-        cached_buffer = vim_lib.GetVariableValue('g:ECY_server_cached_buffer')
+        msg['UsingTextDiffer'] = self._use_textdiffer
 
-        if self._is_debugging and False:
+        if self._use_textdiffer:
+            cached_buffer = vim_lib.GetVariableValue('g:ECY_server_cached_buffer')
+        else:
+            cached_buffer = []
+
+        if self._is_debugging and self._use_textdiffer:
             current_buffer = vim_lib.CallEval('getbufline(bufnr(), 1, "$")')
             msg['AllTextList'] = current_buffer
 
         # TODO, there are bug in vim, check
         # https://github.com/vim/vim/issues/5840
-        if use_differ and file_path in cached_buffer and False:
+        if self._use_textdiffer and file_path in cached_buffer:
             msg['Commands'] = self._parse_differ_commands()
         else:
             current_buffer = vim_lib.CallEval('getbufline(bufnr(), 1, "$")')

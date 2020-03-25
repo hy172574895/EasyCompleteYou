@@ -123,6 +123,8 @@ class EventHandler(object):
         self._pass_results_queue.put(temp)
 
     def BufferHanlder(self, version):
+        if not version['UsingTextDiffer']:
+            return version['AllTextList']
         file_path = version['FilePath']
         file_type = version['FileType']
         if version['IsFullList']:
