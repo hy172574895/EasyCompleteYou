@@ -368,3 +368,23 @@ class Operate(scope_.Source_interface):
             results_list.append(results_format)
         return_['Lists'] = results_list
         return return_
+    
+    def OnDocumentHelp(self, version):
+        if not self._check(version):
+            return None
+        current_start_postion = \
+            {'line': version['StartPosition']['Line'],
+             'character': version['StartPosition']['Colum']}
+        uri_ = self._lsp.PathToUri(version['FilePath'])
+        temp = self._lsp.hover(uri_, current_start_postion)
+        results = self._lsp.GetResponse(temp['Method'])
+        results = results['result']
+        return_ = {'ID': version['VersionID']}
+        return_list = []
+        if type(results) == list:
+            pass
+        else:
+            results = results['contents']
+            return_list = results['value'].split("\n")
+        return_['Results'] = return_list
+        return return_
