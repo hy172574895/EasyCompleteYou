@@ -64,19 +64,10 @@ class Operate(scope_.Source_interface):
             if self.is_server_start == 'not_started':
                 if starting_cmd == "":
                     starting_cmd = 'clangd'
-                starting_cmd = 'C:/Users/qwe/Downloads/clangd-windows-10rc3/clangd_10rc3/bin/clangd.exe'
-                g_logger.debug(starting_cmd)
+                # starting_cmd = 'C:/Users/qwe/Downloads/clangd-windows-10rc3/clangd_10rc3/bin/clangd.exe'
+                # g_logger.debug(starting_cmd)
                 self._lsp.StartJob(starting_cmd)
-                rooturi = self._lsp.PathToUri(workspace)
-                workspace = self._lsp.PathToUri(workspace)
-                workspace = {'uri': workspace, 'name': 'init'}
-                capabilities = self._lsp.BuildCapabilities()
-                # capabilities['workspace']['configuration'] = True
-                capabilities['textDocument']['publishDiagnostics']\
-                        ['relatedInformation'] = is_enable_diagnosis
-                temp = self._lsp.initialize(workspaceFolders=[workspace],
-                                            rootUri=rooturi,
-                                            capabilities=capabilities)
+                temp = self._lsp.initialize()
                 # if time out will raise, meanning can not start a job.
                 self._lsp.GetResponse(temp['Method'], timeout_=5)
                 self.is_server_start = 'started'
@@ -227,25 +218,19 @@ class Operate(scope_.Source_interface):
             results_list.append(temp)
         return results_list
 
-    def GetSymbol(self, version):
-        if not self._check(version):
-            return None
-        return_ = {'ID': version['VersionID']}
-        uri_ = self._lsp.PathToUri(version['FilePath'])
-        temp = self._lsp.documentSymbos(uri_)
-        try:
-            symbos = self._lsp.GetResponse(temp['Method'])
-            symbos = symbos['result']
-        except:
-            symbos = []
+    def _analys_document_symbols(self, sources, file_path=None):
         lists = []
-        for item in symbos:
+        if file_path is not None:
+            path = file_path
+        else:
+            path = file_path
+        for item in sources:
             kind = self._lsp.GetSymbolsKindByNumber(item['kind'])
             start_line = item['range']['start']['line'] + 1
             start_column = item['range']['start']['character']
             pos = self._genarate_position(start_line, start_column)
             position = {'line': start_line, 'colum': start_column,
-                        'path': version['FilePath']}
+                        'path': path}
             items = [{'name': '1', 'content': {'abbr': item['name']}},
                      {'name': '2', 'content': {'abbr': kind}},
                      {'name': '3', 'content': {'abbr': pos}}]
@@ -253,7 +238,24 @@ class Operate(scope_.Source_interface):
                     'type': 'symbol',
                     'position': position}
             lists.append(temp)
-        return_['Results'] = lists
+        return lists
+
+    def GetSymbol(self, version):
+        """ document symbos and workspace symbos
+        """
+        if not self._check(version):
+            return None
+        return_ = {'ID': version['VersionID']}
+        uri_ = self._lsp.PathToUri(version['FilePath'])
+        temp = self._lsp.documentSymbos(uri_)
+        # temp = self._lsp.workspaceSymbos()
+        try:
+            symbos = self._lsp.GetResponse(temp['Method'])
+            symbos = symbos['result']
+        except:
+            symbos = []
+        return_['Results'] = self._analys_document_symbols(symbos,
+                version['FilePath'])
         return return_
 
     def _genarate_position(self, line, colum):
@@ -312,16 +314,6 @@ class Operate(scope_.Source_interface):
             # OnBufferEnter is a notification
             # so we return nothing
             uri_ = self._lsp.PathToUri(version['FilePath'])
-            workspace = version['WorkSpace']
-            if workspace not in self._workspace_list:
-                self._workspace_list.append(workspace)
-                add_workspace = [{'uri': self._lsp.PathToUri(workspace), 'name':
-                                  workspace}]
-                self._lsp.didChangeWorkspaceFolders(
-                    add_workspace=add_workspace)
-                # current_start_postion = {'line': 0,'character': 0}
-                # self._lsp.completion(uri_, current_start_postion)
-
             self._did_open_or_change(uri_, version['AllTextList'],
                                      version['DocumentVersionID'])
         # every event must return something. 'None' means send nothing to client
