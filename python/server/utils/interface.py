@@ -41,7 +41,9 @@ class Source_interface(object):
         return self._return(version['VersionID'])
 
     def OnDocumentHelp(self, version):
-        return self._return(version['VersionID'])
+        return self._return(version['VersionID'],
+                            is_slience=False,
+                            content='Current Engine Have No GetSymbol Ability.')
 
     def OnInsertModeLeave(self, version):
         return self._return(version['VersionID'])
