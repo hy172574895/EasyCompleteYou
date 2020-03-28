@@ -356,6 +356,10 @@ class LSP(conec.Operate):
                   'textDocument': TextDocumentIdentifier,
                   'position':     position}
         return self._build_send(params, 'textDocument/completion')
+    
+    def hover(self, uri, position):
+        params = {'textDocument': {'uri': uri}, 'position': position}
+        return self._build_send(params, 'textDocument/hover')
 
     def documentSymbos(self, uri):
         # query == "" means returning all symbols.
