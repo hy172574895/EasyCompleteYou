@@ -101,7 +101,7 @@ python_jedi   | python               | completion<br>diagnosis<br> goto-definiti
 html_lsp      | html, xhtml          | completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[html-LSP](https://www.npmjs.com/package/vscode-html-languageservice) <br> [HTMLHint](https://www.npmjs.com/package/htmlhint)|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/html_lsp.md)
 vim_lsp       | vimL                 | completion<br> diagnosis<br> snippet-expanding<br>find-symbols|nodejs<br>[vim-LSP](https://www.npmjs.com/package/vim-language-server)|
 go_langserver | golang               | completion<br>snippets-expanding|[go-langserver](https://github.com/sourcegraph/go-langserver)|
-go_gopls      | golang               | completion<br>diagnosis<br>snippets-expanding<br>goto-definition<br>goto-reference|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|
+go_gopls      | golang               | completion<br>diagnosis<br>snippets-expanding<br>goto-definition<br>goto-reference|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/go.md)
 clangd        | C/C++/C-family       | completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding|[clangd](https://github.com/clangd/clangd/releases)|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/clangd.md)
 
 ### Plugins of ECY.
