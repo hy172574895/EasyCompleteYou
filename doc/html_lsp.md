@@ -1,4 +1,4 @@
-# Document for LSP of HTML
+# Document for LSP of `HTML`
 
 ## Installation
 ### Requires:

@@ -20,13 +20,6 @@ class Operate(scope_.Event):
                 "get(g:,'ECY_gopls_starting_cmd','gopls')")
         return self._starting_server_cmd
 
-    def _get_HTMLHint_cmd(self):
-        if self._HTMLHint_cmd is None:
-            self._HTMLHint_cmd = vim_lib.CallEval(
-                "get(g:,'ECY_html_lsp_HtmlHint_cmd','htmlhint')")
-        return self._HTMLHint_cmd
-
     def _pack(self, msg, event_name):
-        msg['HTMLHintCMD'] = self._get_HTMLHint_cmd()
         msg['StartingCMD'] = self._get_starting_cmd()
         return self._generate(msg, event_name)
