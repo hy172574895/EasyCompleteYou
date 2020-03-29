@@ -261,6 +261,30 @@ class Operate(scope_.Source_interface):
                 'Event': 'erro_code',
                 'Description': 'You are missing jedi. So this engine can not work.'}
 
+    def OnDocumentHelp(self, version):
+        try:
+            definitions = self._GetJediScript(version).goto_definitions()
+        except:
+            definitions = None
+            g_logger.exception('')
+        return_ = {'ID': version['VersionID'], 'Results': []}
+        docs = []
+        if not definitions:
+            return return_
+
+        for d in definitions:
+            doc = d.docstring()
+            if doc:
+                title = 'Docstring for %s' % d.desc_with_module
+                underline = '-' * 20
+                # underline = '-' * len(title)
+                docs.append(title)
+                docs.append(underline)
+                docs.extend(doc.split("\n"))
+                docs.append('')
+        return_['Results'] = docs
+        return return_
+
     def Goto(self, version):
         if not self._check(version):
             return None
