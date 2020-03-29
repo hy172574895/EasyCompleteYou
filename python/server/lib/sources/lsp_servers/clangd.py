@@ -139,6 +139,11 @@ class Operate(scope_.Source_interface):
         """
         # {{{
         # LSP requires the edit-version
+        if self.DocumentVersionID == document_id:
+            # to compat clangd
+            self._output_queue(self._diagnosis_cache)
+            return
+        self.DocumentVersionID = document_id
         if uri not in self._did_open_list:
             return_id = self._lsp.didopen(uri, 'go', text, version=0)
             self._did_open_list[uri] = {}
@@ -147,10 +152,6 @@ class Operate(scope_.Source_interface):
             self._did_open_list[uri]['change_version'] += 1
             return_id = self._lsp.didchange(
                 uri, text, version=self._did_open_list[uri]['change_version'])
-        if self.DocumentVersionID == document_id:
-            # to compat clangd
-            self._output_queue(self._diagnosis_cache)
-        self.DocumentVersionID = document_id
         return return_id
         # }}}
 
@@ -276,6 +277,8 @@ class Operate(scope_.Source_interface):
                     # included declaration
                     results = self._lsp.references(position, uri_)
                 if item == 'definition':
+                    results = self._lsp.definition(position, uri_)
+                if item == 'declaration':
                     results = self._lsp.definition(position, uri_)
                 results = self._lsp.GetResponse(results['Method'])
                 result_lists = self._build_goto(results, result_lists,kind=item)
