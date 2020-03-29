@@ -138,6 +138,31 @@ class Operate(scope_.Source_interface):
         self._diagnosis(version)
         return None
 
+    def OnDocumentHelp(self, version):
+        if not self._check(version):
+            return None
+        current_start_postion = \
+            {'line': version['StartPosition']['Line'],
+             'character': version['StartPosition']['Colum']}
+        uri_ = self._lsp.PathToUri(version['FilePath'])
+        temp = self._lsp.hover(uri_, current_start_postion)
+        results = self._lsp.GetResponse(temp['Method'])
+        results = results['result']
+        return_ = {'ID': version['VersionID'], 'Results': []}
+        if results is None:
+            return return_
+        return_list = []
+        results = results['contents']
+
+        if type(results) == list:
+            return_list.append(results[0]['value'])
+            return_list.extend(results[1].split('\n'))
+        elif type(results) == str:
+            return_list.append(results)
+
+        return_['Results'] = return_list
+        return return_
+
     def OnBufferTextChanged(self, version):
         if version['IsInsertMode']:
             # only for completion 
