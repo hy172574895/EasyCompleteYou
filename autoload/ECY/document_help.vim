@@ -62,6 +62,10 @@ endfunction
 
 function! ECY#document_help#cb(msg) abort
 "{{{
+  if len(a:msg['Results']) == 0
+    call ECY#utility#ShowMsg("[ECY] No document to show.", 2)
+    return
+  endif
   if g:has_floating_windows_support == 'vim'
     call s:ShowHelp_vim(a:msg, &filetype)
   else
