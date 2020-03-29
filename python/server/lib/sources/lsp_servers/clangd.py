@@ -382,7 +382,9 @@ class Operate(scope_.Source_interface):
         temp = self._lsp.hover(uri_, current_start_postion)
         results = self._lsp.GetResponse(temp['Method'])
         results = results['result']
-        return_ = {'ID': version['VersionID']}
+        return_ = {'ID': version['VersionID'], 'Results': []}
+        if results is None:
+            return return_
         return_list = []
         if type(results) == list:
             pass
