@@ -1,7 +1,7 @@
 # Document for `snippet`
 ## Installation
 This engine is buildin. And will install automatically.  
-**Ultisnips also require Python3.**
+**Ultisnips also requires Python3.**
 ### Requires:
 | Name               | Kind          | WebSite                                     |
 | -------------      | ------------- | -------                                     |

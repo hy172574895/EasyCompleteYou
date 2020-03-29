@@ -12,7 +12,7 @@
 ### Quickly install
 Execute the following command in normal mode in vim.
 
-`:ECYInstall html_lsp`
+> `:ECYInstall html_lsp`
 
 ECY will check that all, and will ask user to install when one of them 
 are missing.

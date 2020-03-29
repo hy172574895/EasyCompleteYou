@@ -1,7 +1,10 @@
 # Document for `clangd`
 ## Installation
 Download `clangd` and put it into your [OS's global variable](https://en.wikipedia.org/wiki/Global_variable).
-Make sure you can index clangd in your PC's shell.
+Make sure you can index clangd in your PC's shell.  
+
+Execute the following command in normal mode in vim.
+> `:ECYInstall clangd`
 
 ### Requires:
 | Name          | Kind          | WebSite                                     |
@@ -17,3 +20,5 @@ for example, put the code into your vimrc:
 `let g:ECY_clangd_starting_cmd = '/home/xxx/yyyy/zzz/bin/clangd.exe'`
 
 ## Usages
+You should go to check its [website](https://clangd.llvm.org/installation.html) of how it works.  
+Generally, you need a project file named `compile_commands.json`, and how to configure that file bases on your knowledge of `C-language` such as how to include a `lib` or dictate where is the `lib dir`.
