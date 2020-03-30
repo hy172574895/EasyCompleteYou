@@ -167,10 +167,8 @@ function! ECY#diagnosis#ShowNextDiagnosis(next_or_pre) abort
 
   let l:file_path = ECY#utility#GetCurrentBufferPath()
 
-  let g:abc = s:current_diagnosis
   if s:current_diagnosis != {}
     let l:index = (s:current_diagnosis['index'] + a:next_or_pre) % l:items_len
-    let g:abcd = l:index
     try
       let item = g:ECY_diagnosis_items_all[l:index]
       let l:file_path = item['file_path']
@@ -367,7 +365,6 @@ function! s:PlaceSign(engine_name, style, path, line) abort
     call add(s:sign_id_dict[a:engine_name]['id_lists'] , {'sign_id': l:increment_id, 'file_path': a:path})
     let l:temp = 'sign place '.l:increment_id.' line='.a:line.' name='.a:style.' file='.a:path
   endif
-  let g:abc = l:temp
   silent! execute l:temp
 "}}}
 endfunction
