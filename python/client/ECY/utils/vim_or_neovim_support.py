@@ -7,7 +7,13 @@ import os
 # local lib
 
 def CallEval(arg1):
-    return vim.eval(arg1)
+    temp = vim.eval(arg1)
+    if type(temp) == str:
+        if temp == 'True':
+            return True
+        if temp == 'False':
+            return False
+    return temp
 
 
 def Command(arg1):
@@ -92,7 +98,7 @@ def GetCurrentBufferNumber():
 def GetCurrentBufferFilePath():
     try:
         return CallEval('utility#GetCurrentBufferPath()')
-    except Exception as e:
+    except:
         # have bug in popup windows
         return GetBufferFilepath(GetCurrentBufferObject())
 
