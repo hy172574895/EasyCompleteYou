@@ -15,7 +15,7 @@ global g_logger
 g_logger = logging.getLogger('ECY_server')
 
 # local lib
-import utils.lsp.stand_IO_connection as conec
+import ECY.utils.lsp.stand_IO_connection as conec
 
 
 class LSP(conec.Operate):
