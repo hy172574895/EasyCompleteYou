@@ -223,6 +223,8 @@ class Operate(scope_.Source_interface):
         # }}}
 
     def GetSymbol(self, version):
+        """ document symbols
+        """
         if not self._check(version):
             return None
         return_ = {'ID': version['VersionID']}
@@ -240,10 +242,9 @@ class Operate(scope_.Source_interface):
             position = item._name.tree_name.get_definition()
             # start_column is 0-based
             (start_line, start_column) = position.start_pos
-            items = [{'name': '1', 'content': {'abbr': item.name, 'highlight': 'ECY_blue'}},
-                     {'name': '2', 'content': {
-                         'abbr': item.type, 'highlight': 'ECY_green'}},
-                     {'name': '3', 'content': {'abbr': str(position.start_pos),  'highlight': 'ECY_yellow'}}]
+            items = [{'name': '1', 'content': {'abbr': item.name}},
+                     {'name': '2', 'content': {'abbr': item.type}},
+                     {'name': '3', 'content': {'abbr': str(position.start_pos)}}]
             position = {'line': start_line, 'colum': start_column,
                         'path': version['FilePath']}
             temp = {'items': items,
