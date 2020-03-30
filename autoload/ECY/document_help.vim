@@ -5,17 +5,17 @@
 function! ECY#document_help#Init() abort
 "{{{
   let g:ECY_show_doc_key = get(g:,'ECY_show_doc_key', '<C-n>')
-  let s:preview_windows_nr = -1
+  let g:ECY_windows_are_showing['document_help'] = -1
   exe 'nmap ' . g:ECY_show_doc_key . ' :ECYDocHelp<CR>'
 "}}}
 endfunction
 
 function! s:Close_preview_windows() abort
 "{{{
-  if s:preview_windows_nr != -1
-    exe ':bd!' . string(s:preview_windows_nr)
+  if g:ECY_windows_are_showing['document_help'] != -1
+    exe ':bd!' . string(g:ECY_windows_are_showing['document_help'])
   endif
-  let s:preview_windows_nr = -1
+  let g:ECY_windows_are_showing['document_help'] = -1
 "}}}
 endfunction
 
@@ -29,7 +29,7 @@ function! s:ShowHelp_new_windows(msg) abort
   silent! exe ':res '. l:text_len
   let l:current_windows = winnr('$')
   silent! put=l:text
-  let s:preview_windows_nr = bufnr()
+  let g:ECY_windows_are_showing['document_help'] = bufnr()
 
   silent! exe string(l:current_windows).'wincmd w'
 "}}}
@@ -50,6 +50,7 @@ function! s:ShowHelp_vim(msg, file_type) abort
       \ 'padding': [0,1,0,1],
       \ 'zindex': 2000}
   let l:nr = popup_atcursor(l:text, l:opts)
+  let g:ECY_windows_are_showing['document_help'] = l:nr
   call setbufvar(winbufnr(l:nr), '&syntax', a:file_type)
 "}}}
 endfunction

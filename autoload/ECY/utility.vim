@@ -1,12 +1,17 @@
 " Author: Jimmy Huang (1902161621@qq.com)
 " License: WTFPL
 
-let s:show_msg_windows_nr = -1
-let s:show_msg_windows_text_list = []
-let s:show_msg_time = 5
-let s:show_msg_timer_id = -1
-let g:ECY_buffer_preview_windows_size = [[80, 120], [30, 40]]
-let g:ECY_buffer_preview_windows_nr = -1
+function! ECY#utility#Init() abort
+"{{{
+  let s:show_msg_windows_nr = -1
+  let s:show_msg_windows_text_list = []
+  let s:show_msg_time = 5
+  let s:show_msg_timer_id = -1
+  let g:ECY_buffer_preview_windows_size = [[80, 120], [30, 40]]
+  let g:ECY_buffer_preview_windows_nr = -1
+  let g:ECY_windows_are_showing = {}
+"}}}
+endfunction
 
 function! ECY#utility#MoveToBuffer(line, colum, file_path, windows_to_show) abort
 "{{{ move cursor to windows, in normal mode
@@ -232,5 +237,26 @@ function! ECY#utility#StartLeaderfSelecting(content, callback_name) abort
   catch 
     call ECY#utility#ShowMsg("[ECY] You are missing 'Leaderf' or its version is too low. Please install/update it.", 2)
   endtry
+"}}}
+endfunction
+
+function! ECY#utility#RollFloatingWindows(up_or_down) abort
+"{{{ a:up_or_down = -1 = up; a:up_or_down = 1 = down
+"this function will be mapped, so we should return ''
+  if g:has_floating_windows_support == 'vim'
+    for [key, value] in items(g:ECY_windows_are_showing)
+      if value != -1
+        try
+          let l:opts = popup_getoptions(value)
+          if has_key(l:opts, 'firstline')
+            let l:next_line = l:opts['firstline'] + a:up_or_down
+            call popup_setoptions(value, {'firstline': l:next_line})
+          endif
+        " catch
+        endtry
+      endif
+    endfor
+  endif
+  return ''
 "}}}
 endfunction

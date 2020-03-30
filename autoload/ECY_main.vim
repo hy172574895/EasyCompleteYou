@@ -898,8 +898,10 @@ function! s:SetMapping() abort
   endfor
 
   if g:has_floating_windows_support != 'has_no'
-    exe 'inoremap <expr>' . g:ECY_rolling_key_of_floating_windows[0] . ' ECY#completion_preview_windows#Roll(1)'
-    exe 'inoremap <expr>' . g:ECY_rolling_key_of_floating_windows[1] . ' ECY#completion_preview_windows#Roll(-1)'
+    exe 'inoremap <expr>' . g:ECY_rolling_key_of_floating_windows[0] . ' ECY#utility#RollFloatingWindows(1)'
+    exe 'inoremap <expr>' . g:ECY_rolling_key_of_floating_windows[1] . ' ECY#utility#RollFloatingWindows(-1)'
+    exe 'nmap ' . g:ECY_rolling_key_of_floating_windows[0] . ' :call ECY#utility#RollFloatingWindows(1)<CR>'
+    exe 'nmap ' . g:ECY_rolling_key_of_floating_windows[1] . ' :call ECY#utility#RollFloatingWindows(-1)<CR>'
   endif
 
 "}}}

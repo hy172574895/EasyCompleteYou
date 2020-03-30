@@ -4,7 +4,7 @@
 " can only have one preview windows
 function! ECY#completion_preview_windows#Init() abort
 "{{{ 
-  let s:preview_windows_nr = get(s:,'preview_windows_nr',-1)
+  let g:ECY_windows_are_showing['completion_preview_windows'] = -1
   let g:ECY_enable_preview_snippet = get(g:,'ECY_enable_preview_snippet', v:true)
   let g:ECY_preview_windows_size = 
         \get(g:,'ECY_preview_windows_size',[[30, 50], [2, 14]])
@@ -22,9 +22,9 @@ endfunction
 function! ECY#completion_preview_windows#Show(msg, using_highlight) abort
 "{{{ won't be triggered when there are no floating windows features.
   if g:has_floating_windows_support == 'vim'
-    let s:preview_windows_nr = s:PreviewWindows_vim(a:msg,a:using_highlight)
+    let g:ECY_windows_are_showing['completion_preview_windows'] = s:PreviewWindows_vim(a:msg,a:using_highlight)
   else
-    let s:preview_windows_nr = s:PreviewWindows_neovim(a:msg,a:using_highlight)
+    let g:ECY_windows_are_showing['completion_preview_windows'] = s:PreviewWindows_neovim(a:msg,a:using_highlight)
   endif
 "}}}
 endfunction
@@ -32,9 +32,9 @@ endfunction
 function! ECY#completion_preview_windows#Close() abort
 "{{{
   if g:has_floating_windows_support == 'vim'
-    if s:preview_windows_nr != -1
-      call popup_close(s:preview_windows_nr)
-      let s:preview_windows_nr = -1
+    if g:ECY_windows_are_showing['completion_preview_windows'] != -1
+      call popup_close(g:ECY_windows_are_showing['completion_preview_windows'])
+      let g:ECY_windows_are_showing['completion_preview_windows'] = -1
     endif
   elseif g:has_floating_windows_support == 'neovim'
     " TODO
@@ -58,30 +58,6 @@ function! ECY#completion_preview_windows#Close() abort
     pclose
 "}}}
   endif
-"}}}
-endfunction
-
-function! ECY#completion_preview_windows#Roll(up_or_down) abort
-"{{{ a:up_or_down = -1 = up; a:up_or_down = 1 = down
-"this function will be mapped, so we should return ''
-  if g:has_floating_windows_support == 'vim'
-    if s:preview_windows_nr != -1
-      " there are 'scrollbar' we can use in vim to roll preview windows
-      " but it require 8.1+, we use popup_setoptions at here could work at
-      " 8.0+
-      try
-        let l:opts = popup_getoptions(s:preview_windows_nr)
-        call popup_setoptions(s:preview_windows_nr,
-              \{'firstline': l:opts['firstline'] + a:up_or_down})
-      catch 
-      endtry
-    endif
-  elseif g:has_floating_windows_support == 'neovim'
-    " TODO
-  elseif g:has_floating_windows_support == 'has_no'
-    " TODO
-  endif
-  return ''
 "}}}
 endfunction
 

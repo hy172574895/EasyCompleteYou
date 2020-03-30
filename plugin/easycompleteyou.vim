@@ -85,6 +85,7 @@ command! -bar -nargs=1 ECYInstall         call ECY_main#Install('<args>')
 command! -bar -nargs=1 ECYGoTo            call ECY#goto#Go('<args>')
 
 " main:
+call ECY#utility#Init()
 call ECY#diagnosis#Init()
 call ECY#completion_preview_windows#Init()
 call ECY#color_completion#Init()

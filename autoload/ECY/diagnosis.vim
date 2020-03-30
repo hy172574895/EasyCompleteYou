@@ -42,7 +42,7 @@ function ECY#diagnosis#Init() abort
   let s:supports_sign_groups = v:false
   let s:sign_id_dict                         = {}
   let s:current_diagnosis                    = {}
-  let s:current_diagnosis_nr                 = -1
+  let g:ECY_windows_are_showing['diagnosis'] = -1
   let g:ECY_diagnosis_items_all              = []
   let g:ECY_diagnosis_items_with_engine_name = {'nothing': []}
   " user don't want to update diagnosis in insert mode, but engine had
@@ -68,6 +68,7 @@ function s:SetUpEvent() abort
 endfunction
 
 function s:SetUpPython() abort
+"{{{
 python3 <<endpython
 import vim
 
@@ -84,10 +85,11 @@ def CalculateScreenSign(start, end):
         results.append(item)
   return results
 endpython
+"}}}
 endfunction
 
 function s:OnCursorHold() abort
-  if s:current_diagnosis_nr == -1
+  if g:ECY_windows_are_showing['diagnosis'] == -1
     call ECY#diagnosis#ShowCurrentLineDiagnosis(v:true)
   endif
 endfunction
@@ -199,15 +201,15 @@ function! ECY#diagnosis#ShowNextDiagnosis(next_or_pre) abort
 endfunction
 
 function! g:Diagnosis_vim_cb(id, key) abort
-  let s:current_diagnosis_nr = -1
+  let g:ECY_windows_are_showing['diagnosis'] = -1
 endfunction
 
 function! s:CloseDiagnosisPopupWindows() abort
 "{{{
-  if s:current_diagnosis_nr != -1
+  if g:ECY_windows_are_showing['diagnosis'] != -1
     if g:has_floating_windows_support == 'vim'
-      call popup_close(s:current_diagnosis_nr)
-      let s:current_diagnosis_nr = -1
+      call popup_close(g:ECY_windows_are_showing['diagnosis'])
+      let g:ECY_windows_are_showing['diagnosis'] = -1
     endif
   endif
 "}}}
@@ -251,7 +253,7 @@ function! s:ShowDiagnosis_vim(index_list) abort
     let l:nr = popup_atcursor(l:text, l:opts)
     call setbufvar(winbufnr(l:nr), '&syntax', 'ECY_d')
     " call win_execute(l:nr, l:exe)
-    let s:current_diagnosis_nr = l:nr
+    let g:ECY_windows_are_showing['diagnosis'] = l:nr
   endif
 "}}}
 endfunction
@@ -534,7 +536,7 @@ function! ECY#diagnosis#Toggle() abort
     call ECY#diagnosis#CleanAllSignHighlight()
     call ECY#diagnosis#ClearAllSign()
     let s:current_diagnosis       = {}
-    let s:current_diagnosis_nr    = -1
+    let g:ECY_windows_are_showing['diagnosis']    = -1
     let g:ECY_diagnosis_items_all = []
     let g:ECY_diagnosis_items_with_engine_name = {}
   endif
