@@ -1,13 +1,9 @@
 # Author: Jimmy Huang (1902161621@qq.com)
 # License: WTFPL
 
-import utils.fuzzy_match as fm
-
-
 class Operate(object):
     def __init__(self):
         self.symbols_cache_list = []
-        self.fuzzy_match = fm.FuzzyMatch()
 
     def HandleIntegration(self, engine_obj, version):
         event_ = version['Integration_event']

@@ -1,7 +1,7 @@
 # Author: Jimmy Huang (1902161621@qq.com)
 # License: WTFPL
 
-import lib.scope as scope_
+import ECY.utils.scope as scope_
 
 class Operate(scope_.Event):
     def __init__(self, source_name):

@@ -6,7 +6,7 @@ import logging
 global g_logger
 g_logger = logging.getLogger('ECY_server')
 # local lib
-import utils.fuzzy_match as fm
+import ECY.utils.fuzzy_match as fm
 
 
 class Operate(object):

@@ -12,8 +12,8 @@ from socket import *  # noqa
 # local lib
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
-from lib import socket_
-from lib import vim_or_neovim_support as vim_lib
+from ECY.utils import socket_
+from ECY.utils import vim_or_neovim_support as vim_lib
 import lib.event.genernal as genernal
 
 g_is_debug = vim_lib.GetVariableValue('g:ECY_debug')

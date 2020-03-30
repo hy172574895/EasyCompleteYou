@@ -2,7 +2,7 @@
 # License: WTFPL
 
 # local lib
-import utils.interface as scope_
+import ECY.utils.interface as scope_
 
 # we do nothing
 class Operate(scope_.Source_interface):

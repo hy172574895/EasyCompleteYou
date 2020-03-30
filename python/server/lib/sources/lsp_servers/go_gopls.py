@@ -1,8 +1,8 @@
 # Author: Jimmy Huang (1902161621@qq.com)
 # License: WTFPL
 
-import utils.lsp.language_server_protocol as lsp
-import utils.interface as scope_
+import ECY.utils.lsp.language_server_protocol as lsp
+import ECY.utils.interface as scope_
 import logging
 import os
 import threading

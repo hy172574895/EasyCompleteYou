@@ -13,7 +13,7 @@ try:
     has_pygment = True
 except Exception as e:
     has_pygment = False
-import utils.interface as scope_
+import ECY.utils.interface as scope_
 # from util import vim_or_neovim_support as vim_lib
 
 class Operate(scope_.Source_interface):

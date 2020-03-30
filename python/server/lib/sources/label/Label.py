@@ -4,7 +4,7 @@
 # standard lib
 import re
 # local lib
-import utils.interface as scope_
+import ECY.utils.interface as scope_
 # from utils import vim_or_neovim_support as vim_lib
 
 

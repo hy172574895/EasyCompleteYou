@@ -5,7 +5,7 @@ global g_logger
 g_logger = logging.getLogger('ECY_server')
 
 # local lib
-import utils.interface as scope_
+import ECY.utils.interface as scope_
 
 
 class Operate(scope_.Source_interface):

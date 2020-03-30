@@ -14,13 +14,8 @@ import os
 # local lib
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
-from utils import socket_ as server
+from ECY.utils import socket_ as server
 from lib import request_handler as request_handler
-
-# for my testing:
-# C:\Users\qwe\Desktop\gvim_8.2.0205_x86\vim\python38\python-3.8.1-embed-win32\python.exe
-# D:\gvim\vimfiles\myplug\ECY_new\python\server\Main_server.py --hmac 1234 --port 1234
-
 
 parser = argparse.ArgumentParser(
     description='EasyCompleteYou, Easily complete you.')
@@ -52,6 +47,7 @@ g_logger = logging.getLogger('ECY_server')
 if g_args.debug_log:
     g_logger.addHandler(fileHandler)
     g_logger.setLevel(logging.DEBUG)
+    g_logger.debug(BASE_DIR)
 
 
 class Handler(object):

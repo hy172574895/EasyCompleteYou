@@ -5,7 +5,7 @@
 # we do nothing
 
 # local lib
-import utils.interface as scope_
+import ECY.utils.interface as scope_
 class Operate(scope_.Source_interface):
     def __init__(self):
         self._name = 'disabled'

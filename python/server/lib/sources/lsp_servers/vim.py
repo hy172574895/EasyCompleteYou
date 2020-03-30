@@ -6,8 +6,8 @@ import threading
 global g_logger
 g_logger = logging.getLogger('ECY_server')
 
-import utils.interface as scope_
-import utils.lsp.language_server_protocol as lsp
+import ECY.utils.interface as scope_
+import ECY.utils.lsp.language_server_protocol as lsp
 
 
 class Operate(scope_.Source_interface):

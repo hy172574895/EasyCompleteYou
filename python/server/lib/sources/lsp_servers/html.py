@@ -18,8 +18,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 global hint_content
 hint_content = 'ok'
 
-import utils.interface as scope_
-import utils.lsp.language_server_protocol as lsp
+import ECY.utils.interface as scope_
+import ECY.utils.lsp.language_server_protocol as lsp
 
 
 class Operate(scope_.Source_interface):

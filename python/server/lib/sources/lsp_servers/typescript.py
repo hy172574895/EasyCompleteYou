@@ -13,7 +13,7 @@ import shlex
 global g_logger
 g_logger = logging.getLogger('ECY_server')
 
-import utils.interface as scope_
+import ECY.utils.interface as scope_
 
 
 class Operate(scope_.Source_interface):

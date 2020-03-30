@@ -20,7 +20,7 @@ try:
 except:
     has_pyflake = False
 
-import utils.interface as scope_
+import ECY.utils.interface as scope_
 
 if has_pyflake:
     PYFLAKES_ERROR_MESSAGES = (

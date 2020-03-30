@@ -5,8 +5,8 @@ import logging
 global g_logger
 g_logger = logging.getLogger('ECY_client')
 
-import lib.scope as scope_
-import lib.vim_or_neovim_support as vim_lib
+import ECY.utils.scope as scope_
+import ECY.utils.vim_or_neovim_support as vim_lib
 
 
 class Operate(scope_.Event):
