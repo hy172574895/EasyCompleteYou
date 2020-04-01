@@ -249,7 +249,8 @@ function! ECY#utility#RollFloatingWindows(up_or_down) abort
         try
           let l:opts = popup_getoptions(value)
           if has_key(l:opts, 'firstline')
-            let l:next_line = l:opts['firstline'] + a:up_or_down
+            let l:current_first_line = l:opts['firstline']
+            let l:next_line = l:current_first_line + a:up_or_down
             call popup_setoptions(value, {'firstline': l:next_line})
           endif
         " catch

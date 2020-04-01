@@ -10,7 +10,7 @@ function! ECY#document_help#Init() abort
 "}}}
 endfunction
 
-function! s:Close_preview_windows() abort
+function! s:ClosePreviewWindows_buffer() abort
 "{{{
   if g:ECY_windows_are_showing['document_help'] != -1
     exe ':bd!' . string(g:ECY_windows_are_showing['document_help'])
@@ -19,12 +19,12 @@ function! s:Close_preview_windows() abort
 "}}}
 endfunction
 
-function! s:ShowHelp_new_windows(msg) abort
+function! s:ShowHlep_buffer(msg) abort
 "{{{ only works on normal mode.
   let l:text = a:msg['Results'] " lists
   let l:text_len = len(l:text)
   let l:text = join(l:text, "\n") . "\n"
-  call s:Close_preview_windows()
+  call s:ClosePreviewWindows_buffer()
   silent! exe ':new ' . 'ECY-preview'
   silent! exe ':res '. l:text_len
   let l:current_windows = winnr('$')
@@ -70,7 +70,7 @@ function! ECY#document_help#cb(msg) abort
   if g:has_floating_windows_support == 'vim'
     call s:ShowHelp_vim(a:msg, &filetype)
   else
-    call s:ShowHelp_new_windows(a:msg)
+    call s:ShowHlep_buffer(a:msg)
   endif
 "}}}
 endfunction
