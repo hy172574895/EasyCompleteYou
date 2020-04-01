@@ -80,10 +80,12 @@ class Operate(scope_.Source_interface):
             if prefix != '': 
                 # using workspace symbols 
                 full_path = prefix + item
-                if results_format['kind'] == '[Dir]':
-                    full_path += '/'
-                full_path = full_path.split('\n')
-                results_format['info'] = full_path
+            else:
+                full_path = item
+            if results_format['kind'] == '[Dir]':
+                full_path += '/'
+            full_path = full_path.split('\n')
+            results_format['info'] = full_path
             results_list.append(results_format)
         return results_list
 
@@ -105,29 +107,33 @@ class Operate(scope_.Source_interface):
         if workspace is not None and len(path) > 0:
             if path[0] in ['~', '.']:
                 # most of the language like "~/gvim" ro ".\gvim"
-                path_temp = workspace + path[1:]
+                workspace = workspace + path[1:]
             elif path[0] in ['\\','/']:
                 # such as html
-                path_temp = workspace + path
+                workspace = workspace + path
             else:
                 # we try anyway.
-                path_temp = workspace + "/" + path
+                workspace = workspace + "/" + path
             try:
                 # try it with workspace
-                os.chdir(path_temp)
+                os.chdir(workspace)
                 file_list = os.listdir(os.curdir)
-                prefix = path_temp
+                prefix = workspace
             except:
                 pass
 
         if prefix == '':
             try:
                 # try it with no workspace
-                path_temp = path
-                os.chdir(path)
-                file_list = os.listdir(os.curdir)
-                prefix = path
+                if path[0] in ['~', '.']:
+                    prefix = os.curdir
+                    file_list = os.listdir(prefix + path[1:])
+                    g_logger.debug(os.curdir)
+                else:
+                    os.chdir(path)
+                    file_list = os.listdir(os.curdir)
             except:
+                # return buffer id
                 return return_
 
         prefix = prefix.replace("\\\\",'/')
