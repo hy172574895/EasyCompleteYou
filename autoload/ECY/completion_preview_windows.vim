@@ -8,6 +8,12 @@ function! ECY#completion_preview_windows#Init() abort
   let g:ECY_enable_preview_snippet = get(g:,'ECY_enable_preview_snippet', v:true)
   let g:ECY_preview_windows_size = 
         \get(g:,'ECY_preview_windows_size',[[30, 50], [2, 14]])
+  let i = g:ECY_preview_windows_size[0][1]
+  let s:cut_line = ''
+  while i != 0
+    let s:cut_line .= '-'
+    let i -= 1
+  endw
   " TODO:
   " g:ECY_PreviewWindows_style = 'append'
   " g:ECY_PreviewWindows_style = 'preview_windows'
@@ -100,7 +106,7 @@ function s:PreviewWindows_vim(msg, using_highlight) abort
   let l:toShow_list = []
   if l:item_menu != ''
     let l:toShow_list = split(l:item_menu, "\n")
-    call add(l:toShow_list,'----------------')
+    call add(l:toShow_list, s:cut_line)
   endif
   for item in l:item_info
     call add(l:toShow_list, item)
