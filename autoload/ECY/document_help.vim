@@ -36,7 +36,11 @@ function! s:ShowHlep_buffer(msg) abort
 endfunction
 
 function! s:ShowHelp_vim(msg, file_type) abort
-"{{{
+"{{{ floating windows
+  let l:temp = g:ECY_windows_are_showing['document_help']
+  if l:temp != -1
+    call popup_close(l:temp)
+  endif
   let l:text = a:msg['Results']
   let l:opts = {
       \ 'minwidth': g:ECY_preview_windows_size[0][0],
