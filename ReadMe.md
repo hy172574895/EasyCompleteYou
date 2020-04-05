@@ -150,7 +150,8 @@ cmd|params|description
 --|:--:|--:
 `ECYDiagnosisLists`|-| Show diagnostic lists with `leaderf`.
 `ECYToggleDiagnosis`|-| Toggle diagnosis.
-`ECYSymbols`|-| Show symbols lists with `leaderf`.
+`ECYSymbols`|-| Show document symbols lists with `leaderf`.
+`ECYWorkSpaceSymbols`|-| Show workspace symbols lists with `leaderf`.
 `ECYGoTo`|1| goto somewhere, such as `:ECYGoTo reference`.
 `ECYInstall`|1| Install a new engine, such as `:ECYInstall html_lsp`.
 `ECYListEngine`|1| Show status of all ECY's engines`.
@@ -276,6 +277,9 @@ A: Ale use job(channel) feature to send data to linter, but ECY use python3 inst
 And every completion that ECY do will send data of current buffer to Server, on
 the same time, ECY can return diagnosis; that will be send only once. Using Ale
 will do it twice, sending to linter and ECY's Server.
+
+### Q: Why there are no Signature-help?
+A: A Signature-help is to show tips about what user using such as prototype of a function. I think using snippets-expanding is good enough to show prototype.
 
 # Debug & Contribution
 ## How to debug?
