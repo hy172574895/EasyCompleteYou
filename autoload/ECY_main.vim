@@ -727,10 +727,10 @@ function! s:Integration_cb(msg) abort
   endif
   let l:event = a:msg['Integration_event']
   if l:event == 'go_to_declaration_or_definition'
-    call ECY#user_ui#CheckGoto(a:msg['Results'],&filetype)
+    call ECY#user_ui#CheckGoto(a:msg['Results'], &filetype)
   elseif l:event == 'GoToDefinition'
     " TODO
-  elseif l:event == 'get_symbols'
+  elseif l:event == 'get_symbols' || l:event == 'get_workspace_symbols'
     call ECY#symbols#ReturingResults_cb(a:msg['Results'])
   elseif l:event == 'diagnostics'
     call ECY#diagnosis#PlaceSign(a:msg['Results'])

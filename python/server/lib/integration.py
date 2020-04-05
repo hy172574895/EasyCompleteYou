@@ -20,6 +20,9 @@ class Operate(object):
         elif event_ == 'get_symbols':
             return_ = engine_obj.GetSymbol(version)
 
+        elif event_ == 'get_workspace_symbols':
+            return_ = engine_obj.GetWorkSpaceSymbol(version)
+
         if return_ is None:
             return_ = {'Results': 'ok',
                        'ErroCode': 3,

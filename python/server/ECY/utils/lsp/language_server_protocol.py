@@ -362,12 +362,12 @@ class LSP(conec.Operate):
         return self._build_send(params, 'textDocument/hover')
 
     def documentSymbos(self, uri):
-        # query == "" means returning all symbols.
         params = {'textDocument': {'uri': uri}}
         return self._build_send(params, 'textDocument/documentSymbol')
 
     def workspaceSymbos(self, query=""):
         # query == "" means returning all symbols.
+        # few of Server supports this feature.
         params = {'query': query}
         return self._build_send(params, 'workspace/symbol')
 

@@ -49,9 +49,16 @@ class Source_interface(object):
         return self._return(version['VersionID'])
 
     def GetSymbol(self, version):
+        """ documentSymbos
+        """
         return self._return(version['VersionID'],
                             is_slience=False,
                             content='Current Engine Have No GetSymbol Ability.')
+
+    def GetWorkSpaceSymbol(self, version):
+        return self._return(version['VersionID'],
+                            is_slience=False,
+                            content='Current Engine Have No GetWorkSpaceSymbol Ability.')
 
     def Goto(self, version):
         return self._return(version['VersionID'],
