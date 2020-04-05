@@ -16,13 +16,6 @@ except:
     has_jedi = False
 try:
     from pyflakes import api as pyflakes_api, messages
-    has_pyflake = True
-except:
-    has_pyflake = False
-
-import ECY.utils.interface as scope_
-
-if has_pyflake:
     PYFLAKES_ERROR_MESSAGES = (
         messages.UndefinedName,
         messages.UndefinedExport,
@@ -36,7 +29,11 @@ if has_pyflake:
         messages.ContinueInFinally,
         messages.TwoStarredExpressions,
     )
+    has_pyflake = True
+except:
+    has_pyflake = False
 
+import ECY.utils.interface as scope_
 
 
 class Operate(scope_.Source_interface):
