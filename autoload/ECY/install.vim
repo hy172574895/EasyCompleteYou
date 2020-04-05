@@ -124,8 +124,8 @@ endf
 
 function! ECY#install#ListEngine_cb(msg, timer_id) abort
 "{{{
-  let g:abcd = a:msg
   let l:to_show = []
+  call add(l:to_show, ' Version: '. string(g:ECY_version['version']))
   call add(l:to_show, '[ECY] Engine lists:')
   call add(l:to_show, '-------------------')
   call add(l:to_show, '√ installed; × disabled.')
