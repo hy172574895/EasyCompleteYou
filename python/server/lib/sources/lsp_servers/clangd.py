@@ -259,6 +259,20 @@ class Operate(scope_.Source_interface):
                 version['FilePath'])
         return return_
 
+    def GetWorkSpaceSymbol(self, version):
+        if not self._check(version):
+            return None
+        return_ = {'ID': version['VersionID']}
+        temp = self._lsp.workspaceSymbos()
+        try:
+            symbos = self._lsp.GetResponse(temp['Method'])
+            symbos = symbos['result']
+        except:
+            symbos = []
+        return_['Results'] = self._analys_document_symbols(symbos,
+                version['FilePath'])
+        return return_
+
     def _genarate_position(self, line, colum):
         return '[' + str(line) + ', ' + str(colum)+']'
 
