@@ -141,6 +141,11 @@ Some useful command of `LeaderF` are follow.
 
 Especially the `ctags` support of `LeaderF`
 
+## Cooperate with [Rooter](https://github.com/airblade/vim-rooter)
+`Rooter` is build with ECY, you don't have to install it separately.
+---
+You can also make `Rooter` work with some plugins like `lightline.vim` and `airline` to show workspace dir of current buffer.
+
 # Commands
 Run in Normal mode, such as 
 ```

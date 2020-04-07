@@ -172,8 +172,7 @@ function! s:ChangeToRootDirectory()
   endif
 endfunction
 
-" For third-parties.  Not used by plugin.
-function! ECY#rooter#GetCurrentBufferWorkSpace()
+function! FindRootDirectory()
   let s:fd = expand('%:p')
 
   if empty(s:fd)
@@ -189,6 +188,11 @@ function! ECY#rooter#GetCurrentBufferWorkSpace()
   endif
 
   return s:RootDirectory()
+endfunction
+
+" For third-parties.  Not used by plugin.
+function! ECY#rooter#GetCurrentBufferWorkSpace()
+  return FindRootDirectory()
 endfunction
 
 command! Rooter :call <SID>ChangeToRootDirectory()
