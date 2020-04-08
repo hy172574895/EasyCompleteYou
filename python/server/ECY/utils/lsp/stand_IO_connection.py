@@ -103,12 +103,11 @@ class Operate:
         # can not redect stderr to subprocess.PIPE
         try:
             cmd = shlex.split(shell_cmd)
-            CREATE_NO_WINDOW = 0x08000000
+            # CREATE_NO_WINDOW = 0x08000000
             self._p = subprocess.Popen(cmd,
                                        shell=True,
                                        stdout=subprocess.PIPE,
-                                       stdin=subprocess.PIPE,
-                                       creationflags=CREATE_NO_WINDOW)
+                                       stdin=subprocess.PIPE)
             # stderr = subprocess.STDOUT)
 
             self._job = ThreadOfJob(self.server_count, self._p,
