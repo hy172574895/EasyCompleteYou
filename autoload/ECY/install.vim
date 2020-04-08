@@ -207,7 +207,7 @@ function! ECY#install#html_lsp() abort
 "{{{
   " options: 1. cmd for starting Server
   " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
-  if !executable('html-languageserver')
+  if !executable(get(g:,'ECY_html_lsp_starting_cmd','html-languageserver'))
     if !executable('npm')
       return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
     endif
@@ -226,7 +226,7 @@ function! ECY#install#clangd() abort
 "{{{
   " options: 1. cmd for starting Server
   " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
-  if !executable('clangd')
+  if !executable(get(g:,'ECY_clangd_starting_cmd','clangd'))
     return {'status':'-1','description':"You missing 'clangd'."}
   endif
   return {'status':'0','description':"ok"}
@@ -237,7 +237,7 @@ function! ECY#install#typescript_lsp() abort
 "{{{
   " options: 1. cmd for starting Server
   " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
-  if !executable('typescript-language-server')
+  if !executable(get(g:,'ECY_typescripte_starting_cmd', 'tsserver'))
     if !executable('npm')
       return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
     endif
@@ -268,7 +268,7 @@ endfunction
 
 function! ECY#install#Go_gopls() abort
 "{{{
-  if !executable('gopls')
+  if !executable(get(g:,'ECY_gopls_starting_cmd','gopls'))
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
   endif
   return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.go_gopls', 'name':'go_gopls', 'path': ''}
@@ -277,7 +277,7 @@ endfunction
 
 function! ECY#install#Go_langserver() abort
 "{{{
-  if !executable('go-langserver')
+  if !executable(get(g:,'ECY_golangserver_starting_cmd','go-langserver'))
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
   endif
   return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.go_langserver', 'name':'go_langserver', 'path': ''}
