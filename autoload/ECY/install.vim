@@ -39,7 +39,7 @@ function! ECY#install#Init() abort
 
   call ECY#install#AddEngineInfo('clangd',
         \'lib.event.clangd','lib.sources.lsp_servers.clangd',
-        \function('ECY#install#typescript_lsp'), '', 'buildin')
+        \function('ECY#install#clangd'), '', 'buildin')
 "}}}
 endfunction
 
