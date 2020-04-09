@@ -22,6 +22,7 @@ class Operate(scope_.Source_interface):
         self._deamon_queue = None
         self._workspace_list = []
         self._diagnosis_cache = None
+        self._opened_workspace = {}
 
     def GetInfo(self):
         return {'Name': self._name,
@@ -60,27 +61,40 @@ class Operate(scope_.Source_interface):
             is_enable_diagnosis=True):
         if is_enable_diagnosis:
             is_enable_diagnosis = True
+
         try:
+            if workspace not in self._opened_workspace:
+                self.is_server_start = 'not_started'
+                g_logger.debug('newed a new rust_analyzer Server.')
+
             if self.is_server_start == 'not_started':
-                if starting_cmd == "":
-                    starting_cmd = 'clangd'
                 starting_cmd = 'f:/rust/rust-analyzer-windows.exe'
-                # starting_cmd = 'rls'
                 g_logger.debug(starting_cmd)
-                self._lsp.StartJob(starting_cmd)
-                rooturi = 'E:/gvim/vimfiles/myplug/ECY_new/test/rust/hello_cargo'
-                rooturi = self._lsp.PathToUri(rooturi)
+
+                # open new server process
+                server_pid = self._lsp.StartJob(starting_cmd)
+                if server_pid is None:
+                    raise ''
+                self._opened_workspace[workspace] = server_pid
+                self._lsp.ChangeUsingServerID(server_pid)
+
+                # send init request
+                rooturi = self._lsp.PathToUri(workspace)
+                # rooturi = 'E:/gvim/vimfiles/myplug/ECY_new/test/rust/hello_cargo'
                 temp = self._lsp.initialize(rootUri=rooturi)
                 # if time out will raise, meanning can not start a job.
                 self._lsp.GetResponse(temp['Method'], timeout_=5)
-                self.is_server_start = 'started'
+
+                # init
                 threading.Thread(target=self._get_diagnosis,
                                  daemon=True).start()
-                threading.Thread(target=self._handle_log_msg,
+                threading.Thread(target=self._handle_show_msg,
                                  daemon=True).start()
                 threading.Thread(target=self._word_done_progress,
                                  daemon=True).start()
                 self._lsp.initialized()
+                self.is_server_start = 'started'
+            self._lsp.ChangeUsingServerID(self._opened_workspace[workspace])
         except:
             self.is_server_start = 'started_error'
             g_logger.exception(': can not start Sever.')
@@ -109,19 +123,19 @@ class Operate(scope_.Source_interface):
                 g_logger.exception('')
         
 
-    def _handle_log_msg(self):
+    def _handle_show_msg(self):
         g_logger.debug("started hanlde logmsg thread.")
         while 1:
             try:
                 response = self._lsp.GetResponse(
-                    'window/logMessage', timeout_=-1)
+                    'window/showMessage', timeout_=-1)
                 response = response['params']
                 msg = response['message']
                 if self._filter_log_msg(msg):
                     continue
                 types = response['type']
                 if types == 1:
-                    # erro of warning
+                    # error and warning
                     self._build_erro_msg(4, msg)
                 elif types == 3:
                     # info, TODO
@@ -129,7 +143,7 @@ class Operate(scope_.Source_interface):
             except:
                 g_logger.exception('')
 
-    def _did_open_or_change(self, uri, text, document_id):
+    def _did_open_or_change(self, uri, text, document_id, workspace):
         """ will ask diagnostics.
         """
         # {{{
@@ -142,11 +156,12 @@ class Operate(scope_.Source_interface):
             self._did_open_list[uri]['change_version'] += 1
             return_id = self._lsp.didchange(
                 uri, text, version=self._did_open_list[uri]['change_version'])
-        g_logger.debug('_did_open_or_change' + str(document_id))
+
         if self.DocumentVersionID == document_id:
             # to compat clangd
             self._output_queue(self._diagnosis_cache)
         self.DocumentVersionID = document_id
+
         return return_id
         # }}}
 
@@ -327,7 +342,8 @@ class Operate(scope_.Source_interface):
             # so we return nothing
             uri_ = self._lsp.PathToUri(version['FilePath'])
             self._did_open_or_change(uri_, version['AllTextList'],
-                                     version['DocumentVersionID'])
+                                     version['DocumentVersionID'],
+                                     version['WorkSpace'])
         # every event must return something. 'None' means send nothing to client
         return None
 
@@ -338,7 +354,8 @@ class Operate(scope_.Source_interface):
         g_logger.debug('OnBufferTextChanged')
         line_text = version['AllTextList']
         self._did_open_or_change(uri_, line_text,
-                                 version['DocumentVersionID'])
+                                 version['DocumentVersionID'],
+                                 version['WorkSpace'])
 
     def DoCompletion(self, version):
         if not self._check(version):
