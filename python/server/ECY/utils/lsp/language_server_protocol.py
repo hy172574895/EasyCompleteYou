@@ -60,10 +60,17 @@ class LSP(conec.Operate):
         if _method_name not in self._queue_dict:
             # new
             self._queue_dict[_method_name] = queue.Queue()
-        if timeout_ == -1:
-            return self._queue_dict[_method_name].get()
-        else:
-            return self._queue_dict[_method_name].get(timeout=timeout_)
+        queue_obj = None
+        try:
+            if timeout_ == -1:
+                queue_obj = self._queue_dict[_method_name].get()
+            else:
+                queue_obj = self._queue_dict[_method_name].get(timeout=timeout_)
+        except:
+            self._queue_dict[_method_name] = queue.Queue()
+        if queue_obj is None:
+            raise 'queue time out.'
+        return queue_obj
 
     def _add_queue(self, _method_name, _todo):
         if _method_name is None:
@@ -133,12 +140,14 @@ class LSP(conec.Operate):
         self.SendData(self.server_id, message.encode(encoding="utf-8"))
         return {'ID': self._id, 'Method': method}
 
-    def _build_response(self, results, ids):
+    def _build_response(self, results, ids, error=None):
         if self.server_id <= 0:
             # raise an erro:
             # return 'E002: you have to send a initialize request first.'
             return None
         context = {'jsonrpc': '2.0', 'result': results, 'id': ids}
+        if error is not None:
+            context['error'] = error
         context = json.dumps(context)
         context_lenght = len(context)
         debug = "--->" + context
@@ -159,8 +168,8 @@ class LSP(conec.Operate):
                 "applyEdit": True,
                 "workspaceEdit": {
                     "documentChanges": True,
-                    "resourceOperations": ["Create", "Rename", "Delete"],
-                    "failureHandling": "Abort"
+                    "resourceOperations": ["create", "rename", "delete"],
+                    "failureHandling": "abort"
                     },
                 "didChangeConfiguration": {
                     "dynamicRegistration": False
@@ -317,6 +326,9 @@ class LSP(conec.Operate):
         """ workspace/configuration, a response send to Server.
         """ 
         return self._build_response(results, ids)
+
+    def wordDoneProgress(self, ids):
+        return self._build_response(None, ids)
 
     def didopen(self, uri, languageId, text, version=None):
         textDocument = {'uri': uri, 'languageId': languageId,
