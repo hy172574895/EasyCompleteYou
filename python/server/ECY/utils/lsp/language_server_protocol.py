@@ -28,6 +28,7 @@ class LSP(conec.Operate):
         super().__init__()
         threading.Thread(target=self._classify_response, daemon=True).start()
         self._debug = False
+        self._using_server_id = None
 
     def OuputToStd(self):
         self._debug = not self._debug
@@ -110,6 +111,16 @@ class LSP(conec.Operate):
         finally:
             self._lock.release()
 
+    def ChangeUsingServerID(self, id_nr):
+        if id_nr > self.server_count:
+            raise 'have no such a server process.'
+        self._using_server_id = id_nr
+
+    def GetUsingServerID(self):
+        if self._using_server_id is None:
+            return self.server_id
+        return self._using_server_id
+
     def _build_send(self, params, method, isNotification=False):
         """build request format and send it to server as request
            or notification.
@@ -137,7 +148,7 @@ class LSP(conec.Operate):
             "Content-Length: {}\r\n\r\n"
             "{}".format(context_lenght, context)
         )
-        self.SendData(self.server_id, message.encode(encoding="utf-8"))
+        self.SendData(self.GetUsingServerID(), message.encode(encoding="utf-8"))
         return {'ID': self._id, 'Method': method}
 
     def _build_response(self, results, ids, error=None):

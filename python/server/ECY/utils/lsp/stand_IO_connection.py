@@ -82,7 +82,7 @@ class ThreadOfJob(object):
         out_data = out_data.decode("UTF-8")
         return str(out_data)
 
-    def _write_stdin(self, sending_data):
+    def WriteStdin(self, sending_data):
         self._sub_object.stdin.write(sending_data)
         self._sub_object.stdin.flush()
 
@@ -104,33 +104,31 @@ class Operate:
         try:
             cmd = shlex.split(shell_cmd)
             # CREATE_NO_WINDOW = 0x08000000
-            self._p = subprocess.Popen(cmd,
+            process_obj = subprocess.Popen(cmd,
                                        shell=True,
                                        stdout=subprocess.PIPE,
                                        stdin=subprocess.PIPE)
             # stderr = subprocess.STDOUT)
+            self.server_count += 1
 
-            self._job = ThreadOfJob(self.server_count, self._p,
+            process_hanlder = ThreadOfJob(self.server_count, process_obj,
                                     self._queue)
 
-            self._thread = \
-                threading.Thread(target=self._job.Start)
-            # self._thread.daemon = True
-            self._thread.start()
+            threading.Thread(target=process_hanlder.Start, daemon=True).start()
 
-            self.server_count += 1
             self.server_info[self.server_count] = {}
             self.server_info[self.server_count]['cmd'] = cmd
-            self.server_info[self.server_count]['proc_object'] = self._p
-            self.server_info[self.server_count]['thread_object'] = self._job
+            self.server_info[self.server_count]['proc_object'] = process_obj
+            self.server_info[self.server_count]['thread_object'] = process_hanlder
         except:
             g_logger.exception("something wrong")
-            return 0
-        return 1
+            return None
+        g_logger.debug(self.server_info)
+        return self.server_count
 
     def SendData(self, server_id, data):
         if server_id in self.server_info:
-            self.server_info[server_id]['thread_object']._write_stdin(data)
+            self.server_info[server_id]['thread_object'].WriteStdin(data)
         else:
             pass
 
