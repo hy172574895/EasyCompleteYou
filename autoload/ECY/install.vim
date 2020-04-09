@@ -40,6 +40,10 @@ function! ECY#install#Init() abort
   call ECY#install#AddEngineInfo('clangd',
         \'lib.event.clangd','lib.sources.lsp_servers.clangd',
         \function('ECY#install#clangd'), '', 'buildin')
+
+  call ECY#install#AddEngineInfo('rust_analyzer',
+        \'lib.event.rust_analyzer','lib.sources.lsp_servers.rust_analyzer',
+        \function('ECY#install#rust_analyzer'), '', 'buildin')
 "}}}
 endfunction
 
@@ -219,6 +223,17 @@ function! ECY#install#html_lsp() abort
     echo "[Suggestion] We hightly recommend you to install UltiSnips plugin for better experience of HTML's source."
   endtry
   return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.html', 'name':'html_lsp', 'path': ''}
+"}}}
+endfunction
+
+function! ECY#install#rust_analyzer() abort
+"{{{
+  " options: 1. cmd for starting Server
+  " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
+  if !executable(get(g:,'ECY_rust_analyzer_starting_cmd','rust-analyzer'))
+    return {'status':'-1','description':"The setting of 'g:ECY_rust_analyzer_starting_cmd' is invalid. Please check."}
+  endif
+  return {'status':'0','description':"ok"}
 "}}}
 endfunction
 
