@@ -94,6 +94,7 @@ call ECY#document_help#Init()
 call ECY#goto#Init()
 call ECY#install#Init()
 call ECY_main#Start()
+filetype on
 
 let g:ECY_endtime = reltimefloat(reltime())
 let g:ECY_start_time = g:ECY_endtime - g:ECY_starttime
