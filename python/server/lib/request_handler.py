@@ -65,6 +65,7 @@ class EventHandler(object):
         # means returning nothing that do not need to send back to vim's side.
         if event_ == 'DoCompletion':
             version_dict['IsInsertMode'] = True
+            # make sure we update text before completing.
             temp = self.on_buffer.OnBufferTextChanged(engine_obj, version_dict)
             temp = self.completion.DoCompletion(engine_obj,version_dict)
         elif event_ == 'OnBufferEnter':
