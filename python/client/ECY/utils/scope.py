@@ -41,6 +41,10 @@ class Event(object):
     def ChangeSourceName(self, source_name):
         self.source_name = source_name
 
+#######################################################################
+#                               events                                #
+#######################################################################
+
     def InstallSource(self):
         """ user should not rewrite this method
         """
@@ -78,6 +82,10 @@ class Event(object):
     def GetAvailableSources(self):
         return self._pack({}, 'GetAvailableSources')
 
+#######################################################################
+#                                scope                                #
+#######################################################################
+
     def _generate(self, msg, event_name):
         msg['Event'] = event_name
         if event_name == 'DoCompletion':
@@ -95,6 +103,10 @@ class Event(object):
 
     def _pack(self, msg, event_name):
         return self._generate(msg, event_name)
+
+#######################################################################
+#                             get snippet                             #
+#######################################################################
 
     def _get_snippets(self, is_reflesh=False):
         results = {'HasSnippetSupport': True}
@@ -158,6 +170,10 @@ class Event(object):
                     break
         return self.preview_content[file_type]
 
+#######################################################################
+#                                basic                                #
+#######################################################################
+
     def _is_return_diagnosis(self):
         return vim_lib.GetVariableValue("g:ECY_enable_diagnosis")
 
@@ -175,8 +191,11 @@ class Event(object):
         msg['StartPosition'] = start_position
         msg['SourceName'] = self.source_name
         msg['WorkSpace'] = self._workspace
-        g_logger.debug("current buffer WorkSpace:")
         return self._return_buffer(msg, file_path)
+
+#######################################################################
+#                            using differ                             #
+#######################################################################
 
     def _parse_differ_commands(self):
         infos = vim_lib.GetVariableValue('g:ECY_buffer_need_to_update')

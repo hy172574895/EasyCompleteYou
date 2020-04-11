@@ -180,4 +180,5 @@ class ECY_Client(_do):
             g_logger.exception("Failed to trigger a Client event.")
 
     def Exe(self, do):
+        g_logger.debug(do)
         self._add(do)

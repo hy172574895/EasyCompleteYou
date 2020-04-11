@@ -47,6 +47,9 @@ endfunction
 
 function ECY_main#TextDifferEvent(bufnr, start, end, added, changes)
 "{{{
+  if !ECY_main#UsingTextDifferEvent()
+    return
+  endif
   let l:line_need_to_update = []
   " let l:line_need_to_update = [a, b ,c]
   " a is the kind of operations.
@@ -170,11 +173,9 @@ function! s:OnBufferEnter() abort
   let s:indentexpr           = &indentexpr
   let s:completeopt_temp     = &completeopt
   let s:completeopt_fuc_temp = &completefunc
-  " call ECY_main#ChangeDocumentVersionID()
   call ECY#diagnosis#CleanAllSignHighlight()
   call s:SetUpCompleteopt()
   " OnBufferEnter will trigger Diagnosis
-  call ECY_main#Log("asked Diagnosis.")
   call ECY_main#Do("OnBufferEnter", v:true)
   "}}}
 endfunction
@@ -772,7 +773,6 @@ function! s:EventSort(id, data, event) abort
   "{{{ classify events.
   " a:data is a list that every item was divided into a decodable json
   " try
-    call ECY_main#Log("<---" . string(a:data))
     for item in a:data
       if item == ''
         " an additional part when splitting line with '\n'
