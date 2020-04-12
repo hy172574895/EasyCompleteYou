@@ -232,7 +232,16 @@ function! s:ShowDiagnosis_vim(index_list) abort
       let l:style = 'ECY_diagnosis_warn'
     endif
     call add(l:text, l:style . ' [' .l:line . ', ' . l:colum . '] ' . l:nr)
-    call add(l:text, '(' . item['diagnosis'] . ')')
+    let l:temp = item['diagnosis']
+    if type(l:temp) == 1
+      " strings
+      call add(l:text, '(' . l:temp . ')')
+    elseif type(l:temp) == 3
+      " lists
+      let l:temp[0] = '(' . l:temp[0]
+      let l:temp[len(l:temp) - 1] .= ')'
+      call extend(l:text, l:temp)
+    endif
   endfor
   if g:ECY_PreviewWindows_style == 'append'
     " show a popup windows aside current cursor.

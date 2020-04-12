@@ -209,7 +209,7 @@ class Operate(scope_.Source_interface):
             position = {'line': start_line, 'range': {
                 'start': {'line': start_line, 'colum': start_colum},
                 'end': {'line': end_line, 'colum': end_colum}}}
-            diagnosis = item['message']
+            diagnosis = item['message'].replace("\n", '; ')
             if item['severity'] == 1:
                 kind = 1
             else:
@@ -315,12 +315,14 @@ class Operate(scope_.Source_interface):
         if 'error' not in results:
             results = results['result']
             for item in results:
-                start_line = item['range']['start']['line'] + 1
-                start_colum = item['range']['start']['character']
-                # end_line = item['range']['end']['line'] + 1
-                # end_colum = item['range']['end']['character']
-
-                file_path = self._lsp.UriToPath(item['uri'])
+                if kind == "references":
+                    start_line = item['range']['start']['line'] + 1
+                    start_colum = item['range']['start']['character']
+                    file_path = self._lsp.UriToPath(item['uri'])
+                else:
+                    start_line = item['targetSelectionRange']['start']['line'] + 1
+                    start_colum = item['targetSelectionRange']['start']['character']
+                    file_path = self._lsp.UriToPath(item['targetUri'])
                 file_size = str(int(os.path.getsize(file_path)/1000)) + 'KB'
                 position = {'line': start_line,
                             'colum': start_colum, 'path': file_path}
