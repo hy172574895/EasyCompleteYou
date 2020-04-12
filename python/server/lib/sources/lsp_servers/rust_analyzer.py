@@ -68,7 +68,7 @@ class Operate(scope_.Source_interface):
                 g_logger.debug('newed a new rust_analyzer Server.')
 
             if self.is_server_start == 'not_started':
-                starting_cmd = 'f:/rust/rust-analyzer-windows.exe'
+                # starting_cmd = 'f:/rust/rust-analyzer-windows.exe'
                 g_logger.debug(starting_cmd)
 
                 # open new server process
@@ -80,7 +80,6 @@ class Operate(scope_.Source_interface):
 
                 # send init request
                 rooturi = self._lsp.PathToUri(workspace)
-                # rooturi = 'E:/gvim/vimfiles/myplug/ECY_new/test/rust/hello_cargo'
                 temp = self._lsp.initialize(rootUri=rooturi)
                 # if time out will raise, meanning can not start a job.
                 self._lsp.GetResponse(temp['Method'], timeout_=5)
@@ -99,7 +98,7 @@ class Operate(scope_.Source_interface):
             self.is_server_start = 'started_error'
             g_logger.exception(': can not start Sever.')
             self._build_erro_msg(2,
-                                 'Failed to start LSP server. You will need Clangd 7.0+. Check Log file of server to get more details.')
+                                 'Failed to start LSP server. Check Log file of server to get more details.')
 
     def _filter_log_msg(self, msg):
         """ return True means filter this msg.

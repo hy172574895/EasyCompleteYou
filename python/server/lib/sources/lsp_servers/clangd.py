@@ -64,7 +64,6 @@ class Operate(scope_.Source_interface):
             if self.is_server_start == 'not_started':
                 if starting_cmd == "":
                     starting_cmd = 'clangd'
-                # starting_cmd = 'C:/Users/qwe/Downloads/clangd-windows-10rc3/clangd_10rc3/bin/clangd.exe'
                 # g_logger.debug(starting_cmd)
                 self._lsp.StartJob(starting_cmd)
                 temp = self._lsp.initialize()
@@ -364,8 +363,7 @@ class Operate(scope_.Source_interface):
                               'menu': '', 'info': [], 'user_data': ''}
             results_format['abbr'] = item['filterText']
             results_format['word'] = item['filterText']
-            results_format['kind'] = self._lsp.GetKindNameByNumber(
-                item['kind'])
+            results_format['kind'] = self._lsp.GetKindNameByNumber(item['kind'])
             if 'detail' in item:
                 results_format['menu'] = item['detail']
             if 'documentation' in item:
@@ -375,7 +373,7 @@ class Operate(scope_.Source_interface):
             try:
                 if item['insertTextFormat'] == 2:
                     temp = item['insertText']
-                    if '$' in temp or '(' in temp:
+                    if '$' in temp or '(' in temp or '{' in temp:
                         temp = temp.replace('{\\}', '\{\}')
                         results_format['snippet'] = temp
                         results_format['kind'] += '~'
