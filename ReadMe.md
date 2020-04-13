@@ -147,6 +147,10 @@ Especially the `ctags` support of `LeaderF`
 ---
 You can also make `Rooter` work with some plugins like `lightline.vim` and `airline` to show workspace dir of current buffer.
 
+## Cooperate with other plugins
+such as `lightline.vim` and `airline`, you can show current buffer engine name by `ECY_main#GetCurrentUsingSourceName()`, or show current buffer count of errors/warnings by `ECY#diagnosis#CurrentBufferErrorAndWarningCounts()`
+
+
 # Commands
 Run in Normal mode, such as 
 ```

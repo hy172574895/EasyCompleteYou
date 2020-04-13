@@ -112,6 +112,14 @@ function! ECY#diagnosis#ShowCurrentLineDiagnosis(is_triggered_by_event) abort
 "}}}
 endfunction
 
+function! ECY#diagnosis#CurrentBufferErrorAndWarningCounts() abort
+  let l:current_engine = ECY_main#GetCurrentUsingSourceName()
+  if !has_key(g:ECY_diagnosis_items_with_engine_name, l:current_engine)
+    return 0
+  endif
+  return len(g:ECY_diagnosis_items_with_engine_name[l:current_engine])
+endfunction
+
 function! ECY#diagnosis#Show(file_path, line, colum, is_triggered_by_event) abort
 "{{{ show a popup windows and move to that position.
   if g:ECY_diagnosis_items_all == []
