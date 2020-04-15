@@ -170,7 +170,7 @@ function! s:OnBufferEnter() abort
     call listener_add('ECY_main#TextDifferEvent')
     let g:ECY_cached_buffer_nr_to_path[bufnr()] = ECY#utility#GetCurrentBufferPath()
   endif
-  let s:indentexpr           = &indentexpr
+  call ECY#utility#SaveIndent()
   let s:completeopt_temp     = &completeopt
   let s:completeopt_fuc_temp = &completefunc
   call ECY#diagnosis#CleanAllSignHighlight()
@@ -223,7 +223,7 @@ function! s:DoCompletion() abort
     endif
     " reflesh it when user typing key into buffer.
     call ECY#completion_preview_windows#Close()
-    let &indentexpr = s:indentexpr
+    call ECY#utility#RecoverIndent()
     call ECY#color_completion#ClosePrompt()
   endif
   call ECY_main#ChangeVersionID()
@@ -352,7 +352,6 @@ function! s:SetVariable() abort
   endif
 
   let s:isSelecting          = v:false
-  let s:indentexpr           = &indentexpr
   let s:completeopt_temp     = &completeopt
   let s:back_to_source_key   = get(s:,'back_to_source_key',['<Space>'])
   let s:completion_text_id   = 0
@@ -387,7 +386,7 @@ function! s:BackToLastSource(typing_key) abort
         \g:ECY_use_floating_windows_to_be_popup_windows == v:true
       " reset
       call ECY#color_completion#ClosePrompt()
-      let &indentexpr = s:indentexpr
+      call ECY#utility#RecoverIndent()
       let s:isSelecting = v:false
   endif
 "}}}
@@ -820,7 +819,7 @@ function! ECY_main#SelectItems(next_or_pre, send_key) abort
 
   if ECY#color_completion#IsPromptOpen()
     let s:isSelecting = v:true
-    let &indentexpr = ''
+    call ECY#utility#DisableIndent()
 
     " select it, then complete it into buffer
     call ECY#color_completion#SelectItems(a:next_or_pre,s:show_item_position)

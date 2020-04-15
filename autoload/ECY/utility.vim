@@ -240,6 +240,29 @@ function! ECY#utility#StartLeaderfSelecting(content, callback_name) abort
 "}}}
 endfunction
 
+function! ECY#utility#SaveIndent() abort
+"{{{
+  if !exists('b:indentexpr_temp')
+    let b:indentexpr_temp = &indentexpr
+  endif
+"}}}
+endfunction
+
+function! ECY#utility#DisableIndent() abort
+"{{{ DisableIndent temporally.
+  call ECY#utility#SaveIndent()
+  let &indentexpr = ''
+"}}}
+endfunction
+
+function! ECY#utility#RecoverIndent() abort
+"{{{
+  if exists('b:indentexpr_temp')
+    let &indentexpr = b:indentexpr_temp
+  endif
+"}}}
+endfunction
+
 function! ECY#utility#RollFloatingWindows(up_or_down) abort
 "{{{ a:up_or_down = -1 = up; a:up_or_down = 1 = down
 "this function will be mapped, so we should return ''
