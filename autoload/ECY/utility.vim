@@ -56,6 +56,37 @@ function! ECY#utility#IsFileLoaded(file_name) abort
   return bufnr(a:file_name)
 endfunction
 
+function! ECY#utility#ParseCMD(variable) abort
+"{{{
+  let l:types = type(a:variable)
+  if l:types == 1
+    " string
+    return split(a:variable, " ")
+  elseif l:types == 3
+    " lists
+    return a:variable
+  else
+    throw "[ECY] invalid command."
+  endif
+"}}}
+endfunction
+
+function! ECY#utility#CMDRunable(cmd, ...) abort
+"{{{
+  let l:lists = ECY#utility#ParseCMD(a:cmd)
+  if len(l:lists) == 0
+    throw '[ECY] invalid command.  ' . string(a:cmd)
+  endif
+  if executable(l:lists[0])
+    return v:true
+  endif
+  if a:0 != 0
+    throw '[ECY] invalid command.  ' . string(l:lists[0])
+  endif
+  return v:false
+"}}}
+endfunction
+
 function! s:ShowPreview_vim(file_name, roll_line, syntaxs) abort
 "{{{
   let l:bufnr = ECY#utility#IsFileLoaded(a:file_name)

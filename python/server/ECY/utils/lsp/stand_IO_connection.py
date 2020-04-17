@@ -102,6 +102,8 @@ class Operate:
     def StartJob(self, shell_cmd):
         # can not redect stderr to subprocess.PIPE
         try:
+            if type(shell_cmd) == list:
+                shell_cmd = " ".join(shell_cmd)
             cmd = shlex.split(shell_cmd)
             # CREATE_NO_WINDOW = 0x08000000
             process_obj = subprocess.Popen(cmd,

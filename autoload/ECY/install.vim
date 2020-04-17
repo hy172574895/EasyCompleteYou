@@ -44,6 +44,10 @@ function! ECY#install#Init() abort
   call ECY#install#AddEngineInfo('rust_analyzer',
         \'lib.event.rust_analyzer','lib.sources.lsp_servers.rust_analyzer',
         \function('ECY#install#rust_analyzer'), '', 'buildin')
+
+  call ECY#install#AddEngineInfo('css_lsp',
+        \'lib.event.css','lib.sources.lsp_servers.css',
+        \function('ECY#install#rust_analyzer'), '', 'buildin')
 "}}}
 endfunction
 
@@ -210,9 +214,8 @@ endfunction
 function! ECY#install#html_lsp() abort
 "{{{
   " options: 1. cmd for starting Server
-  " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
-  if !executable(get(g:,'ECY_html_lsp_starting_cmd','html-languageserver'))
-    if !executable('npm')
+  if !ECY#utility#CMDRunable(get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio'))
+    if !ECY#utility#CMDRunable('npm')
       return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
     endif
     call s:ExeCMD("npm install --global vscode-html-languageserver-bin")
@@ -229,9 +232,17 @@ endfunction
 function! ECY#install#rust_analyzer() abort
 "{{{
   " options: 1. cmd for starting Server
-  " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
-  if !executable(get(g:,'ECY_rust_analyzer_starting_cmd','rust-analyzer'))
+  if !ECY#utility#CMDRunable(get(g:,'ECY_rust_analyzer_starting_cmd','html-languageserver --stdio'))
     return {'status':'-1','description':"The setting of 'g:ECY_rust_analyzer_starting_cmd' is invalid. Please check."}
+  endif
+  return {'status':'0','description':"ok"}
+"}}}
+endfunction
+
+function! ECY#install#css() abort
+"{{{
+  if !ECY#utility#CMDRunable(get(g:,'ECY_css_lsp_starting_cmd', 'css-language-server'))
+    return {'status':'-1','description':"The setting of 'g:ECY_css_lsp_starting_cmd' is invalid. Please check."}
   endif
   return {'status':'0','description':"ok"}
 "}}}
@@ -241,7 +252,7 @@ function! ECY#install#clangd() abort
 "{{{
   " options: 1. cmd for starting Server
   " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
-  if !executable(get(g:,'ECY_clangd_starting_cmd','clangd'))
+  if !ECY#utility#CMDRunable(get(g:,'ECY_clangd_starting_cmd','clangd'))
     return {'status':'-1','description':"You missing 'clangd'."}
   endif
   return {'status':'0','description':"ok"}
@@ -252,8 +263,8 @@ function! ECY#install#typescript_lsp() abort
 "{{{
   " options: 1. cmd for starting Server
   " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
-  if !executable(get(g:,'ECY_typescripte_starting_cmd', 'tsserver'))
-    if !executable('npm')
+  if !ECY#utility#CMDRunable(get(g:,'ECY_typescripte_starting_cmd', 'tsserver'))
+    if !ECY#utility#CMDRunable('npm')
       return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
     endif
     call s:ExeCMD("npm install -g typescript typescript-language-server")
@@ -266,8 +277,8 @@ function! ECY#install#vim_lsp() abort
 "{{{
   " options: 1. cmd for starting Server
   " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
-  " if !executable('vim-language-server')
-  "   if !executable('npm')
+  " if !ECY#utility#CMDRunable('vim-language-server')
+  "   if !ECY#utility#CMDRunable('npm')
   "     return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
   "   endif
   "   call s:ExeCMD("npm i vim-language-server")
@@ -283,7 +294,7 @@ endfunction
 
 function! ECY#install#Go_gopls() abort
 "{{{
-  if !executable(get(g:,'ECY_gopls_starting_cmd','gopls'))
+  if !ECY#utility#CMDRunable(get(g:,'ECY_gopls_starting_cmd','gopls'))
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
   endif
   return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.go_gopls', 'name':'go_gopls', 'path': ''}
@@ -292,7 +303,7 @@ endfunction
 
 function! ECY#install#Go_langserver() abort
 "{{{
-  if !executable(get(g:,'ECY_golangserver_starting_cmd','go-langserver'))
+  if !ECY#utility#CMDRunable(get(g:,'ECY_golangserver_starting_cmd','go-langserver'))
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
   endif
   return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.go_langserver', 'name':'go_langserver', 'path': ''}
