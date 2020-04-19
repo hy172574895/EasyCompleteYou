@@ -46,8 +46,12 @@ function! ECY#install#Init() abort
         \function('ECY#install#rust_analyzer'), '', 'buildin')
 
   call ECY#install#AddEngineInfo('css_lsp',
-        \'lib.event.css','lib.sources.lsp_servers.css',
-        \function('ECY#install#rust_analyzer'), '', 'buildin')
+        \'lib.event.css_lsp','lib.sources.lsp_servers.css',
+        \function('ECY#install#css'), '', 'buildin')
+
+  call ECY#install#AddEngineInfo('php_phan',
+        \'lib.event.php_phan','lib.sources.lsp_servers.php_phan',
+        \function('ECY#install#php_phan'), '', 'buildin')
 "}}}
 endfunction
 
@@ -234,6 +238,16 @@ function! ECY#install#rust_analyzer() abort
   " options: 1. cmd for starting Server
   if !ECY#utility#CMDRunable(get(g:,'ECY_rust_analyzer_starting_cmd','html-languageserver --stdio'))
     return {'status':'-1','description':"The setting of 'g:ECY_rust_analyzer_starting_cmd' is invalid. Please check."}
+  endif
+  return {'status':'0','description':"ok"}
+"}}}
+endfunction
+
+function! ECY#install#php_phan() abort
+"{{{
+  " options: 1. cmd for starting Server
+  if !ECY#utility#CMDRunable(get(g:,'ECY_php_phan_starting_cmd','html-languageserver --stdio'))
+    return {'status':'-1','description':"The setting of 'g:ECY_php_phan_starting_cmd' is invalid. Please check."}
   endif
   return {'status':'0','description':"ok"}
 "}}}
