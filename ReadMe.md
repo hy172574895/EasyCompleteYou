@@ -103,7 +103,8 @@ vim_lsp       | vimL                 | completion<br> diagnosis<br> snippet-expa
 go_langserver | golang               | completion<br>snippets-expanding|[go-langserver](https://github.com/sourcegraph/go-langserver)|
 go_gopls      | golang               | completion<br>diagnosis<br>snippets-expanding<br>goto-definition<br>goto-reference|[gopls](https://github.com/golang/tools/blob/master/gopls/README.md)|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/go.md)
 clangd        | C/C++/C-family       | completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding<br> document-help|[clangd](https://github.com/clangd/clangd/releases)|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/clangd.md)
-rust_analyzer | rust       | completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding<br> document-help|[rust_analyzer](https://github.com/rust-analyzer/rust-analyzer)|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/rust.md)
+rust_analyzer | rust                 | completion<br>diagnosis<br> goto-definition<br> find-symbols<br> goto-declaration<br> find-reference<br> snippets-expanding<br> document-help|[rust_analyzer](https://github.com/rust-analyzer/rust-analyzer)|[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/rust.md)
+css_lsp      | css                   | completion<br> diagnosis<br> snippet-expanding<br>find-symbols<br> document-help<br> goto-definition<br>goto-reference|nodejs<br>[css-LSP](https://www.npmjs.com/package/vscode-css-languageserver-bin) |[Home](https://github.com/hy172574895/EasyCompleteYou/blob/master/doc/css_lsp.md)
 
 ### Plugins of ECY.
 Totally like above list of engines, but just as one repo.
