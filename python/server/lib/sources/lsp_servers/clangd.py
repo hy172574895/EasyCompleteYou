@@ -72,8 +72,6 @@ class Operate(scope_.Source_interface):
                 self.is_server_start = 'started'
                 threading.Thread(target=self._get_diagnosis,
                                  daemon=True).start()
-                threading.Thread(
-                    target=self._handle_configuration, daemon=True).start()
                 threading.Thread(target=self._handle_log_msg,
                                  daemon=True).start()
                 self._lsp.initialized()
@@ -110,26 +108,6 @@ class Operate(scope_.Source_interface):
                 elif types == 3:
                     # info, TODO
                     pass
-            except:
-                g_logger.exception('')
-
-    def _handle_configuration(self):
-        g_logger.debug("started _handle_configuration thread.")
-        while 1:
-            try:
-                response = self._lsp.GetResponse('workspace/configuration',
-                                                 timeout_=-1)
-
-                config = {
-                    'hoverKind': 'NoDocumentation',
-                    'completeUnimported': True,
-                    'staticcheck': True,
-                    'usePlaceholders': True,
-                    'deepCompletion': True}
-                results = []
-                for item in response['params']['items']:
-                    results.append(config)
-                self._lsp.configuration(response['id'], results=results)
             except:
                 g_logger.exception('')
 
