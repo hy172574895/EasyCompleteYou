@@ -292,6 +292,9 @@ will do it twice, sending to linter and ECY's Server.
 ### Q: Why there are no Signature-help?
 A: A Signature-help is to show tips about what user using such as prototype of a function. I think using snippets-expanding is good enough to show prototype.
 
+### Q: Why there are no Auto-format?
+A: It will be nice to use other mature plugins for auto-format such as [vim-autoformat](https://github.com/Chiel92/vim-autoformat) or [neoformat](https://github.com/sbdchd/neoformat).
+
 # Debug & Contribution
 ## How to debug?
 Put `let g:ECY_debug = v:true` into your vimrc and restart Vim.  

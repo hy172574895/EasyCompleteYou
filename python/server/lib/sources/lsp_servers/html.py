@@ -76,13 +76,7 @@ class Operate(scope_.Source_interface):
         try:
             if self.is_server_start == 'not started':
                 # cmd = "html-languageserver --stdio"
-                # cmd = "node D:/gvim/nodejs/node-v10.13.0-win-x86/node_modules/vscode-html-languageserver-bin/htmlServerMain.js --stdio"
                 self._lsp.StartJob(self._starting_server_cmd)
-
-                # you can change the capabilities of init request like this:
-
-                # capabilities_dict = self._lsp.BuildCapabilities()
-                # capabilities_dict['completion']['dynamicRegistration'] = True
                 init_msg = self._lsp.initialize(
                     initializationOptions=None, rootUri=None)
                 self._lsp.GetResponse(init_msg['Method'])
