@@ -25,9 +25,9 @@ class Operate(scope_.Source_interface):
 
     def GetInfo(self):
         return {'Name': self._name,
-                'WhiteList': ['css', 'lcss'],
-                'Regex': r'[\w]',
-                'TriggerKey': [".",">",":"]}
+                'WhiteList': ['css', 'less', 'sass'],
+                'Regex': r'[\w-]',
+                'TriggerKey': [":"]}
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']
