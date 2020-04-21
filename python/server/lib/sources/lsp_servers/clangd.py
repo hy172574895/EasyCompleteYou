@@ -27,7 +27,7 @@ class Operate(scope_.Source_interface):
         return {'Name': self._name,
                 'WhiteList': ['c', 'cpp', 'objc', 'objcpp', 'cuda'],
                 'Regex': r'[\w]',
-                'TriggerKey': [".",">",":"]}
+                'TriggerKey': [".",">",":","#"]}
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']
