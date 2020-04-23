@@ -161,7 +161,7 @@ cmd|params|description
 --|:--:|--:
 `ECYDiagnosisLists`|-| Show diagnostic lists with `leaderf`.
 `ECYToggleDiagnosis`|-| Toggle diagnosis.
-`ECYSymbols`|-| Show document symbols lists with `leaderf`.
+`ECYDocumentSymbols`|-| Show document symbols lists with `leaderf`.
 `ECYWorkSpaceSymbols`|-| Show workspace symbols lists with `leaderf`.
 `ECYGoTo`|1| goto somewhere, such as `:ECYGoTo reference`.
 `ECYInstall`|1| Install a new engine, such as `:ECYInstall html_lsp`.

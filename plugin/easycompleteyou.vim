@@ -13,7 +13,7 @@ function! s:restore_cpo()
   unlet s:save_cpo
 endfunction
 
-let g:ECY_version = {'version': 18, 'tags': '1.3'}
+let g:ECY_version = {'version': 19, 'tags': '1.3'}
 let g:is_vim = !has('nvim')
 
 if g:loaded_easycomplete
@@ -76,10 +76,10 @@ if g:has_floating_windows_support == 'has_no'
 endif
 
 command! -bar -nargs=0 ECYWorkSpaceSymbols call ECY_main#Execute('get_workspace_symbols')
+command! -bar -nargs=0 ECYDocumentSymbols  call ECY_main#Execute('get_symbols')
 command! -bar -nargs=0 ECYToggleDiagnosis  call ECY#diagnosis#Toggle()
 command! -bar -nargs=0 ECYDiagnosisLists   call ECY#diagnosis#ShowSelecting()
 command! -bar -nargs=0 ECYListEngine       call ECY_main#Do("GetAllEngineInfo", v:true)
-command! -bar -nargs=0 ECYSymbols          call ECY_main#Execute('get_symbols')
 command! -bar -nargs=0 ECYDocHelp          call ECY_main#Do("OnDocumentHelp", v:true)
 
 command! -bar -nargs=1 ECYInstall         call ECY_main#Install('<args>')
