@@ -56,6 +56,13 @@ function! ECY#utility#IsFileLoaded(file_name) abort
   return bufnr(a:file_name)
 endfunction
 
+function! ECY#utility#has_key(dicts, key) abort
+  if !has_key(a:dicts , a:key)
+    return ''
+  endif
+  return a:dicts[a:key]
+endfunction
+
 function! ECY#utility#ParseCMD(variable) abort
 "{{{
   let l:types = type(a:variable)

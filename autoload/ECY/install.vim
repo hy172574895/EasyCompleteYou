@@ -7,56 +7,56 @@ function! ECY#install#Init() abort
    " when Client finding no Clent event will omit it to genernal
   call ECY#install#AddEngineInfo('html_lsp',
         \'lib.event.html_lsp','lib.sources.lsp_servers.html',
-        \function('ECY#install#html_lsp'), '', 'buildin')
+        \function('ECY#install#html_lsp'), '', v:true)
 
   call ECY#install#AddEngineInfo('snippets',
         \'lib.event.snippets','lib.sources.snippets.snippets',
-        \function('ECY#install#Snippets'), '', 'buildin')
+        \function('ECY#install#Snippets'), '', v:true)
 
   call ECY#install#AddEngineInfo('youcompleteme',
         \'','lib.sources.youcompleteme.ycm',
-        \function('ECY#install#YCM'), '', 'buildin')
+        \function('ECY#install#YCM'), '', v:true)
 
   call ECY#install#AddEngineInfo('go_langserver',
         \'lib.event.go_langserver','lib.sources.lsp_servers.go_langserver',
-        \function('ECY#install#Go_langserver'), '', 'buildin')
+        \function('ECY#install#Go_langserver'), '', v:true)
 
   call ECY#install#AddEngineInfo('go_gopls',
         \'lib.event.go_gopls','lib.sources.lsp_servers.go_gopls',
-        \function('ECY#install#Go_gopls'), '', 'buildin')
+        \function('ECY#install#Go_gopls'), '', v:true)
 
   call ECY#install#AddEngineInfo('vim_lsp',
         \'lib.event.vim','lib.sources.lsp_servers.vim',
-        \function('ECY#install#vim_lsp'), '', 'buildin')
+        \function('ECY#install#vim_lsp'), '', v:true)
 
   call ECY#install#AddEngineInfo('path',
         \'lib.event.path','lib.sources.path.path',
-        \'', '', 'buildin')
+        \'', '', v:true)
 
   call ECY#install#AddEngineInfo('typescript_lsp',
         \'lib.event.typescript','lib.sources.lsp_servers.typescript',
-        \function('ECY#install#typescript_lsp'), '', 'buildin')
+        \function('ECY#install#typescript_lsp'), '', v:true)
 
   call ECY#install#AddEngineInfo('clangd',
         \'lib.event.clangd','lib.sources.lsp_servers.clangd',
-        \function('ECY#install#clangd'), '', 'buildin')
+        \function('ECY#install#clangd'), '', v:true)
 
   call ECY#install#AddEngineInfo('rust_analyzer',
         \'lib.event.rust_analyzer','lib.sources.lsp_servers.rust_analyzer',
-        \function('ECY#install#rust_analyzer'), '', 'buildin')
+        \function('ECY#install#rust_analyzer'), '', v:true)
 
   call ECY#install#AddEngineInfo('css_lsp',
         \'lib.event.css_lsp','lib.sources.lsp_servers.css',
-        \function('ECY#install#css'), '', 'buildin')
+        \function('ECY#install#css'), '', v:true)
 
   call ECY#install#AddEngineInfo('php_phan',
         \'lib.event.php_phan','lib.sources.lsp_servers.php_phan',
-        \function('ECY#install#php_phan'), '', 'buildin')
+        \function('ECY#install#php_phan'), '', v:true)
 "}}}
 endfunction
 
 function! ECY#install#AddEngineInfo(engine_name, client_module_path,
-      \server_module_path, install_fuc, uninstall_fuc, ...) abort
+      \server_module_path, install_fuc, uninstall_fuc, is_buildin) abort
 "{{{
   if !exists('g:ECY_all_engine_info')
     let g:ECY_all_engine_info = {}
@@ -64,7 +64,7 @@ function! ECY#install#AddEngineInfo(engine_name, client_module_path,
   if a:server_module_path == ''
     throw '[ECY] server module can not be empty.'
   endif
-  if a:0 == 1 " a:0 means length of param.
+  if a:is_buildin && a:is_buildin != ''
     " buildin engine
     call ECY#install#RegisterClient(a:engine_name, a:client_module_path)
     call ECY#install#RegisterServer(a:engine_name, a:server_module_path)
@@ -90,11 +90,48 @@ function! ECY#install#AddEngineInfo(engine_name, client_module_path,
   let g:ECY_all_engine_info[a:engine_name]['server']       = a:server_module_path
   let g:ECY_all_engine_info[a:engine_name]['install_fuc']  = a:install_fuc
   let g:ECY_all_engine_info[a:engine_name]['unintall_fuc'] = a:uninstall_fuc
-  if a:0 == 1
+  if a:is_buildin && a:is_buildin != ''
     let g:ECY_all_engine_info[a:engine_name]['is_buildin'] = v:true
   else
     let g:ECY_all_engine_info[a:engine_name]['is_buildin'] = v:false
   endif
+"}}}
+endfunction
+
+function! ECY#install#AddEngine(engine_info) abort
+"{{{ better scope to replace ECY#install#AddEngineInfo()
+" key == '' or does not exists means 'false' and use default value.
+  if type(a:engine_info) != 4
+    " != dict
+    throw "Failed to add engine. ECY needs dict." . string(a:engine_info)
+  endif
+
+  try
+    " key that can not be none
+    let l:name = a:engine_info['engine_name']
+    let l:server_path = a:engine_info['server_module_path']
+    let l:client_module_path = a:engine_info['engine_name']
+
+    " key that can be none
+    let l:Uninstall_fuc = ECY#utility#has_key(a:engine_info, 'uninstall_fuc')
+    let l:capabilities  = ECY#utility#has_key(a:engine_info, 'capabilities')
+    let l:client_path   = ECY#utility#has_key(a:engine_info, 'client_module_path')
+    let l:Install_fuc   = ECY#utility#has_key(a:engine_info, 'install_fuc')
+    let l:is_buildin    = ECY#utility#has_key(a:engine_info, 'is_buildin')
+
+    call ECY#install#AddEngineInfo(l:name,
+          \l:client_path,
+          \l:server_path,
+          \l:Install_fuc,
+          \l:Uninstall_fuc,
+          \l:is_buildin
+          \)
+    let g:ECY_all_engine_info[l:name]['capabilities'] = l:capabilities
+  catch 
+   call ECY_main#Log(v:throwpoint)
+   call ECY_main#Log(v:exception)
+  endtry
+
 "}}}
 endfunction
 
