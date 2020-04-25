@@ -152,10 +152,10 @@ class ECY_Client(_do):
             self.UpdateClientModule()
         method = None
         if engine_name in self.available_engine_name_dict.keys():
-            if engine_name not in self.event_obj.keys() \
-                    and self.available_engine_name_dict[engine_name]['lib'] != '':
-                client_lib = self.available_engine_name_dict[engine_name]['lib']
-                method = self._import_client_event(engine_name, client_lib, event)
+            if engine_name not in self.event_obj.keys():
+                if self.available_engine_name_dict[engine_name]['lib'] != '':
+                    client_lib = self.available_engine_name_dict[engine_name]['lib']
+                    method = self._import_client_event(engine_name, client_lib, event)
             else:
                 method = getattr(self.event_obj[engine_name], event, None)
 
