@@ -63,6 +63,18 @@ function! ECY#utility#has_key(dicts, key) abort
   return a:dicts[a:key]
 endfunction
 
+function! ECY#utility#CheckCurrentCapabilities(capability) abort
+"{{{
+  try
+    let l:engine_name = ECY_main#GetCurrentUsingSourceName()
+    let l:capabilities = g:ECY_all_engine_info[l:engine_name]['capabilities']
+    return ECY#utility#IsInList(a:capability, l:capabilities)
+  catch 
+    return v:false
+  endtry
+"}}}
+endfunction
+
 function! ECY#utility#ParseCMD(variable) abort
 "{{{
   let l:types = type(a:variable)

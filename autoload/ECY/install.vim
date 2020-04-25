@@ -52,6 +52,90 @@ function! ECY#install#Init() abort
   call ECY#install#AddEngineInfo('php_phan',
         \'lib.event.php_phan','lib.sources.lsp_servers.php_phan',
         \function('ECY#install#php_phan'), '', v:true)
+
+  call ECY#install#AddEngineInfo('python_jedi', '', 
+        \'lib.sources.python.python', '', '', v:true)
+
+  call ECY#install#AddCapabilities()
+"}}}
+endfunction
+
+function! ECY#install#AddCapabilities() abort
+"{{{
+  let g:ECY_all_engine_info['html_lsp']['capabilities'] = [
+        \'Completion',
+        \'Diagnosis',
+        \'Snippet-expanding',
+        \'Find-document-symbols',
+        \'Document-help',
+        \'Goto-reference',
+        \'Goto-definition']
+
+  let g:ECY_all_engine_info['snippets']['capabilities'] = [
+        \'Completion',
+        \'Snippet-expanding']
+
+  let g:ECY_all_engine_info['path']['capabilities'] = [
+        \'Completion']
+
+  let g:ECY_all_engine_info['python_jedi']['capabilities'] = [
+        \'Completion',
+        \'Diagnosis',
+        \'Snippet-expanding',
+        \'Find-document-symbols',
+        \'Document-help',
+        \'Goto-reference',
+        \'Goto-declaration',
+        \'Goto-definition']
+
+  let g:ECY_all_engine_info['vim_lsp']['capabilities'] = [
+        \'Completion',
+        \'Diagnosis',
+        \'Snippet-expanding',
+        \'Find-document-symbols']
+
+  let g:ECY_all_engine_info['go_langserver']['capabilities'] = [
+        \'Completion',
+        \'Snippet-expanding']
+
+  let g:ECY_all_engine_info['go_gopls']['capabilities'] = [
+        \'Completion',
+        \'Diagnosis',
+        \'Snippet-expanding',
+        \'Find-document-symbols',
+        \'Document-help',
+        \'Goto-reference',
+        \'Goto-definition']
+
+  let g:ECY_all_engine_info['clangd']['capabilities'] = [
+        \'Completion',
+        \'Diagnosis',
+        \'Snippet-expanding',
+        \'Find-document-symbols',
+        \'Document-help',
+        \'Goto-reference',
+        \'Goto-declaration',
+        \'Goto-definition']
+
+  let g:ECY_all_engine_info['rust_analyzer']['capabilities'] = [
+        \'Completion',
+        \'Diagnosis',
+        \'Snippet-expanding',
+        \'Find-document-symbols',
+        \'Document-help',
+        \'Goto-reference',
+        \'Goto-declaration',
+        \'Goto-definition']
+
+  let g:ECY_all_engine_info['css_lsp']['capabilities'] = [
+        \'Completion',
+        \'Diagnosis',
+        \'Snippet-expanding',
+        \'Find-document-symbols',
+        \'Document-help',
+        \'Goto-reference',
+        \'Goto-definition']
+
 "}}}
 endfunction
 
