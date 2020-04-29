@@ -50,6 +50,7 @@ class Operate(scope_.Source_interface):
         self._deamon_queue = None
         g_logger.debug('python_jedi has pyflakes:' + str(has_pyflake))
         self._jedi_cache = None
+        self._using_jedi_env = {'auto':None, 'force': None, 'force_version': None}
         if has_pyflake:
             self._diagnosis_queue = queue.LifoQueue()
             threading.Thread(target=self._output_diagnosis,
@@ -69,10 +70,46 @@ class Operate(scope_.Source_interface):
                                line_nr,
                                current_colum,
                                path)
+                               # environment=self._get_environment(version['ForceVersion']))
             self._jedi_cache = temp
             return temp
         except:
             return self._jedi_cache
+
+    def _get_auto_env(self):
+        if self._using_jedi_env['auto'] is None:
+            self._using_jedi_env['auto'] = \
+                    jedi.api.environment.get_cached_default_environment()
+        return self._using_jedi_env['auto']
+        
+
+    def _get_environment(self, force_to_use):
+        if force_to_use == 'auto':
+            return self._get_auto_env()
+
+        force_python_version = force_to_use
+        if self._using_jedi_env['force_version'] is not None \
+                and self._using_jedi_env['force'] == force_to_use:
+            # cached
+            return self._using_jedi_env['force_version']
+
+        # reflesh
+        self._using_jedi_env['force'] = force_to_use
+        if '0000' in force_python_version or '9999' in force_python_version:
+            # It's probably a float that wasn't shortened.
+            try:
+                force_python_version = "{:.1f}".format(float(force_python_version))
+            except ValueError:
+                pass
+        elif isinstance(force_python_version, float):
+            force_python_version = "{:.1f}".format(force_python_version)
+
+        try:
+            environment = jedi.get_system_environment(force_python_version)
+            self._using_jedi_env['force_version'] = environment
+        except jedi.InvalidPythonEnvironment:
+            self._using_jedi_env['force_version'] = None
+            return self._get_auto_env()
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']
