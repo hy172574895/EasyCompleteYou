@@ -276,6 +276,10 @@ class Operate(scope_.Source_interface):
                     temp = temp.split('\n')
                     results_format['info'] = temp
                 try:
+                    if item['kind'] == 3:
+                        # Function
+                        results_format['kind'] += '~'
+                        results_format['snippet'] = item['label'] + '($1)$0'
                     if item['insertTextFormat'] == 2:
                         # results_format['abbr'] += ' ~'
                         results_format['kind'] = '[Snippet]'
