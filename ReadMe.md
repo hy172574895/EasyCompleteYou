@@ -21,10 +21,11 @@
 # Brief Introduction
 1. Automatically compatible with [YCM](https://github.com/ycm-core/YouCompleteMe), can be an extension for YCM.
 2. Fluent completion.
-3. Wrote with Python3.
+3. Written in Python3.
 4. Fuzzy-find support like YCM.
 5. Buildin [LSP](https://microsoft.github.io/language-server-protocol).
 6. Out of the box.
+7. Easily to use.
 
 [Screenshots of ECY -->>>>](https://github.com/hy172574895/EasyCompleteYou/issues/1)
 

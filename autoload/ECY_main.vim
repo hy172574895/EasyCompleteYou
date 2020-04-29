@@ -994,6 +994,11 @@ function! ECY_main#Install(name) abort
     return
   endif
   let l:Fuc = g:ECY_available_engine_installer[a:name]
+  if l:Fuc == ''
+    call ECY#utility#ShowMsg('[ECY] This is buildin engine. You already installed it.', 3)
+    return
+  endif
+
   let l:install_return = l:Fuc()
   if l:install_return['status'] == 0
     " refleshing all the running completor to make new completor work at every
@@ -1004,6 +1009,7 @@ function! ECY_main#Install(name) abort
     call ECY#utility#ShowMsg(l:install_return['description'], 3)
     return
   endif
+
   let l:engine_info = g:ECY_server_info[a:name]
   let g:ecy_source_name_2_install = {'EngineLib': l:engine_info['lib'],
         \'EnginePath': l:engine_info['path'],
