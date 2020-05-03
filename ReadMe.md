@@ -265,6 +265,13 @@ variable name|default values|description
 `g:ECY_erro_sign_highlight`|'ECY_erro_sign_highlight'|**String**. Color of error sign.
 `g:ECY_warn_sign_highlight`|'ECY_warn_sign_highlight'|**String**. Color of warning sign.
 
+## API
+API name|params and type|return
+--|:--:|--:
+`ECY_main#GetCurrentUsingSourceName()`|-|**String**. 
+`ECY#diagnosis#CurrentBufferErrorAndWarningCounts()`|-|**Int**. 
+`ECY#utility#CheckCurrentCapabilities()`|1.capability - string|**boolean**. 
+
 # How to write an engine by yourself?
 Check out this basic [repo](https://github.com/hy172574895/ECY-dictionary).
 If you wrote a new plugin for ECY, please let me konw; I'll put it into lists of
