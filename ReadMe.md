@@ -145,7 +145,7 @@ Some useful command of `LeaderF` are follow.
 Especially the `ctags` support of `LeaderF`
 
 ## Cooperate with [Rooter](https://github.com/airblade/vim-rooter)
-`Rooter` is build with ECY, you don't have to install it separately.
+`Rooter` build with ECY, you don't have to install it separately.
 ---
 You can also make `Rooter` work with some plugins like `lightline.vim` and `airline` to show workspace dir of current buffer.
 
@@ -158,15 +158,15 @@ Run in Normal mode, such as
 ```
  :ECYDiagnosisLists
 ```
-cmd|params|description
---|:--:|--:
-`ECYDiagnosisLists`|-| Show diagnostic lists with `leaderf`.
-`ECYToggleDiagnosis`|-| Toggle diagnosis.
-`ECYDocumentSymbols`|-| Show document symbols lists with `leaderf`.
-`ECYWorkSpaceSymbols`|-| Show workspace symbols lists with `leaderf`.
-`ECYGoTo`|1| goto somewhere, such as `:ECYGoTo reference`.
-`ECYInstall`|1| Install a new engine, such as `:ECYInstall html_lsp`.
-`ECYListEngine`|1| Show status of all ECY's engines`.
+cmd                   | params | description
+--                    | :--:   | --:
+`ECYDiagnosisLists`   | -      | Show diagnostic lists with `leaderf`.
+`ECYToggleDiagnosis`  | -      | Toggle diagnosis.
+`ECYDocumentSymbols`  | -      | Show document symbols lists with `leaderf`.
+`ECYWorkSpaceSymbols` | -      | Show workspace symbols lists with `leaderf`.
+`ECYListEngine`       | -      | Show status of all ECY's engines.
+`ECYGoTo`             | 1      | goto somewhere, such as `:ECYGoTo reference`.
+`ECYInstall`          | 1      | Install a new engine, such as `:ECYInstall html_lsp`.
 
 # Configuration
 ## How to change the default values to you want?
