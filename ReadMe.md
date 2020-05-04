@@ -303,6 +303,9 @@ A: A Signature-help is to show tips about what user using such as prototype of a
 ### Q: Why there are no Auto-format?
 A: It will be nice to use other mature plugins for auto-format such as [vim-autoformat](https://github.com/Chiel92/vim-autoformat) or [neoformat](https://github.com/sbdchd/neoformat).
 
+### Q: Why there are no capability for highlight in LSP?
+A: There are few of Server supports that feature. I think it can be replaced by other vim's plugins such as [vim-css-color](https://github.com/ap/vim-css-color)
+
 # Debug & Contribution
 ## How to debug?
 Put `let g:ECY_debug = v:true` into your vimrc and restart Vim.  
