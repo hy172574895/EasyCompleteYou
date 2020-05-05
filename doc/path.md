@@ -15,3 +15,5 @@ Basically, it's totally same as [Rooter](https://github.com/airblade/vim-rooter)
 3. You can change current buffer's `workspace` by `Root` command, such as `:Root /home/jjjj/iii/mmm/yyy`
 
 4. You will trigger this engine while typing `/` in Insert mode.
+
+5. The `path` engine supports relative path such as "~/after/plugin/xxx.vim" and "./after/plugin/yyy.vim", it requires `workspace` first, because the ~ and . will be replaced by `workspace`.
