@@ -270,6 +270,7 @@ API name|params and type|return
 --|:--:|--:
 `ECY_main#GetCurrentUsingSourceName()`|-|**String**. 
 `ECY#diagnosis#CurrentBufferErrorAndWarningCounts()`|-|**Int**. 
+`ECY#utility#OpenECYLogFile()`|-|**-**. 
 `ECY#utility#CheckCurrentCapabilities()`|1.capability - string|**boolean**. 
 
 # How to write an engine by yourself?

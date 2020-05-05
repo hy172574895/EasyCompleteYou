@@ -5,8 +5,8 @@
 " 2020-02-02 22:25  Happy 2020-0202.
 
 " must put these outside a function
-let  s:python_script_folder_path = expand( '<sfile>:p:h:h' ).'/python'
-let  s:python_script_folder_path = tr(s:python_script_folder_path, '\', '/')
+let  g:ECY_python_script_folder_path = expand( '<sfile>:p:h:h' ).'/python'
+let  g:ECY_python_script_folder_path = tr(g:ECY_python_script_folder_path, '\', '/')
   
 function! s:SetUpEvent() abort
 "{{{
@@ -396,7 +396,7 @@ function! s:SetUpPython() abort
 "{{{
   if !s:is_using_stdio
     call ECY_main#Do("import os", v:false)
-    let l:temp =  s:python_script_folder_path."/client"
+    let l:temp =  g:ECY_python_script_folder_path."/client"
     let l:temp = "sys.path.append('" . l:temp . "')"
     call ECY_main#Do(l:temp, v:false)
     call ECY_main#Do("import Main_client", v:false)
@@ -908,7 +908,7 @@ endfunction
 
 function! s:StartCommunication() abort
 "{{{
-  let s:server_exe_path = s:python_script_folder_path.'/server/Main_server.py'
+  let s:server_exe_path = g:ECY_python_script_folder_path.'/server/Main_server.py'
   let l:start_cmd = g:ECY_python3_cmd.' '.s:server_exe_path
   if !s:is_using_stdio
     " let s:HMAC_KEY = s:PythonEval("ECY_Client_.CreateHMACKey()")

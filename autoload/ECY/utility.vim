@@ -143,6 +143,15 @@ function! ECY#utility#GetLoadedFile() abort
 "}}}
 endfunction
 
+function! ECY#utility#OpenECYLogFile() abort
+"{{{
+  let l:server_log_file_path = g:ECY_python_script_folder_path . '/server/ECY_server.log'
+  let l:client_log_file_path = g:ECY_python_script_folder_path . '/client/ECY_client.log'
+  execute 'new '. l:server_log_file_path
+  execute 'new '. l:client_log_file_path
+"}}}
+endfunction
+
 function! ECY#utility#GetCurrentBufferPath(...) abort
 "{{{
   " let l:full_path = fnamemodify(@%, ':p')
