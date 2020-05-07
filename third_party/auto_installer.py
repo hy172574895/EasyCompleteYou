@@ -89,7 +89,6 @@ class Installer(object):
         print('Downloading %s ZIP dependences.' % len(self.dependences))
         for item in self.dependences:
             url = self.ChooseBestUrl(item)
-            print('Downloading "%s" from: %s' % (item['name'], url))
             dep_name = self.download_cache_dir + item['name']
             self._download_to(url, dep_name)
             print('"%s" downloaded to: %s' % (item['name'], dep_name))
@@ -99,8 +98,16 @@ class Installer(object):
         """ choose the best url to download
         """
         os_type = self.GetCurrentOS()
+        if self._region not in item['url']:
+            self._region = 'world'
         all_url = item['url'][self._region]
-        return all_url[os_type]
+        url = all_url[os_type]
+
+        print('')
+        print('Current OS: %s' % os_type)
+        print('Using minor in %s' % self._region)
+        print('Downloading "%s" from: %s' % (item['name'], url))
+        return url
 
     def OrginizeDependences(self):
         pass
@@ -175,9 +182,9 @@ world_url['linux']   = 'https://github.com/clangd/clangd/releases/download/snaps
 world_url['mac']     = 'https://github.com/clangd/clangd/releases/download/snapshot_20200503/clangd-mac-snapshot_20200503.zip'
 
 china_url = {}
-china_url['windows'] = 'https://github.com/clangd/clangd/releases/download/snapshot_20200503/clangd-windows-snapshot_20200503.zip'
-china_url['linux']   = 'https://github.com/clangd/clangd/releases/download/snapshot_20200503/clangd-linux-snapshot_20200503.zip'
-china_url['mac']     = 'https://github.com/clangd/clangd/releases/download/snapshot_20200503/clangd-mac-snapshot_20200503.zip'
+china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/387671/download'
+china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/387672/download'
+china_url['windows'] = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/387673/download'
 
 all_url = {'China': china_url, 'world':world_url}
 
@@ -190,8 +197,23 @@ clangd = Installer(dependences,'clangd', region=region)
 #                                gopls                                #
 #######################################################################
 
+#######################################################################
+#                               nodejs                                #
+#######################################################################
+world_url = {}
+world_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
+world_url['linux']   = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-linux-x64.tar.xz'
+world_url['mac']     = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-darwin-x64.tar.gz'
+
+all_url = {'world':world_url}
+
+dependences = []
+dependences.append({'url':all_url, 'name':'nodejs'})
+nodejs = Installer(dependences,'nodejs', region=region)
+
 
 #######################################################################
 #                               testing                               #
 #######################################################################
-clangd.Install()
+# clangd.Install()
+nodejs.Install()
