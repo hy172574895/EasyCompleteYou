@@ -5,6 +5,8 @@
 [._]ss[a-gi-z]
 [._]sw[a-p]
 __pycache__
+download_cache
+engines_deps
 
 # Session
 Session.vim
