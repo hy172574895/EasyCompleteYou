@@ -27,7 +27,7 @@ class Operate(scope_.Source_interface):
         return {'Name': self._name,
                 'WhiteList': ['c', 'cpp', 'objc', 'objcpp', 'cuda'],
                 'Regex': r'[\w]',
-                'TriggerKey': [".",">",":","#"]}
+                'TriggerKey': [".","<",":","#"]}
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']
@@ -339,9 +339,16 @@ class Operate(scope_.Source_interface):
         for item in items:
             results_format = {'abbr': '', 'word': '', 'kind': '',
                               'menu': '', 'info': [], 'user_data': ''}
-            results_format['abbr'] = item['filterText']
-            results_format['word'] = item['filterText']
             results_format['kind'] = self._lsp.GetKindNameByNumber(item['kind'])
+
+            item_name = item['filterText']
+            if results_format['kind'] == 'File':
+                name_len = len(item_name)
+                if item_name[name_len - 1] in ['>', '"'] and name_len >= 2:
+                    item_name = item_name[:name_len - 1]
+
+            results_format['abbr'] = item_name
+            results_format['word'] = item_name
             if 'detail' in item:
                 results_format['menu'] = item['detail']
             if 'documentation' in item:
