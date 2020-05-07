@@ -5,6 +5,7 @@ import os
 import os.path as p
 import sys
 import zipfile
+
 global DIR_OF_THIRD_PARTY
 DIR_OF_THIRD_PARTY = p.dirname( p.abspath( __file__ ) )
 sys.path[ 0:0 ] = [ p.join( DIR_OF_THIRD_PARTY, 'installer_deps', 'requests' ),
@@ -18,14 +19,11 @@ sys.path[ 0:0 ] = [ p.join( DIR_OF_THIRD_PARTY, 'installer_deps', 'requests' ),
 import requests
 
 class Installer(object):
-    """
+    """ all the dir should end with no '/'
     """
     def __init__(self, dependences, engine_name,
             install_dir=None, region='world', download_cache_dir=None):
 
-        #####################################
-        #  all the dir should end with no '/'  #
-        #####################################
         self.download_cache_dir = download_cache_dir
         self.install_dir = install_dir
 
@@ -33,18 +31,21 @@ class Installer(object):
         self._region = region
         self.install_name = engine_name
 
+    def _init_dir(self, dirs):
+        if not os.path.isdir(dirs):
+            os.mkdir(dirs)
+        return dirs
+
     def _init_install_dir(self):
         temp = self.install_dir
         global DIR_OF_THIRD_PARTY
         if temp is None:
             path = DIR_OF_THIRD_PARTY + '/engines_deps'
-            if not os.path.isdir(path):
-                os.mkdir(path)
+            path = self._init_dir(path)
             path = DIR_OF_THIRD_PARTY + '/engines_deps/' + self.install_name
         else:
             path = temp
-        if not os.path.isdir(path):
-            os.mkdir(path)
+        path = self._init_dir(path)
         path += '/'
         print('dependences installation dir: %s' % path)
         self.install_dir = path
@@ -55,13 +56,11 @@ class Installer(object):
         global DIR_OF_THIRD_PARTY
         if temp is None:
             path = DIR_OF_THIRD_PARTY + '/download_cache'
-            if not os.path.isdir(path):
-                os.mkdir(path)
+            path = self._init_dir(path)
             path = DIR_OF_THIRD_PARTY + '/download_cache/' + self.install_name
         else:
             path = temp
-        if not os.path.isdir(path):
-            os.mkdir(path)
+        path = self._init_dir(path)
         path += '/'
         print('download cache dir: %s' % path)
         self.download_cache_dir = path
@@ -139,8 +138,7 @@ class Installer(object):
             zip_cache = self.download_cache_dir + item['name']
             print('Decompressing %s' % zip_cache)
             dirs = self.install_dir + item['name']
-            if not os.path.isdir(dirs):
-                os.mkdir(dirs)
+            dirs = self._init_dir(dirs)
             if not zipfile.is_zipfile(zip_cache):
                 raise "Fatal error. Unpackable ZIP " + zip_cache
             zip_file = zipfile.ZipFile(zip_cache)
