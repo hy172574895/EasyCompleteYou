@@ -9,10 +9,10 @@ import zipfile
 import argparse
 parser = argparse.ArgumentParser(
     description='EasyCompleteYou installer, Easily install.')
-parser.add_argument('--clangd', help='language server of clangd. Linux, Windows and Mac. x86')
-parser.add_argument('--rust_analyzer', help='language server of rust_analyzer. Linux, Windows and Mac. x86')
-parser.add_argument('--nodejs', help='nodejs, programming language. Linux and Mac in x64. Windows in x86')
-parser.add_argument('--html_lsp', help='language server of html, and html-hint, Depends on nodejs. Linux and Mac in x64. Windows in x86.')
+parser.add_argument('--clangd', action='store_true', help='language server of clangd. Linux, Windows and Mac. x86')
+parser.add_argument('--rust_analyzer', action='store_true', help='language server of rust_analyzer. Linux, Windows and Mac. x86')
+parser.add_argument('--nodejs', action='store_true', help='nodejs, programming language. Linux and Mac in x64. Windows in x86')
+parser.add_argument('--html_lsp',action='store_true', help='language server of html, and html-hint, Depends on nodejs. Linux and Mac in x64. Windows in x86.')
 g_args = parser.parse_args()
 
 global DIR_OF_THIRD_PARTY
@@ -114,7 +114,7 @@ class Installer(object):
 
         print('')
         print('Current OS: %s' % os_type)
-        print('Using minor in %s' % self._region)
+        print('Using mirror in %s wild' % self._region)
         print('Downloading "%s" from: %s' % (item['name'], url))
         return url
 
@@ -190,12 +190,12 @@ world_url['windows'] = 'https://github.com/clangd/clangd/releases/download/snaps
 world_url['linux']   = 'https://github.com/clangd/clangd/releases/download/snapshot_20200503/clangd-linux-snapshot_20200503.zip'
 world_url['mac']     = 'https://github.com/clangd/clangd/releases/download/snapshot_20200503/clangd-mac-snapshot_20200503.zip'
 
-china_url = {}
-china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/387671/download'
-china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/387672/download'
-china_url['windows'] = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/387673/download'
+# china_url = {}
+# china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/387671/download'
+# china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/387672/download'
+# china_url['windows'] = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/387673/download'
 
-all_url = {'China': china_url, 'world':world_url}
+all_url = {'world':world_url}
 
 dependences = []
 dependences.append({'url':all_url, 'name':'clangd'})
@@ -215,12 +215,12 @@ world_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.z
 world_url['linux']   = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-linux-x64.zip'
 world_url['mac']     = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-darwin-x64.zip'
 
-china_url = {}
-china_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
-china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388535/download'
-china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388536/download'
+# china_url = {}
+# china_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
+# china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388535/download'
+# china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388536/download'
 
-all_url = {'China': china_url, 'world':world_url}
+all_url = {'world':world_url}
 
 dependences = []
 dependences.append({'url':all_url, 'name':'nodejs'})
@@ -236,12 +236,12 @@ world_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.z
 world_url['linux']   = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-linux-x64.zip'
 world_url['mac']     = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-darwin-x64.zip'
 
-china_url = {}
-china_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
-china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388535/download'
-china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388536/download'
+# china_url = {}
+# china_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
+# china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388535/download'
+# china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388536/download'
 
-all_url = {'China': china_url, 'world':world_url}
+all_url = {'world':world_url}
 
 dependences = []
 dependences.append({'url':all_url, 'name':'nodejs'})
@@ -256,12 +256,12 @@ world_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.z
 world_url['linux']   = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-linux-x64.zip'
 world_url['mac']     = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-darwin-x64.zip'
 
-china_url = {}
-china_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
-china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388535/download'
-china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388536/download'
+# china_url = {}
+# china_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
+# china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388535/download'
+# china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388536/download'
 
-all_url = {'China': china_url, 'world':world_url}
+all_url = {'world':world_url}
 
 dependences = []
 dependences.append({'url':all_url, 'name':'nodejs'})
