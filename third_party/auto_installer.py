@@ -166,6 +166,8 @@ class Installer(object):
         print('')
 
 def GetRegion():
+    # for now
+    return 'world'
     try:
         print('-------------------------------')
         print('Getting your IP.')
