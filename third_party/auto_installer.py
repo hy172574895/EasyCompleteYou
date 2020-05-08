@@ -6,6 +6,15 @@ import os.path as p
 import sys
 import zipfile
 
+import argparse
+parser = argparse.ArgumentParser(
+    description='EasyCompleteYou installer, Easily install.')
+parser.add_argument('--clangd', help='language server of clangd. Linux, Windows and Mac. x86')
+parser.add_argument('--rust_analyzer', help='language server of rust_analyzer. Linux, Windows and Mac. x86')
+parser.add_argument('--nodejs', help='nodejs, programming language. Linux and Mac in x64. Windows in x86')
+parser.add_argument('--html_lsp', help='language server of html, and html-hint, Depends on nodejs. Linux and Mac in x64. Windows in x86.')
+g_args = parser.parse_args()
+
 global DIR_OF_THIRD_PARTY
 DIR_OF_THIRD_PARTY = p.dirname( p.abspath( __file__ ) )
 sys.path[ 0:0 ] = [ p.join( DIR_OF_THIRD_PARTY, 'installer_deps', 'requests' ),
@@ -121,10 +130,10 @@ class Installer(object):
         print('Installed')
 
     def DownloadFileTo( download_url, file_path ):
-      request = requests.get( download_url, stream = True )
-      with open( file_path, 'wb' ) as package_file:
-        package_file.write( request.content )
-      request.close()
+        request = requests.get( download_url, stream = True )
+        with open( file_path, 'wb' ) as package_file:
+            package_file.write( request.content )
+        request.close()
 
     def GetCurrentOS(self):
         temp = sys.platform
@@ -201,11 +210,17 @@ clangd = Installer(dependences,'clangd', region=region)
 #                               nodejs                                #
 #######################################################################
 world_url = {}
+# offical nodejs link for linux and max are not ZIP. so I put it to github
 world_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
-world_url['linux']   = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-linux-x64.tar.xz'
-world_url['mac']     = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-darwin-x64.tar.gz'
+world_url['linux']   = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-linux-x64.zip'
+world_url['mac']     = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-darwin-x64.zip'
 
-all_url = {'world':world_url}
+china_url = {}
+china_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
+china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388535/download'
+china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388536/download'
+
+all_url = {'China': china_url, 'world':world_url}
 
 dependences = []
 dependences.append({'url':all_url, 'name':'nodejs'})
@@ -213,7 +228,56 @@ nodejs = Installer(dependences,'nodejs', region=region)
 
 
 #######################################################################
+#                       html_lsp and html_hint                        #
+#######################################################################
+world_url = {}
+# offical nodejs link for linux and max are not ZIP. so I put it to github
+world_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
+world_url['linux']   = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-linux-x64.zip'
+world_url['mac']     = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-darwin-x64.zip'
+
+china_url = {}
+china_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
+china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388535/download'
+china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388536/download'
+
+all_url = {'China': china_url, 'world':world_url}
+
+dependences = []
+dependences.append({'url':all_url, 'name':'nodejs'})
+html_lsp = Installer(dependences,'nodejs', region=region)
+
+###############
+#  html_hint  #
+###############
+world_url = {}
+# offical nodejs link for linux and max are not ZIP. so I put it to github
+world_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
+world_url['linux']   = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-linux-x64.zip'
+world_url['mac']     = 'https://github.com/hy172574895/for_ECY_download/releases/download/nodejs-01/node-v12.16.3-darwin-x64.zip'
+
+china_url = {}
+china_url['windows'] = 'https://nodejs.org/dist/v12.16.3/node-v12.16.3-win-x86.zip'
+china_url['linux']   = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388535/download'
+china_url['mac']     = 'https://gitee.com/Jimmy_Huang/for_ECY_download/attach_files/388536/download'
+
+all_url = {'China': china_url, 'world':world_url}
+
+dependences = []
+dependences.append({'url':all_url, 'name':'nodejs'})
+html_hint = Installer(dependences,'nodejs', region=region)
+
+
+#######################################################################
 #                               testing                               #
 #######################################################################
-# clangd.Install()
-nodejs.Install()
+if g_args.clangd:
+    clangd.Install()
+
+if g_args.nodejs:
+    nodejs.Install()
+
+if g_args.html_lsp:
+    nodejs.Install()
+    html_lsp.Install()
+    html_hint.Install()
