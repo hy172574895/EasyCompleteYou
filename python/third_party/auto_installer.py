@@ -5,10 +5,10 @@ import os
 import os.path as p
 import sys
 import zipfile
+import json
 
 import argparse
-parser = argparse.ArgumentParser(
-    description='EasyCompleteYou installer, Easily install.')
+parser = argparse.ArgumentParser(description='EasyCompleteYou installer, Easily install.')
 parser.add_argument('--clangd', action='store_true', help='language server of clangd. Linux, Windows and Mac. x86')
 parser.add_argument('--rust_analyzer', action='store_true', help='language server of rust_analyzer. Linux, Windows and Mac. x86')
 parser.add_argument('--nodejs', action='store_true', help='nodejs, programming language. Linux and Mac in x64. Windows in x86')
@@ -119,7 +119,11 @@ class Installer(object):
         return url
 
     def OrginizeDependences(self):
-        pass
+        value = {}
+        dirs = self.install_dir + self.install_name
+        for in self.dependences:
+            pass
+        WriteConif(self.install_name, value)
 
     def CheckInstall(self):
         """ check if it was installed.
@@ -153,7 +157,7 @@ class Installer(object):
         for item in self.dependences:
             zip_cache = self.download_cache_dir + item['name']
             print('Decompressing %s' % zip_cache)
-            dirs = self.install_dir + item['name']
+            dirs = self.install_dir + self.install_name
             dirs = self._init_dir(dirs)
             if not zipfile.is_zipfile(zip_cache):
                 raise "Fatal error. Unpackable ZIP " + zip_cache
@@ -183,6 +187,32 @@ def GetRegion():
     finally:
         print('')
 region = GetRegion()
+
+def InitConfig():
+    config_path = DIR_OF_THIRD_PARTY + '/installed_engines.json'
+    if not os.path.exists(config_path):
+        init_content = {'is_init': 'true'}
+        with open(config_path, 'w+', encoding='utf-8') as f:
+            f.write(json.dumps(init_content))
+        return init_content
+
+    # read config
+    with open(config_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    return json.loads(content)
+
+def WriteConif(key, value):
+    config_path = DIR_OF_THIRD_PARTY + '/installed_engines.json'
+    if type(config_content) is not dict:
+        raise
+    config_content[key] = value
+    config_content['is_init'] = 'false'
+    with open(config_path, 'w+', encoding='utf-8') as f:
+        f.write(json.dumps(config_content))
+
+global config_content
+config_content = InitConfig()
 
 #######################################################################
 #                               clangd                                #
@@ -283,3 +313,5 @@ if g_args.html_lsp:
     nodejs.Install()
     html_lsp.Install()
     html_hint.Install()
+
+
