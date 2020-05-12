@@ -307,6 +307,9 @@ A: It will be nice to use other mature plugins for auto-format such as [vim-auto
 ### Q: Why there are no capability for highlight in LSP?
 A: There are few of Server supports that feature. I think it can be replaced by other vim's plugins such as [vim-css-color](https://github.com/ap/vim-css-color)
 
+### Q: Can ECY be used in Neovim?
+A: Yes. But ECY tested and developed mainly in Vim.
+
 # Debug & Contribution
 ## How to debug?
 Put `let g:ECY_debug = v:true` into your vimrc and restart Vim.  
