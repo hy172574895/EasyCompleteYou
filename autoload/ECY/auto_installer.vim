@@ -1,5 +1,5 @@
 function ECY#auto_installer#Init() abort
-  let g:ECY_auto_install_engines = get(g:,'ECY_auto_install_engines', ['clangd'])
+  let g:ECY_auto_install_engines = get(g:,'ECY_auto_install_engines', [])
   let s:can_be_auto_installed = ['clangd']
 
   " call ECY#auto_installer#AutoInstall()
@@ -37,6 +37,7 @@ function s:RunInstaller(to_install) abort
   let s:installer_script .= l:flags
   let l:temp = ['Auto Installing' . l:flags]
   call ECY#utility#ShowMsg(l:temp, 2)
+  call ECY#utility#ExeCMD(s:installer_script)
 "}}}
 endfunction
 

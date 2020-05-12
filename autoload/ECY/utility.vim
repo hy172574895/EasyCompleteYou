@@ -270,6 +270,11 @@ function! ECY#utility#ShowMsg(msg, style) abort
 "}}}
 endfunction
 
+function! ECY#utility#ExeCMD(cmd) abort
+  " synchronous in vim
+   execute "normal! :!" . a:cmd . "\<cr>" 
+endfunction
+
 function! ECY#utility#IsInList(item, list) abort
 "{{{
   let i = 0

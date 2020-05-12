@@ -343,7 +343,7 @@ function! ECY#install#html_lsp() abort
     if !ECY#utility#CMDRunable('npm')
       return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
     endif
-    call s:ExeCMD("npm install --global vscode-html-languageserver-bin")
+    call ECY#utility#ExeCMD("npm install --global vscode-html-languageserver-bin")
   endif
   try
     call UltiSnips#SnippetsInCurrentScope(1)
@@ -402,7 +402,7 @@ function! ECY#install#typescript_lsp() abort
     if !ECY#utility#CMDRunable('npm')
       return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
     endif
-    call s:ExeCMD("npm install -g typescript typescript-language-server")
+    call ECY#utility#ExeCMD("npm install -g typescript typescript-language-server")
   endif
   return {'status':'0','description':"ok"}
 "}}}
@@ -416,7 +416,7 @@ function! ECY#install#vim_lsp() abort
   "   if !ECY#utility#CMDRunable('npm')
   "     return {'status':'-1','description':"ECY failed to install it by NPM. You missing server's implement and NPM."}
   "   endif
-  "   call s:ExeCMD("npm i vim-language-server")
+  "   call ECY#utility#ExeCMD("npm i vim-language-server")
   " endif
   try
     call UltiSnips#SnippetsInCurrentScope(1)
@@ -469,7 +469,7 @@ endfunction
 function! ECY#install#Pygment() abort
 "{{{
   try
-    call s:ExeCMD("pip install Pygments")
+    call ECY#utility#ExeCMD("pip install Pygments")
   catch
     return {'status':'-1','description':"ECY failed to install it. You missing Pygment. Please install that plugin, firstly. "}
   endtry
@@ -495,9 +495,4 @@ function! ECY#install#Install_cb(dict) abort
   endif
   call ECY#utility#ShowMsg('[ECY]' . string(a:dict['Name']) . a:dict['Description'], 2)
 "}}}
-endfunction
-
-function! s:ExeCMD(cmd) abort
-  " synchronous in vim
-   execute "normal! :!" . a:cmd . "\<cr>" 
 endfunction
