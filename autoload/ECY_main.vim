@@ -908,7 +908,7 @@ endfunction
 
 function! s:StartCommunication() abort
 "{{{
-  let s:server_exe_path = g:ECY_python_script_folder_path.'/server/Main_server.py'
+  let s:server_exe_path = g:ECY_python_script_folder_path . '/server/Main_server.py'
   let l:start_cmd = g:ECY_python3_cmd.' '.s:server_exe_path
   if !s:is_using_stdio
     " let s:HMAC_KEY = s:PythonEval("ECY_Client_.CreateHMACKey()")

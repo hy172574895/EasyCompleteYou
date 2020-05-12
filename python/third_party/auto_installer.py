@@ -121,8 +121,8 @@ class Installer(object):
     def OrginizeDependences(self):
         value = {}
         dirs = self.install_dir + self.install_name
-        for in self.dependences:
-            pass
+        for item in self.dependences:
+            value[item['name']] = dirs + '/' + item['name'] + '/'
         WriteConif(self.install_name, value)
 
     def CheckInstall(self):

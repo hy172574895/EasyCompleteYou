@@ -221,6 +221,7 @@ endfunction
 
 function! ECY#utility#ShowMsg(msg, style) abort
 "{{{
+"msg can be list or string.
   " if a:style == 1 means short
   " a:style == 2 warning with no redraw
   " a:style == 3 erro with redraw
