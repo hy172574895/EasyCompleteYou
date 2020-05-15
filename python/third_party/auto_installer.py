@@ -313,5 +313,3 @@ if g_args.html_lsp:
     nodejs.Install()
     html_lsp.Install()
     html_hint.Install()
-
-

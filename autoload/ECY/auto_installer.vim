@@ -1,12 +1,17 @@
 function ECY#auto_installer#Init() abort
   let g:ECY_auto_install_engines = get(g:,'ECY_auto_install_engines', [])
   let s:can_be_auto_installed = ['clangd']
-
-  " call ECY#auto_installer#AutoInstall()
+  let s:installed_engines = {}
 endfunction
 
 function ECY#auto_installer#AutoInstall() abort
 "{{{
+  if len(g:ECY_auto_install_engines) == 0
+    let l:temp = ['[ECY] g:ECY_auto_install_engines is empty.']
+    call ECY#utility#ShowMsg(l:temp, 2)
+    return
+  endif
+
   let l:to_install = []
   " check
   for item in g:ECY_auto_install_engines
@@ -41,4 +46,20 @@ function s:RunInstaller(to_install) abort
 "}}}
 endfunction
 
-
+function ECY#auto_installer#ReadAutoInstalled() abort
+"{{{ read installed engines that installed by auto installing script.
+  let s:installed_engines_path = g:ECY_python_script_folder_path . '/third_party/installed_engines.json'
+  if !filereadable(s:installed_engines_path)
+    return
+  endif
+  try
+    let l:read_content_list = readfile(s:installed_engines_path)
+    let l:read_content_list = l:read_content_list[0]
+    " the 'installed_engines.json' might not be init yet.
+    let s:installed_engines = json_decode(l:read_content_list)
+  catch 
+    let s:installed_engines = {}
+  endtry
+  return s:installed_engines
+"}}}
+endfunction
