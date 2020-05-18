@@ -1,7 +1,7 @@
 function ECY#auto_installer#Init() abort
   let g:ECY_auto_install_engines = get(g:,'ECY_auto_install_engines', [])
   let s:can_be_auto_installed = ['clangd']
-  let s:installed_engines = {}
+  call ECY#auto_installer#ReadAutoInstalled() " init
 endfunction
 
 function ECY#auto_installer#AutoInstall() abort
@@ -22,8 +22,8 @@ function ECY#auto_installer#AutoInstall() abort
     endif
     call add(l:to_install, item)
   endfor
-
   call s:RunInstaller(l:to_install)
+  call ECY#auto_installer#ReadAutoInstalled()
 "}}}
 endfunction
 
@@ -49,17 +49,37 @@ endfunction
 function ECY#auto_installer#ReadAutoInstalled() abort
 "{{{ read installed engines that installed by auto installing script.
   let s:installed_engines_path = g:ECY_python_script_folder_path . '/third_party/installed_engines.json'
+  let s:installed_engines = {}
   if !filereadable(s:installed_engines_path)
-    return
+    return s:installed_engines
   endif
   try
     let l:read_content_list = readfile(s:installed_engines_path)
     let l:read_content_list = l:read_content_list[0]
     " the 'installed_engines.json' might not be init yet.
     let s:installed_engines = json_decode(l:read_content_list)
+    call s:InitEnginesVariable(s:installed_engines)
   catch 
-    let s:installed_engines = {}
   endtry
   return s:installed_engines
+"}}}
+endfunction
+
+function s:InitEnginesVariable(l:installed_engines) abort
+"{{{
+  for [key, value] in l:installed_engines
+    try
+      let l:Fuc = function('ECY#auto_installer#' . key)
+      call l:Fuc(value)
+    catch 
+      call ECY_main#Log('auto installer failed. ' . key)
+    endtry
+  endfor
+"}}}
+endfunction
+
+function ECY#auto_installer#clangd(dependences) abort
+"{{{
+  let g:ECY_clangd_starting_cmd = dependences['clangd'] . 'clangd'
 "}}}
 endfunction

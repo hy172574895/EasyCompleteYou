@@ -94,8 +94,8 @@ call ECY#color_completion#Init()
 call ECY#document_help#Init()
 call ECY#goto#Init()
 call ECY#install#Init()
-call ECY#auto_installer#Init()
 call ECY_main#Start()
+call ECY#auto_installer#Init()
 filetype on
 
 let g:ECY_endtime = reltimefloat(reltime())
