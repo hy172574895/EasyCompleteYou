@@ -266,12 +266,13 @@ variable name|default values|description
 `g:ECY_warn_sign_highlight`|'ECY_warn_sign_highlight'|**String**. Color of warning sign.
 
 ## API
-API name|params and type|return
---|:--:|--:
-`ECY_main#GetCurrentUsingSourceName()`|-|**String**. 
-`ECY#diagnosis#CurrentBufferErrorAndWarningCounts()`|-|**Int**. 
-`ECY#utility#OpenECYLogFile()`|-|**-**. 
-`ECY#utility#CheckCurrentCapabilities()`|1.capability - string|**boolean**. 
+API name                                             | params and type       | return
+--                                                   | :--:                  | --:
+`ECY_main#GetCurrentUsingSourceName()`               | -                     | **String**.
+`ECY#diagnosis#CurrentBufferErrorAndWarningCounts()` | -                     | **Int**.
+`ECY#utility#OpenECYLogFile()`                       | -                     | **-**.
+`ECY_main#Check()`                                   | -                     | **boolean**.
+`ECY#utility#CheckCurrentCapabilities()`             | 1.capability - string | **boolean**.
 
 # How to write an engine by yourself?
 Check out this basic [repo](https://github.com/hy172574895/ECY-dictionary).
