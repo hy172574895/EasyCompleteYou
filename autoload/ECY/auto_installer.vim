@@ -65,7 +65,7 @@ function ECY#auto_installer#ReadAutoInstalled() abort
 "}}}
 endfunction
 
-function s:InitEnginesVariable(l:installed_engines) abort
+function s:InitEnginesVariable(installed_engines) abort
 "{{{
   for [key, value] in l:installed_engines
     try
