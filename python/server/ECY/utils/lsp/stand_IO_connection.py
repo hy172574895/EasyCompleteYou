@@ -65,6 +65,13 @@ class ThreadOfJob(object):
         else:
             pass
 
+    def LogStderr(self):
+        g_logger.debug("lisenting on Server's stderr.")
+        while self.IsServerAlive():
+            temp = self._sub_object.stderr.readline()
+            temp = str(temp.decode("UTF-8"))
+            g_logger.debug(temp)
+
     def IsServerAlive(self):
         if self._sub_object.poll() is None:
             return True
@@ -109,6 +116,7 @@ class Operate:
             process_obj = subprocess.Popen(cmd,
                                        shell=True,
                                        stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE,
                                        stdin=subprocess.PIPE)
             # stderr = subprocess.STDOUT)
             self.server_count += 1
@@ -116,7 +124,11 @@ class Operate:
             process_hanlder = ThreadOfJob(self.server_count, process_obj,
                                     self._queue)
 
+            # stdin
             threading.Thread(target=process_hanlder.Start, daemon=True).start()
+
+            # stderr
+            threading.Thread(target=process_hanlder.LogStderr, daemon=True).start()
 
             self.server_info[self.server_count] = {}
             self.server_info[self.server_count]['cmd'] = cmd
