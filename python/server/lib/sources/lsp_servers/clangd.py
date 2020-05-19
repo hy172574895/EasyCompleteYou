@@ -22,12 +22,13 @@ class Operate(scope_.Source_interface):
         self._deamon_queue = None
         self._workspace_list = []
         self._diagnosis_cache = None
+        self._is_incomplete_items = True
 
     def GetInfo(self):
         return {'Name': self._name,
                 'WhiteList': ['c', 'cpp', 'objc', 'objcpp', 'cuda'],
                 'Regex': r'[\w]',
-                'NotCache': True,
+                'NotCache': self._is_incomplete_items,
                 'TriggerKey': [".","<",":","#"]}
 
     def _check(self, version):
@@ -332,9 +333,11 @@ class Operate(scope_.Source_interface):
         temp = self._lsp.completion(uri_, current_start_postion)
 
         _return_data = self._waitting_for_response(temp['Method'], temp['ID'])
+        self._is_incomplete_items = False
         if _return_data is None:
             items = []
         else:
+            self._is_incomplete_items = _return_data['result']['isIncomplete']
             items = _return_data['result']['items']
         results_list = []
         for item in items:

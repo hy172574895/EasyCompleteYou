@@ -60,7 +60,8 @@ class Operate(object):
 
         if current_start_postion != self.start_position[engine_name]\
                 or self.completion_items['EngineName'] != engine_name\
-                or ('NotCache' in source_info and source_info['NotCache']):
+                or ('NotCache' in source_info and source_info['NotCache'])\
+                or filter_words == '':
             # reflesh cache
             return_ = engine_obj.DoCompletion(version)
             if return_ is None:
