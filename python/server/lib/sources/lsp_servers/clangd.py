@@ -27,6 +27,7 @@ class Operate(scope_.Source_interface):
         return {'Name': self._name,
                 'WhiteList': ['c', 'cpp', 'objc', 'objcpp', 'cuda'],
                 'Regex': r'[\w]',
+                'NotCache': True,
                 'TriggerKey': [".","<",":","#"]}
 
     def _check(self, version):
@@ -117,7 +118,7 @@ class Operate(scope_.Source_interface):
         # {{{
         # LSP requires the edit-version
         if uri not in self._did_open_list:
-            return_id = self._lsp.didopen(uri, 'go', text, version=0)
+            return_id = self._lsp.didopen(uri, 'c', text, version=0)
             self._did_open_list[uri] = {}
             self._did_open_list[uri]['change_version'] = 0
         else:
