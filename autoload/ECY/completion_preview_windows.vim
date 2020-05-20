@@ -5,7 +5,7 @@
 function! ECY#completion_preview_windows#Init() abort
 "{{{ 
   let g:ECY_windows_are_showing['completion_preview_windows'] = -1
-  let g:ECY_enable_preview_snippet = get(g:,'ECY_enable_preview_snippet', v:true)
+  " let g:ECY_enable_preview_snippet = get(g:,'ECY_enable_preview_snippet', v:true)
   let g:ECY_preview_windows_size = 
         \get(g:,'ECY_preview_windows_size',[[30, 50], [2, 14]])
   let i = g:ECY_preview_windows_size[0][1]

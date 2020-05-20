@@ -22,7 +22,7 @@ class Operate(scope_.Source_interface):
         self._deamon_queue = None
         self._workspace_list = []
         self._diagnosis_cache = None
-        self._is_incomplete_items = True
+        self._is_incomplete_items = False
 
     def GetInfo(self):
         return {'Name': self._name,
@@ -33,11 +33,10 @@ class Operate(scope_.Source_interface):
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']
-        # self._start_server(version['StartingCMD'],
-        #         version['Vimruntime'], version['Runtimepath'])
         self._start_server(workspace=version['WorkSpace'],
                            starting_cmd=version['StartingCMD'],
-                           is_enable_diagnosis=version['ReturnDiagnosis'])
+                           is_enable_diagnosis=version['ReturnDiagnosis'],
+                           results_limit=version['ResultsLimitation'])
         if self.is_server_start == 'started':
             return True
         return False
@@ -58,7 +57,7 @@ class Operate(scope_.Source_interface):
         self._output_queue(temp)
         
 
-    def _start_server(self, starting_cmd="", workspace="",
+    def _start_server(self, starting_cmd="", workspace="", results_limit='100',
             is_enable_diagnosis=True):
         if is_enable_diagnosis:
             is_enable_diagnosis = True
@@ -66,7 +65,8 @@ class Operate(scope_.Source_interface):
             if self.is_server_start == 'not_started':
                 if starting_cmd == "":
                     starting_cmd = 'clangd'
-                # g_logger.debug(starting_cmd)
+                # check https://github.com/clangd/clangd/issues/396 for more
+                starting_cmd += ' --limit-results=' + results_limit
                 self._lsp.StartJob(starting_cmd)
                 temp = self._lsp.initialize()
                 # if time out will raise, meanning can not start a job.
@@ -353,11 +353,28 @@ class Operate(scope_.Source_interface):
 
             results_format['abbr'] = item_name
             results_format['word'] = item_name
+
+            detail = []
             if 'detail' in item:
-                results_format['menu'] = item['detail']
+                detail = item['detail'].split('\n')
+                if len(detail) == 2:
+                    results_format['menu'] = detail[1]
+                else:
+                    results_format['menu'] = item['detail']
+
+            document = []
             if 'documentation' in item:
                 temp = item['documentation'].split('\n')
-                results_format['info'] = temp
+                document.extend(temp)
+
+            if 'label' in item:
+                temp = item['label']
+                if temp[0] == ' ':
+                    temp = temp[1:]
+                if results_format['kind'] == 'Function':
+                    temp = detail[0] + ' ' + temp
+                document.append(temp)
+            results_format['info'] = document
 
             try:
                 if item['insertTextFormat'] == 2:

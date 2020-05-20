@@ -214,10 +214,10 @@ class LSP(conec.Operate):
                         "commitCharactersSupport": False,
                         "documentationFormat": [],
                         "deprecatedSupport": True,
-                        "preselectSupport": True
+                        "preselectSupport": False
                         },
                     "completionItemKind": {"valueSet": []},
-                    "contextSupport": True
+                    "contextSupport": False
                     },
                 "hover": {
                     "dynamicRegistration": False,

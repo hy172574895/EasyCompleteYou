@@ -42,13 +42,14 @@ class Operate(object):
         source_info = engine_obj.GetInfo()
 
         # get full items
-        current_colum = version['StartPosition']['Colum']
+        original_colum = version['StartPosition']['Colum']
+        current_line = version['StartPosition']['Line']
         current_line_text = version['CurrentLineText']
-        pre_words = current_line_text[:current_colum]
+        pre_words = current_line_text[:original_colum]
         current_colum, filter_words, last_key = \
             self.FindStart(pre_words, source_info['Regex'])
         current_start_postion = \
-            {'Line': version['StartPosition']['Line'], 'Colum': current_colum}
+                {'Line': current_line, 'Colum': current_colum, 'OriginalColum': original_colum}
         version['Filter_words'] = filter_words
         version['Filter_start_position'] = current_start_postion
         pre_words = current_line_text[:current_colum]
@@ -56,14 +57,19 @@ class Operate(object):
         engine_name = source_info['Name']
         if engine_name not in self.start_position:
             # init
-            self.start_position[engine_name] = {'Line': 0, 'Colum': 0}
+            self.start_position[engine_name] = {'Line': 0, 'Colum': 0, 'OriginalColum': 0}
 
-        if current_start_postion != self.start_position[engine_name]\
+        cache_position = self.start_position[engine_name]
+        g_logger.debug(cache_position)
+        g_logger.debug(current_start_postion)
+        if current_start_postion['Line'] != cache_position['Line']\
+                or current_start_postion['Colum'] != cache_position['Colum']\
+                or cache_position['OriginalColum'] >= original_colum\
                 or self.completion_items['EngineName'] != engine_name\
-                or ('NotCache' in source_info and source_info['NotCache'])\
-                or filter_words == '':
+                or ('NotCache' in source_info and source_info['NotCache']):
             # reflesh cache
             return_ = engine_obj.DoCompletion(version)
+            g_logger.debug('reflesh cache')
             if return_ is None:
                 return None
             return_['EngineName'] = engine_name
