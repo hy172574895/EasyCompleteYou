@@ -363,10 +363,6 @@ class Operate(scope_.Source_interface):
                     results_format['menu'] = item['detail']
 
             document = []
-            if 'documentation' in item:
-                temp = item['documentation'].split('\n')
-                document.extend(temp)
-
             if 'label' in item:
                 temp = item['label']
                 if temp[0] == ' ':
@@ -374,6 +370,11 @@ class Operate(scope_.Source_interface):
                 if results_format['kind'] == 'Function':
                     temp = detail[0] + ' ' + temp
                 document.append(temp)
+                document.append('')
+
+            if 'documentation' in item:
+                temp = item['documentation'].split('\n')
+                document.extend(temp)
             results_format['info'] = document
 
             try:
