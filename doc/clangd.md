@@ -29,3 +29,6 @@ for example, put the code into your vimrc:
 ## Usages
 You should go to check its [website](https://clangd.llvm.org/installation.html) of how it works.  
 Generally, you need a project file named `compile_commands.json`, and how to configure that file bases on your knowledge of `C-language` such as how to include a `lib` or dictate where is the `lib dir`.
+
+### compile_commands.json
+You can use [this](https://gitee.com/Jimmy_Huang/PyConstructor) to make `compile_commands.json`
