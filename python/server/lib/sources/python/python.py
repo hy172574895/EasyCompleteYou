@@ -57,7 +57,7 @@ class Operate(scope_.Source_interface):
                              daemon=True).start()
 
     def GetInfo(self):
-        return {'Name': self._name, 'WhiteList': ['python'], 'Regex': r'[\w]',
+        return {'Name': self._name, 'WhiteList': ['python'], 'Regex': r'[a-z0-9]',
                 'TriggerKey': ['.']}
 
     def _GetJediScript(self, version):

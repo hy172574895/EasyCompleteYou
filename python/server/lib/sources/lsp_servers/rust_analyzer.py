@@ -27,7 +27,7 @@ class Operate(scope_.Source_interface):
     def GetInfo(self):
         return {'Name': self._name,
                 'WhiteList': ['rust'],
-                'Regex': r'[\w]',
+                'Regex': r'[a-z0-9]',
                 'TriggerKey': [":","."]}
 
     def _check(self, version):

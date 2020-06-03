@@ -13,4 +13,4 @@ class Operate(scope_.Source_interface):
     def GetInfo(self):
         # WhiteList must be 'all'
         return {'Name': self._name, 'WhiteList': ['all'],
-                'Regex': r'[\w]', 'TriggerKey': []}
+                'Regex': r'[a-z0-9]', 'TriggerKey': []}
