@@ -21,17 +21,20 @@ class Operate(scope_.Source_interface):
         self.DocumentVersionID = -1
         self._deamon_queue = None
         self._workspace_list = []
+        self.BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        self._workspace = None
 
     def GetInfo(self):
         return {'Name': self._name, 'WhiteList': ['go'],
-                'Regex': r'[\w]',
+                'Regex': r'[a-z0-9\_]',
                 'TriggerKey': ['.']}
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']
         # self._start_server(version['StartingCMD'],
         #         version['Vimruntime'], version['Runtimepath'])
-        self._start_server(workspace=version['WorkSpace'],
+        self._workspace =  version['WorkSpace']
+        self._start_server(workspace=self._workspace,
                            starting_cmd=version['StartingCMD'],
                            is_enable_diagnosis=version['ReturnDiagnosis'])
         if self.is_server_start == 'started':
@@ -52,7 +55,9 @@ class Operate(scope_.Source_interface):
                 'Event': 'erro_code',
                 'Description': msg}
         self._output_queue(temp)
-        
+
+    def _save_log_msg(self, ):
+        pass
 
     def _start_server(self, starting_cmd="", workspace="",
             is_enable_diagnosis=True):
@@ -101,6 +106,19 @@ class Operate(scope_.Source_interface):
 
     def _handle_log_msg(self):
         g_logger.debug("started hanlde logmsg thread.")
+        if self._workspace is None or self._workspace == '':
+            output_log_dir = self.BASE_DIR + "/gopls.log"
+        else:
+            output_log_dir = self._workspace + "/gopls.log"
+        fileHandler = logging.FileHandler(
+            output_log_dir, mode="w", encoding="UTF-8")
+        formatter = logging.Formatter(
+            '%(asctime)s %(filename)s:%(lineno)d | %(message)s')
+        fileHandler.setFormatter(formatter)
+        lsp_logger = logging.getLogger('gopls')
+        lsp_logger.addHandler(fileHandler)
+        lsp_logger.setLevel(logging.DEBUG)
+        lsp_logger.debug("started hanlde logmsg thread.")
         while 1:
             try:
                 response = self._lsp.GetResponse(

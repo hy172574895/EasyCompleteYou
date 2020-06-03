@@ -21,7 +21,7 @@ class Operate(scope_.Source_interface):
     def GetInfo(self):
         # the key of 'Regex' is the regular of filter
         temp = {'Name': self._name, 'WhiteList': ['all'],
-                    'Regex': r'[a-z0-9\-\.\~\&\$]', 'TriggerKey': ['/','\\']}
+                    'Regex': r'[a-z0-9\_\-\.\~\&\$]', 'TriggerKey': ['/','\\']}
         if self._current_system() == 'Windows':
             # such as 'C:\windows\gvim\'
             temp['TriggerKey'] = ['/','\\',':']

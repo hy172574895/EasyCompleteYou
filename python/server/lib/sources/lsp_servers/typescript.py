@@ -30,7 +30,7 @@ class Operate(scope_.Source_interface):
 
     def GetInfo(self):
         return {'Name': self._name, 'WhiteList': ['javascript', 'typescript'],
-                'Regex': r'[a-z0-9]',
+                'Regex': r'[a-z0-9\_]',
                 'TriggerKey': [".","\"","'","/","@","<"]}
 
     def _check(self, version):

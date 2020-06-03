@@ -27,7 +27,7 @@ class Operate(scope_.Source_interface):
     def GetInfo(self):
         return {'Name': self._name,
                 'WhiteList': ['c', 'cpp', 'objc', 'objcpp', 'cuda'],
-                'Regex': r'[a-z0-9]',
+                'Regex': r'[a-z0-9\_]',
                 'NotCache': self._is_incomplete_items,
                 'TriggerKey': [".","<",":","#"]}
 
