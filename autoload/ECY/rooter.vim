@@ -23,7 +23,7 @@ if !exists('g:rooter_use_lcd')
 endif
 
 if !exists('g:rooter_patterns')
-  let g:rooter_patterns = ['.git', 'Cargo.toml', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/']
+  let g:rooter_patterns = ['.git', '.root', 'Cargo.toml', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/']
 endif
 
 if !exists('g:rooter_targets')
