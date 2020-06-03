@@ -254,29 +254,33 @@ function! s:GetCurrentPosition() abort
 "}}}
 endfunction
 
-function! s:UsingSpecicalSource(completor_name, invoke_key, is_replace) abort
+function! s:UsingSpecicalSource(engine_name, invoke_key, is_replace) abort
 "{{{
   if ECY_main#IsECYWorksAtCurrentBuffer()
     let l:curren_file_type = &filetype
     let l:temp = g:ECY_file_type_info[l:curren_file_type]['filetype_using']
     if !exists('s:last_used_completor') 
-          \|| a:completor_name != l:temp
+          \|| a:engine_name != l:temp
       let s:last_used_completor                = {}
       let s:last_used_completor['source_name'] = l:temp
       let s:last_used_completor['file_type']   = l:curren_file_type
     endif
-    for item in g:ECY_file_type_info[l:curren_file_type]['available_sources']
-      if item == a:completor_name
-        let g:ECY_file_type_info[l:curren_file_type]['filetype_using']
-              \ = a:completor_name
-        if a:is_replace
-          let g:ECY_file_type_info[l:curren_file_type]['special_position'] = 
-                \s:GetCurrentPosition()
-        else
-          let g:ECY_file_type_info[l:curren_file_type]['special_position'] = {}
-        endif
+    let l:available_sources = g:ECY_file_type_info[l:curren_file_type]['available_sources']
+    if ECY#utility#IsInList(a:engine_name, l:available_sources)
+      let g:ECY_file_type_info[l:curren_file_type]['filetype_using']
+            \ = a:engine_name
+
+      " replace invoke_key in buffer.
+      if a:is_replace
+        let g:ECY_file_type_info[l:curren_file_type]['special_position'] = 
+              \s:GetCurrentPosition()
+      else
+        let g:ECY_file_type_info[l:curren_file_type]['special_position'] = {}
       endif
-    endfor
+
+      " send buffer context to new engine.
+      call ECY_main#AfterUserChooseASource()
+    endif
   endif
   call ECY#utility#SendKeys(a:invoke_key)
   return ''
@@ -305,8 +309,7 @@ function! s:SetVariable() abort
   let g:ECY_choose_special_source_key
         \= get(g:,'ECY_choose_special_source_key',
         \[{'source_name':'snippets','invoke_key':'@', 'is_replace': v:true},
-        \{'source_name':'path','invoke_key':'/', 'is_replace': v:false},
-        \{'source_name':'label','invoke_key':'^', 'is_replace': v:true}])
+        \{'source_name':'path','invoke_key':'/', 'is_replace': v:false}])
 
   if executable('python2')
     " user have python2
@@ -605,16 +608,15 @@ function! ECY_main#AfterUserChooseASource() abort
       endif
       call s:YCMCompatible(v:true)
       doautocmd <nomodeline> youcompleteme BufEnter
-      " will not call ECY's Event
+      " Returning make YCM work, so we will not call ECY's event.
       return
     endif
     if !exists('g:ycm_filetype_blacklist[l:filetype]')
       let g:ycm_filetype_blacklist[l:filetype] = 1
       call s:YCMCompatible(v:false)
-      " available at current buffer, so we don't return
+      " YCM are not available at current buffer, so we don't return
     endif
   endif
-  " exe "do BufEnter EasyCompleteYou"
   doautocmd <nomodeline> EasyCompleteYou BufEnter
 "}}}
 endfunction
@@ -647,7 +649,7 @@ function! s:SetFileTypeSource_cb(msg) abort
         \a:msg['Dicts']['using_source']
   let g:ECY_file_type_info[a:msg['FileType']]['special_position']  =
         \{}
-  " trigger events again
+  " trigger events again.
   call ECY_main#AfterUserChooseASource()
 
   call s:DefaultSourcesCheck(l:available_sources)
