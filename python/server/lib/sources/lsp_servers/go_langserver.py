@@ -20,7 +20,7 @@ class Operate(scope_.Source_interface):
 
     def GetInfo(self):
         return {'Name': self._name, 'WhiteList': ['go'],
-                'Regex': r'[a-z0-9\_]',
+                'Regex': r'[A-Za-z0-9\_]',
                 'TriggerKey': ['.']}
 
     def _check(self, version):

@@ -6,6 +6,7 @@ vim's doc for more (:h key).
 Example: 
   let g:ECY_show_switching_source_popup = '<C-g>'    √
   let g:ECY_show_switching_source_popup = "\<C-g>"   ×
+  let g:ECY_show_switching_source_popup = "\<C-g\>"   ×
 
 -------------------------------------------------------------------------------
 
@@ -31,8 +32,7 @@ Example(not default):
 3. g:ECY_expand_snippets_key
   default: '<CR>' a.k.a '<Enter>'
 
-Expand a snippet in Insert mode through ultsnippes while the popup 
-windows is showing and there are snippet that can be expanded. 
+Expand a snippet in Insert mode by ultsnippes while the popup is showing and there are snippet that can be expanded. 
 Otherwise key will input into buffer.
 Example(not default): 
   let g:ECY_expand_snippets_key = '<F2>'
@@ -56,7 +56,7 @@ let g:ECY_choose_special_source_key = [{'source_name':'snippets','invoke_key':'~
 5. g:ECY_python3_cmd
   default: 'python'
 
-CMD of executing python3. Pointing to python3 in your computer.
+CMD of executing python3. Pointing to python3 bin in your computer.
 Example(not default): 
   let g:ECY_python3_cmd = 'd:/gvim/vimfiles/python3/python.exe'
 

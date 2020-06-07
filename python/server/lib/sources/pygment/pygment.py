@@ -22,7 +22,7 @@ class Operate(scope_.Source_interface):
 
     def GetInfo(self):
         return {'Name': self._name, 'WhiteList': ['all'],
-                'Regex': r'[a-z0-9\_]', 'TriggerKey': []}
+                'Regex': r'[A-Za-z0-9\_]', 'TriggerKey': []}
 
     def _check(self, version):
         if not has_pygment:
