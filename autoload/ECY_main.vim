@@ -662,6 +662,13 @@ function! s:CachedBufferList_cb(msg) abort
 "}}}
 endfunction
 
+function! s:Restart_cb(msg) abort
+"{{{
+  call ECY#utility#ShowMsg("[ECY] restared :" . a:msg['EngineName'], 2)
+  call ECY_main#AfterUserChooseASource()
+"}}}
+endfunction
+
 function! s:Completion_cb(msg) abort
 "{{{
   if ECY_main#GetVersionID() != a:msg['Version_ID'] || mode() != 'i'
@@ -805,7 +812,7 @@ function! s:EventSort(id, data, event) abort
       elseif l:Event == 'CachedBufferList'
         call s:CachedBufferList_cb(l:data_dict)
       elseif l:Event == 'restart'
-        call ECY#utility#ShowMsg("[ECY] restared :" . l:data_dict['EngineName'], 2)
+        call s:Restart_cb(l:data_dict)
       endif
     endfor
   " catch
