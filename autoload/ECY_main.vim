@@ -804,6 +804,8 @@ function! s:EventSort(id, data, event) abort
         call timer_start(1, function('ECY#install#ListEngine_cb', [l:data_dict]))
       elseif l:Event == 'CachedBufferList'
         call s:CachedBufferList_cb(l:data_dict)
+      elseif l:Event == 'restart'
+        call ECY#utility#ShowMsg("[ECY] restared :" . l:data_dict['EngineName'], 2)
       endif
     endfor
   " catch

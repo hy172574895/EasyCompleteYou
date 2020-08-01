@@ -79,6 +79,7 @@ command! -bar -nargs=0 ECYWorkSpaceSymbols call ECY_main#Execute('get_workspace_
 command! -bar -nargs=0 ECYDocumentSymbols  call ECY_main#Execute('get_symbols')
 command! -bar -nargs=0 ECYToggleDiagnosis  call ECY#diagnosis#Toggle()
 command! -bar -nargs=0 ECYDiagnosisLists   call ECY#diagnosis#ShowSelecting()
+command! -bar -nargs=0 ECYRestartServer    call ECY_main#Do("Restart", v:true)
 command! -bar -nargs=0 ECYAutoInstall      call ECY#auto_installer#AutoInstall()
 command! -bar -nargs=0 ECYListEngine       call ECY_main#Do("GetAllEngineInfo", v:true)
 command! -bar -nargs=0 ECYDocHelp          call ECY_main#Do("OnDocumentHelp", v:true)

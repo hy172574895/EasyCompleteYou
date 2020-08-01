@@ -29,7 +29,7 @@ class Operate(scope_.Source_interface):
                 'WhiteList': ['c', 'cpp', 'objc', 'objcpp', 'cuda'],
                 'Regex': r'[A-Za-z0-9\_]',
                 'NotCache': self._is_incomplete_items,
-                'TriggerKey': [".","<",":","#"]}
+                'TriggerKey': [".","<",":","#",">"]}
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']

@@ -70,6 +70,15 @@ class Operate(object):
             installed_engine_path = self.conf['installed_engine_path']
         return installed_engine_lib, installed_engine_path
 
+    def NewObj(self, module_name):
+        module_temp = importlib.import_module(module_name)
+        obj_temp = module_temp.Operate()
+        module_info = obj_temp.GetInfo()  # return a dict
+        module_info['Object'] = obj_temp
+        name = module_info['Name']
+        self.sources_info[name] = module_info
+        return module_info
+
     def _load_engine(self, specify_lib=None, specify_path={}):
         """ load the installed source list when specify_lib is None
         e.g.
@@ -92,25 +101,37 @@ class Operate(object):
                 # e.g.
                 # name = 'label'
                 # lib = 'lib.sources.label.Label'
+                if name in self.sources_info:
+                    # already inited, so we pass this
+                    continue
                 try:
                     if name in loading_source_path and \
                             loading_source_path[name] != '':
                         temp = loading_source_path[name]
                         sys.path.append(temp)
                         g_logger.debug('appended a new path:' + temp)
-                    module_temp = importlib.import_module(lib)
-                    obj_temp = module_temp.Operate()
-                    module_temp = obj_temp.GetInfo()  # return a dict
-                    module_temp['Object'] = obj_temp
-                    name = module_temp['Name']
-                    self.sources_info[name] = module_temp
-                    g_logger.debug('installed: ' + name + " from " + lib)
+                    module_temp = self.NewObj(lib)
+                    g_logger.debug('Installed: "%s" from "%s" ' % (module_temp['Name'],lib))
                 except:
                     # return erro
                     g_logger.exception("failed to load engine.")
             return module_temp
         except:
             raise "Failed to load engine."
+
+    def ReLoadEngine(self, engine_name):
+        del self.sources_info[engine_name]
+        try:
+            self._load_engine()
+            return {'Event': 'restart',
+                    'Status': 0,
+                    'EngineName': engine_name,
+                    'Description': 'ok'}
+        except:
+            return {'Event': 'restart',
+                    'Status': 1,
+                    'EngineName': engine_name,
+                    'Description': 'Failed to reload. Check log file for more.'}
 
     def InstallSource(self, engine_name, engine_lib, package_path=''):
         """this method will not check if engine is runable.

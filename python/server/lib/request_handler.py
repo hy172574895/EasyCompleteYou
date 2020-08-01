@@ -37,7 +37,7 @@ class EventHandler(object):
         version_dict = version_dict['Msg']
         event_ = version_dict['Event']
         file_type = version_dict['FileType']
-        source_name = version_dict['SourceName']
+        engine_name = version_dict['SourceName']
         self._is_debug = version_dict['IsDebugging']
 
         results_ = []
@@ -49,12 +49,17 @@ class EventHandler(object):
             results_.append(temp)
             return results_
 
+        if event_ == 'Restart':
+            temp = self.source_manager.ReLoadEngine(engine_name)
+            results_.append(temp)
+            return results_
+
         # we passing that queue to let source handle asyn by itself.
         # if the source's event will block for a while, the source can return
         # None, and then put the result into deamon_queue when it finished
         version_dict['DeamonQueue'] = self._pass_results_queue
         engine_obj = self.source_manager.GetSourceObjByName(
-            source_name, file_type)
+            engine_name, file_type)
 
         lists = self.BufferHanlder(version_dict)
         if lists is None:

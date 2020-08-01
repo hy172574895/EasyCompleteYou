@@ -81,7 +81,6 @@ class Operate(scope_.Source_interface):
             self._using_jedi_env['auto'] = \
                     jedi.api.environment.get_cached_default_environment()
         return self._using_jedi_env['auto']
-        
 
     def _get_environment(self, force_to_use):
         if force_to_use == 'auto':

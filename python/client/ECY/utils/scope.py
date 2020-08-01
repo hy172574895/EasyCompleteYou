@@ -55,6 +55,9 @@ class Event(object):
         msg['EngineName'] = temp['EngineName']
         return self._pack(msg, 'InstallSource')
 
+    def Restart(self):
+        return self._pack({}, 'Restart')
+
     def DoCompletion(self):
         return self._pack({}, 'DoCompletion')
 
