@@ -14,6 +14,7 @@ import completor_manager
 import completion
 import on_buffer
 import document_help
+import exit
 
 
 class EventHandler(object):
@@ -28,6 +29,7 @@ class EventHandler(object):
             self.integration = integration.Operate()
             self.goto = goto.Operate()
             self.document_help = document_help.Operate()
+            self.exit = exit.Operate()
         except:
             g_logger.exception("")
             raise
@@ -89,6 +91,8 @@ class EventHandler(object):
             temp = self.source_manager.GetAllEngine(version_dict)
         elif event_ == 'OnDocumentHelp':
             temp = self.document_help.GetDocument(engine_obj, version_dict)
+        elif event_ == 'Exit':
+            self.exit.Exit(self.source_manager.sources_info, version_dict)
         elif event_ == 'InstallSource':
             temp = self.source_manager.InstallSource(version_dict['EngineName'],
                     version_dict['EngineLib'],

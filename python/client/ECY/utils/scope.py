@@ -58,6 +58,9 @@ class Event(object):
     def Restart(self):
         return self._pack({}, 'Restart')
 
+    def Exit(self):
+        return self._pack({}, 'Exit')
+
     def DoCompletion(self):
         return self._pack({}, 'DoCompletion')
 

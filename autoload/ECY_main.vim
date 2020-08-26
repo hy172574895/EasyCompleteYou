@@ -143,6 +143,7 @@ endfunction
 
 function! s:OnVIMLeave() abort 
   "{{{ clean all legacy of ECY before existing.
+  call ECY_main#Do("Exit", v:true)
   "}}}
 endfunction
 
