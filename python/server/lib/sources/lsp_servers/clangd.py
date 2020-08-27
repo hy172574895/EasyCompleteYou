@@ -12,7 +12,7 @@ g_logger = logging.getLogger('ECY_server')
 
 class Operate(scope_.Source_interface):
     def __init__(self):
-        """ notes: 
+        """ notes:
         """
         self._name = 'clangd'
         self._did_open_list = {}
@@ -29,7 +29,7 @@ class Operate(scope_.Source_interface):
                 'WhiteList': ['c', 'cpp', 'objc', 'objcpp', 'cuda'],
                 'Regex': r'[A-Za-z0-9\_]',
                 'NotCache': self._is_incomplete_items,
-                'TriggerKey': [".","<",":","#",">"]}
+                'TriggerKey': [".", "<", ":", "#", ">"]}
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']
@@ -55,10 +55,9 @@ class Operate(scope_.Source_interface):
                 'Event': 'erro_code',
                 'Description': msg}
         self._output_queue(temp)
-        
 
     def _start_server(self, starting_cmd="", workspace="", results_limit='100',
-            is_enable_diagnosis=True):
+                      is_enable_diagnosis=True):
         if is_enable_diagnosis:
             is_enable_diagnosis = True
         try:
@@ -154,14 +153,13 @@ class Operate(scope_.Source_interface):
         while 1:
             try:
                 temp = self._lsp.GetResponse('textDocument/publishDiagnostics',
-                        timeout_=-1)
+                                             timeout_=-1)
                 return_['DocumentID'] = self.DocumentVersionID
                 return_['Lists'] = self._diagnosis_analysis(temp['params'])
                 self._diagnosis_cache = return_
                 self._output_queue(return_)
             except:
                 g_logger.exception('')
-
 
     def _diagnosis_analysis(self, params):
         results_list = []
@@ -234,7 +232,7 @@ class Operate(scope_.Source_interface):
         except:
             symbos = []
         return_['Results'] = self._analys_document_symbols(symbos,
-                version['FilePath'])
+                                                           version['FilePath'])
         return return_
 
     def GetWorkSpaceSymbol(self, version):
@@ -248,7 +246,7 @@ class Operate(scope_.Source_interface):
         except:
             symbos = []
         return_['Results'] = self._analys_document_symbols(symbos,
-                version['FilePath'])
+                                                           version['FilePath'])
         return return_
 
     def _genarate_position(self, line, colum):
@@ -273,7 +271,8 @@ class Operate(scope_.Source_interface):
                 if item == 'declaration':
                     results = self._lsp.definition(position, uri_)
                 results = self._lsp.GetResponse(results['Method'])
-                result_lists = self._build_goto(results, result_lists,kind=item)
+                result_lists = self._build_goto(
+                    results, result_lists, kind=item)
             except:
                 # will return []
                 g_logger.exception('')
@@ -343,7 +342,8 @@ class Operate(scope_.Source_interface):
         for item in items:
             results_format = {'abbr': '', 'word': '', 'kind': '',
                               'menu': '', 'info': [], 'user_data': ''}
-            results_format['kind'] = self._lsp.GetKindNameByNumber(item['kind'])
+            results_format['kind'] = self._lsp.GetKindNameByNumber(
+                item['kind'])
 
             item_name = item['filterText']
             if results_format['kind'] == 'File':
@@ -389,7 +389,7 @@ class Operate(scope_.Source_interface):
             results_list.append(results_format)
         return_['Lists'] = results_list
         return return_
-    
+
     def OnDocumentHelp(self, version):
         if not self._check(version):
             return None
