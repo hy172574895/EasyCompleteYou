@@ -1,12 +1,18 @@
 " Author: Jimmy Huang (1902161621@qq.com)
 " License: WTFPL
 
+fun! ECY#document_help#OnDocKey()
+  call ECY_main#Do("OnDocumentHelp", v:true)
+  return ''
+endf
+
 " this file namely hover.
 function! ECY#document_help#Init() abort
 "{{{
   let g:ECY_show_doc_key = get(g:,'ECY_show_doc_key', '<C-n>')
   let g:ECY_windows_are_showing['document_help'] = -1
   exe 'nmap ' . g:ECY_show_doc_key . ' :ECYDocHelp<CR>'
+  exe 'inoremap <silent> ' . g:ECY_show_doc_key . ' <C-R>=ECY#document_help#OnDocKey()<CR>'
 "}}}
 endfunction
 

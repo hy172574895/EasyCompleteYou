@@ -778,7 +778,7 @@ function! ECY_main#ChangeDocumentVersionID() abort
 "}}}
 endfunction
 
-function! s:EventSort(id, data, event) abort
+function! ECY_main#EventSort(id, data, event) abort
   "{{{ classify events.
   " a:data is a list that every item was divided into a decodable json
   " try
@@ -934,7 +934,7 @@ function! s:StartCommunication() abort
   call ECY_main#Log(l:start_cmd)
   try
     let s:server_job_id = ECY#jobs#Create(l:start_cmd, {
-        \ 'on_stdout': function('s:EventSort')
+        \ 'on_stdout': function('ECY_main#EventSort')
         \ })
     if !s:is_using_stdio
       call s:PythonEval("ECY_Client_.ConnectSocketServer()")

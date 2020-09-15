@@ -47,7 +47,7 @@ class FuzzyMatch(object):
                             break
                         i -= 1
                     else:
-                        if temp['results']['abbr'] != item['abbr']:
+                        if temp['results'] != item:
                             vim_items.insert(i+1, item_)
                         break
                 if len(vim_items) == 0:
