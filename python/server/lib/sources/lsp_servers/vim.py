@@ -28,17 +28,22 @@ class Operate(scope_.Source_interface):
     def GetInfo(self):
         return {'Name': self._name,
                 'WhiteList': ['vim'],
-                'Regex': r'[A-Za-z0-9\_]',
+                'Regex': r'[A-Za-z0-9\_\:\#]',
                 'NotCache': self._is_incomplete_items,
-                'TriggerKey': [".", "<", ":", "#", ">"]}
+                'TriggerKey': [".",":","#","[","&","$","<","\"","'"]}
+
+    def _get_lsp_setting(self, lsp_setting):
+        if self.lsp_setting is not None:
+            return
+        for item in lsp_setting:
+            if item['name'] == 'vim-language-server':
+                self.lsp_setting = item
+                return
 
     def _check(self, version):
         self._deamon_queue = version['DeamonQueue']
-        self.lsp_setting = version['lsp_setting']
-        self._start_server(workspace=version['WorkSpace'],
-                           starting_cmd=version['StartingCMD'],
-                           is_enable_diagnosis=version['ReturnDiagnosis'],
-                           results_limit=version['ResultsLimitation'])
+        self._get_lsp_setting(version['lsp_setting'])
+        self._start_server()
         if self.is_server_start == 'started':
             return True
         return False
@@ -58,15 +63,17 @@ class Operate(scope_.Source_interface):
                 'Description': msg}
         self._output_queue(temp)
 
-    def _start_server(self, starting_cmd="", workspace="", results_limit='100',
-                      is_enable_diagnosis=True):
-        if is_enable_diagnosis:
-            is_enable_diagnosis = True
+    def _start_server(self):
         try:
             if self.is_server_start == 'not_started':
-                starting_cmd = ''
+                starting_cmd = self.lsp_setting['cmd']
+                starting_cmd = ' '.join(starting_cmd)
+                starting_cmd = starting_cmd.replace('\\', '/')
                 self._lsp.StartJob(starting_cmd)
-                temp = self._lsp.initialize()
+                temp = self._lsp.initialize(
+                    initializationOptions=self.lsp_setting['initialization_options'],
+                    rootUri=self.lsp_setting['root_uri'])
+
                 # if time out will raise, meanning can not start a job.
                 self._lsp.GetResponse(temp['Method'], timeout_=5)
                 self.is_server_start = 'started'
@@ -77,9 +84,9 @@ class Operate(scope_.Source_interface):
                 self._lsp.initialized()
         except:
             self.is_server_start = 'started_error'
-            g_logger.exception(': can not start Sever.')
+            g_logger.exception('Can not start Sever.')
             self._build_erro_msg(2,
-                                 'Failed to start LSP server. You will need Clangd 7.0+. Check Log file of server to get more details.')
+                                 'Failed to start LSP server.')
 
     def _filter_log_msg(self, msg):
         """ return True means filter this msg.
@@ -343,11 +350,8 @@ class Operate(scope_.Source_interface):
             results_format['kind'] = self._lsp.GetKindNameByNumber(
                 item['kind'])
 
-            item_name = item['filterText']
-            if results_format['kind'] == 'File':
-                name_len = len(item_name)
-                if item_name[name_len - 1] in ['>', '"'] and name_len >= 2:
-                    item_name = item_name[:name_len - 1]
+            if 'label' in item:
+                item_name = item['label']
 
             results_format['abbr'] = item_name
             results_format['word'] = item_name
@@ -361,14 +365,8 @@ class Operate(scope_.Source_interface):
                     results_format['menu'] = item['detail']
 
             document = []
-            if 'label' in item:
-                temp = item['label']
-                if temp[0] == ' ':
-                    temp = temp[1:]
-                if results_format['kind'] == 'Function':
-                    temp = detail[0] + ' ' + temp
-                document.append(temp)
-                document.append('')
+            document.append(item_name)
+            document.append('')
 
             if 'documentation' in item:
                 temp = item['documentation'].split('\n')
