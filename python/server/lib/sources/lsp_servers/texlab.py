@@ -359,22 +359,14 @@ class Operate(scope_.Source_interface):
             results_format['abbr'] = item_name
             results_format['word'] = item_name
 
-            detail = []
+            detail = ''
             if 'detail' in item:
-                detail = item['detail'].split('\n')
-                if len(detail) == 2:
-                    results_format['menu'] = detail[1]
-                else:
-                    results_format['menu'] = item['detail']
+                detail = item['detail']
 
             document = []
-            document.append(item_name)
-            document.append('')
-
             if 'documentation' in item:
                 temp = item['documentation'].split('\n')
                 document.extend(temp)
-            results_format['info'] = document
 
             if 'insertTextFormat' in item:
                 if item['insertTextFormat'] == 2 and 'insertText' in item:
@@ -384,10 +376,23 @@ class Operate(scope_.Source_interface):
                         results_format['snippet'] = temp
                         results_format['kind'] += '~'
 
-            if 'snippet' not in results_format and 'data' in item:
-                if item['data'] == 'command':
-                    results_format['snippet'] = "%s{$1}$0" % item_name
-                    results_format['kind'] += '~'
+            try:
+                if 'data' in item:
+                    if 'snippet' not in results_format:
+                        if item['data'] == 'command':
+                            results_format['snippet'] = "%s{$1}$0" % item_name
+                            results_format['kind'] += '~'
+                    if type(item['data']) is dict and 'citation' in item['data']:
+                        results_format['kind'] = 'Citation'
+                        detail = item['data']['citation']['uri']
+                        document.append(item['filterText'])
+                    elif item['data'] == 'package':
+                        results_format['kind'] = 'Package'
+            except:
+                pass
+
+            results_format['info'] = document
+            results_format['menu'] = detail
             results_list.append(results_format)
         return_['Lists'] = results_list
         return return_
