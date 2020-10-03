@@ -14,9 +14,9 @@ class Operate(scope_.Source_interface):
     def __init__(self):
         """ notes:
         """
-        self._name = 'vim_lsp'
-        self.lsp_name = 'vim-language-server'
-        self.languageId = 'viml'
+        self._name = 'texlab'
+        self.lsp_name = 'texlab'
+        self.languageId = 'latex'
 
         self._did_open_list = {}
         self._lsp = lsp.LSP()
@@ -30,10 +30,10 @@ class Operate(scope_.Source_interface):
 
     def GetInfo(self):
         return {'Name': self._name,
-                'WhiteList': ['vim'],
-                'Regex': r'[A-Za-z0-9\_\:\#]',
+                'WhiteList': ['tex', 'plaintex'],
+                'Regex': r'[A-Za-z0-9\_\-]',
                 'NotCache': self._is_incomplete_items,
-                'TriggerKey': [".",":","#","[","&","$","<","\"","'"]}
+                'TriggerKey': ["\\","{","}","@","/"," "]}
 
     def _get_lsp_setting(self, lsp_setting):
         if self.lsp_setting is not None:
@@ -376,15 +376,18 @@ class Operate(scope_.Source_interface):
                 document.extend(temp)
             results_format['info'] = document
 
-            try:
-                if item['insertTextFormat'] == 2:
+            if 'insertTextFormat' in item:
+                if item['insertTextFormat'] == 2 and 'insertText' in item:
                     temp = item['insertText']
                     if '$' in temp or '(' in temp or '{' in temp:
                         temp = temp.replace('{\\}', '\{\}')
                         results_format['snippet'] = temp
                         results_format['kind'] += '~'
-            except:
-                pass
+
+            if 'snippet' not in results_format and 'data' in item:
+                if item['data'] == 'command':
+                    results_format['snippet'] = "%s{$1}$0" % item_name
+                    results_format['kind'] += '~'
             results_list.append(results_format)
         return_['Lists'] = results_list
         return return_

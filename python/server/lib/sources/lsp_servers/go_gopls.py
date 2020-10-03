@@ -12,7 +12,7 @@ g_logger = logging.getLogger('ECY_server')
 
 class Operate(scope_.Source_interface):
     def __init__(self):
-        """ notes: 
+        """ notes:
         """
         self._name = 'go_gopls'
         self._did_open_list = {}

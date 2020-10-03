@@ -56,9 +56,9 @@ function! ECY#install#Init() abort
   call ECY#install#AddEngineInfo('python_jedi', '', 
         \'lib.sources.python.python', '', '', v:true)
 
-  call ECY#install#AddEngineInfo('lsp_setting', 'lib.event.lsp_setting', 
-        \'lib.sources.lsp_setting.lsp_setting', 
-        \function('ECY#install#lsp_setting'), '', v:true)
+  call ECY#install#AddEngineInfo('texlab',
+        \'','lib.sources.lsp_servers.texlab',
+        \function('ECY#install#texlab'), '', v:true)
 
   call ECY#install#AddCapabilities()
 "}}}
@@ -377,16 +377,6 @@ function! ECY#install#rust_analyzer() abort
 "}}}
 endfunction
 
-function! ECY#install#lsp_setting() abort
-"{{{
-  " options: 1. cmd for starting Server
-  if !exists('g:loaded_lsp_settings')
-    return {'status':'-1','description':"Missing lsp_setting."}
-  endif
-  return {'status':'0','description':"ok"}
-"}}}
-endfunction
-
 function! ECY#install#php_phan() abort
 "{{{
   " options: 1. cmd for starting Server
@@ -455,6 +445,12 @@ function! ECY#install#Go_gopls() abort
     return {'status':'-1','description':"ECY failed to install it. You missing go-langserver Server. Please install that plugin, firstly. "}
   endif
   return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.go_gopls', 'name':'go_gopls', 'path': ''}
+"}}}
+endfunction
+
+function! ECY#install#texlab() abort
+"{{{
+  return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.texlab', 'name':'texlab', 'path': ''}
 "}}}
 endfunction
 
