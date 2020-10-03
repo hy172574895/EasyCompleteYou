@@ -56,6 +56,10 @@ function! ECY#install#Init() abort
   call ECY#install#AddEngineInfo('python_jedi', '', 
         \'lib.sources.python.python', '', '', v:true)
 
+  call ECY#install#AddEngineInfo('lsp_setting', 'lib.event.lsp_setting', 
+        \'lib.sources.lsp_setting.lsp_setting', 
+        \function('ECY#install#lsp_setting'), '', v:true)
+
   call ECY#install#AddCapabilities()
 "}}}
 endfunction
@@ -139,6 +143,14 @@ function! ECY#install#AddCapabilities() abort
 "}}}
 endfunction
 
+function! ECY#install#AddLspSetting(engine_info) abort
+"{{{
+  if exists('g:loaded_lsp_settings') && exists('g:ECY_lsp_setting_dict')
+    let g:ECY_all_engine_info[a:engine_name]['lsp_setting'] = g:ECY_lsp_setting_dict
+  endif
+"}}}
+endfunction
+
 function! ECY#install#AddEngineInfo(engine_name, client_module_path,
       \server_module_path, install_fuc, uninstall_fuc, is_buildin) abort
 "{{{
@@ -179,6 +191,7 @@ function! ECY#install#AddEngineInfo(engine_name, client_module_path,
   else
     let g:ECY_all_engine_info[a:engine_name]['is_buildin'] = v:false
   endif
+  call ECY#install#AddLspSetting(g:ECY_all_engine_info[a:engine_name])
 "}}}
 endfunction
 
@@ -364,6 +377,16 @@ function! ECY#install#rust_analyzer() abort
 "}}}
 endfunction
 
+function! ECY#install#lsp_setting() abort
+"{{{
+  " options: 1. cmd for starting Server
+  if !exists('g:loaded_lsp_settings')
+    return {'status':'-1','description':"Missing lsp_setting."}
+  endif
+  return {'status':'0','description':"ok"}
+"}}}
+endfunction
+
 function! ECY#install#php_phan() abort
 "{{{
   " options: 1. cmd for starting Server
@@ -386,7 +409,6 @@ endfunction
 function! ECY#install#clangd() abort
 "{{{
   " options: 1. cmd for starting Server
-  " let l:temp = get(g:,'ECY_html_lsp_starting_cmd','html-languageserver --stdio') 
   if !ECY#utility#CMDRunable(get(g:,'ECY_clangd_starting_cmd','clangd'))
     return {'status':'-1','description':"You missing 'clangd'."}
   endif

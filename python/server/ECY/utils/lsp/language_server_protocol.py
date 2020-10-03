@@ -335,7 +335,7 @@ class LSP(conec.Operate):
 
     def configuration(self, ids, results=[]):
         """ workspace/configuration, a response send to Server.
-        """ 
+        """
         return self._build_response(results, ids)
 
     def wordDoneProgress(self, ids):
