@@ -60,6 +60,10 @@ function! ECY#install#Init() abort
         \'','lib.sources.lsp_servers.texlab',
         \function('ECY#install#texlab'), '', v:true)
 
+  call ECY#install#AddEngineInfo('intelephense',
+        \'','lib.sources.lsp_servers.intelephense',
+        \function('ECY#install#texlab'), '', v:true)
+
   call ECY#install#AddCapabilities()
 "}}}
 endfunction
