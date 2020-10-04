@@ -187,8 +187,8 @@ class Event(object):
         return vim_lib.GetVariableValue("g:ECY_enable_diagnosis")
 
     def _get_lsp_setting_dict(self):
-        if vim_lib.GetVariableValue('g:ECY_lsp_setting_new_server') == 1 or \
-                self._lsp_setting is None:
+        if vim_lib.CallEval('get(g:, "ECY_lsp_setting_new_server", 0)') == 1 \
+                or self._lsp_setting is None:
             self._lsp_setting = vim_lib.CallEval('lsp#GetDict()')
         return self._lsp_setting
 

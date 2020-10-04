@@ -77,7 +77,7 @@ class Operate(scope_.Source_interface):
             else:
                 results_format['kind'] = 'Unkown'
 
-            if prefix != '': 
+            if prefix != '':
                 # using workspace symbols 
                 full_path = prefix + item
             else:
