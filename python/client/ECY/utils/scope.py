@@ -188,7 +188,7 @@ class Event(object):
 
     def _get_lsp_setting_dict(self):
         if vim_lib.CallEval('get(g:, "ECY_lsp_setting_new_server", 0)') == 1 \
-                or self._lsp_setting is None:
+                or self._lsp_setting is None or self._lsp_setting == []:
             self._lsp_setting = vim_lib.CallEval('lsp#GetDict()')
         return self._lsp_setting
 
