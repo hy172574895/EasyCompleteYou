@@ -249,12 +249,6 @@ function! s:PythonEval(eval_string) abort
 "}}}
 endfunction
 
-function! s:GetCurrentPosition() abort
-"{{{
-    return { 'Line': line('.') - 1, 'Colum': col('.') -1 }
-"}}}
-endfunction
-
 function! s:UsingSpecicalSource(engine_name, invoke_key, is_replace) abort
 "{{{
   if ECY_main#IsECYWorksAtCurrentBuffer()
@@ -274,7 +268,7 @@ function! s:UsingSpecicalSource(engine_name, invoke_key, is_replace) abort
       " replace invoke_key in buffer.
       if a:is_replace
         let g:ECY_file_type_info[l:curren_file_type]['special_position'] = 
-              \s:GetCurrentPosition()
+              \ECY#utility#GetCurrentBufferPosition()
       else
         let g:ECY_file_type_info[l:curren_file_type]['special_position'] = {}
       endif

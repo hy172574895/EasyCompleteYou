@@ -330,6 +330,12 @@ function! ECY#utility#RecoverIndent() abort
 "}}}
 endfunction
 
+function! ECY#utility#GetCurrentBufferPosition() abort
+"{{{
+  return { 'Line': line('.') - 1, 'Colum': col('.') -1 }
+"}}}
+endfunction
+
 function! ECY#utility#RollFloatingWindows(up_or_down) abort
 "{{{ a:up_or_down = -1 = up; a:up_or_down = 1 = down
 "this function will be mapped, so we should return ''
