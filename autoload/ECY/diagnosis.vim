@@ -518,6 +518,9 @@ function! s:InitDiagnosisLists() abort
 "{{{return lists
  let l:temp = []
  for [key, lists] in items(g:ECY_diagnosis_items_with_engine_name)
+   if type(lists) != 3 " is not list
+     continue
+   endif
    call extend(l:temp, lists)
  endfor
  let g:ECY_diagnosis_items_all = l:temp
