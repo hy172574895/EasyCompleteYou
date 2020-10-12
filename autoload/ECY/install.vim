@@ -147,7 +147,7 @@ function! ECY#install#AddCapabilities() abort
 "}}}
 endfunction
 
-function! ECY#install#AddLspSetting(engine_info) abort
+function! ECY#install#AddLspSetting(engine_name) abort
 "{{{
   if exists('g:loaded_lsp_settings') && exists('g:ECY_lsp_setting_dict')
     let g:ECY_all_engine_info[a:engine_name]['lsp_setting'] = g:ECY_lsp_setting_dict
@@ -195,7 +195,7 @@ function! ECY#install#AddEngineInfo(engine_name, client_module_path,
   else
     let g:ECY_all_engine_info[a:engine_name]['is_buildin'] = v:false
   endif
-  call ECY#install#AddLspSetting(g:ECY_all_engine_info[a:engine_name])
+  call ECY#install#AddLspSetting(a:engine_name)
 "}}}
 endfunction
 
