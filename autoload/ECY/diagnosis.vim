@@ -468,7 +468,8 @@ endfunction
 function! ECY#diagnosis#PlaceSign(msg) abort
 "{{{Place Sign and highlight it. partly or all
   let l:engine_name = a:msg['EngineName']
-  if !g:ECY_enable_diagnosis || l:engine_name == '' || type(a:msg) != 4
+  if !g:ECY_enable_diagnosis || l:engine_name == '' || type(a:msg) != 4 || 
+        \!has_key(a:msg, 'Lists') || type(a:msg['Lists']) != 3
     return
   endif
   call s:UpdateDiagnosisByEngineName(a:msg) " but don't show sign, just update variable.
