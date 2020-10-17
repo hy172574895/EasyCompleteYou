@@ -131,7 +131,7 @@ class Event(object):
             results['UltisnipsSnippets'] = self._snippets_cache
         except:
             results = {'HasSnippetSupport': False}
-            g_logger.exception("Failed to load snippets.")
+            g_logger.debug("Failed to load snippets.")
         return results
 
     def _list_preview_file(self):
@@ -151,7 +151,7 @@ class Event(object):
                             self.preview_file_list.append(item)
                     g_logger.debug(self.preview_file_list)
                 except:
-                    g_logger.exception("have no preview file path.")
+                    g_logger.debug("have no preview file path.")
                     self.preview_file_dir = 'failed to get variable.'
                     self.preview_file_list = []
         return self.preview_file_list
@@ -164,7 +164,7 @@ class Event(object):
             f.close()
             return dicts
         except:
-            g_logger.exception("Failed to load preview file.")
+            g_logger.debug("Failed to load preview file.")
             return {}
 
     def _get_preview_content(self):
