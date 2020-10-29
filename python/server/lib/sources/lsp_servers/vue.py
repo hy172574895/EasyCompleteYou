@@ -15,7 +15,7 @@ class Operate(scope_.Source_interface):
         """ notes:
         """
         self._name = 'vue_vls'
-        self.lsp_name = 'vue_vls'
+        self.lsp_name = 'vls'
         self.languageId = 'vue'
 
         self._did_open_list = {}
@@ -41,6 +41,7 @@ class Operate(scope_.Source_interface):
         for item in lsp_setting:
             if item['name'] == self.lsp_name:
                 self.lsp_setting = item
+                g_logger.debug(self.lsp_setting)
                 return
 
     def _check(self, version):
