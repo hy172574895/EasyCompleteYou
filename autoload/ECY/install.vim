@@ -60,6 +60,10 @@ function! ECY#install#Init() abort
         \'','lib.sources.lsp_servers.texlab',
         \function('ECY#install#texlab'), '', v:true)
 
+  call ECY#install#AddEngineInfo('vue_vls',
+        \'','lib.sources.lsp_servers.vue',
+        \function('ECY#install#vue_vls'), '', v:true)
+
   call ECY#install#AddEngineInfo('intelephense',
         \'','lib.sources.lsp_servers.intelephense',
         \function('ECY#install#texlab'), '', v:true)
@@ -455,6 +459,12 @@ endfunction
 function! ECY#install#texlab() abort
 "{{{
   return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.texlab', 'name':'texlab', 'path': ''}
+"}}}
+endfunction
+
+function! ECY#install#vue_vls() abort
+"{{{
+  return {'status':'0','description':"ok",'lib': 'lib.sources.lsp_servers.vue', 'name':'vue_vls', 'path': ''}
 "}}}
 endfunction
 
