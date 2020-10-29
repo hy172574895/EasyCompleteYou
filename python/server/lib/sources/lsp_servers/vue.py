@@ -38,10 +38,10 @@ class Operate(scope_.Source_interface):
     def _get_lsp_setting(self, lsp_setting):
         if self.lsp_setting is not None:
             return
+        g_logger.debug(self.lsp_setting)
         for item in lsp_setting:
             if item['name'] == self.lsp_name:
                 self.lsp_setting = item
-                g_logger.debug(self.lsp_setting)
                 return
 
     def _check(self, version):
