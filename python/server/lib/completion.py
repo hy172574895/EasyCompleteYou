@@ -60,8 +60,8 @@ class Operate(object):
             self.start_position[engine_name] = {'Line': 0, 'Colum': 0, 'OriginalColum': 0}
 
         cache_position = self.start_position[engine_name]
-        g_logger.debug('pre_words', pre_words)
-        g_logger.debug('filter_words', filter_words)
+        g_logger.debug(pre_words)
+        g_logger.debug(filter_words)
         if current_start_postion['Line'] != cache_position['Line']\
                 or current_start_postion['Colum'] != cache_position['Colum']\
                 or cache_position['OriginalColum'] >= original_colum\
