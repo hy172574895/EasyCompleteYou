@@ -33,7 +33,7 @@ class Operate(scope_.Source_interface):
                 'WhiteList': ['vue'],
                 'Regex': r'[A-Za-z0-9\_\-]',
                 'NotCache': self._is_incomplete_items,
-                'TriggerKey': ["\\","{","}","@","/"," "]}
+                'TriggerKey': [".",":","<","\"","'","/","@","*"," "]}
 
     def _get_lsp_setting(self, lsp_setting):
         if self.lsp_setting is not None:
