@@ -45,7 +45,9 @@ class Operate(object):
         original_colum = version['StartPosition']['Colum']
         current_line = version['StartPosition']['Line']
         current_line_text = version['CurrentLineText']
-        pre_words = current_line_text[:original_colum]
+        temp = bytes(current_line_text, encoding='utf-8')
+        pre_words = str(temp[:original_colum], encoding='utf-8')
+        # pre_words = current_line_text[:original_colum]
         current_colum, filter_words, last_key = \
             self.FindStart(pre_words, source_info['Regex'])
         current_start_postion = \
