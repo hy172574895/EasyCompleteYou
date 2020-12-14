@@ -42,13 +42,9 @@ class Operate(object):
             self._cache_file_name = path_temp + '/ECY_server_config.ini'
         return self._cache_file_name
 
-    def _load_config(self):
-        """
-        """
+    def _write_default_config(self):
         path_temp = self._get_cache_file()
-        if not os.path.exists(path_temp):
-            # default config
-            fp = open(path_temp, mode="w", encoding='utf-8')
+        with open(path_temp, mode='w', encoding='utf-8') as f:
             installed_engine_lib = \
                 {'label': 'lib.sources.label.Label',
                  'path': 'lib.sources.path.path',
@@ -62,10 +58,22 @@ class Operate(object):
             self.conf['installed_engine_lib'] = installed_engine_lib
             self.conf['installed_engine_path'] = installed_engine_path
             self.conf['filetype_using'] = {}
-            self.conf.write(fp)
-            fp.close()
+            self.conf.write(f)
+        return installed_engine_lib, installed_engine_path
+
+    def _load_config(self):
+        """
+        """
+        path_temp = self._get_cache_file()
+        if not os.path.exists(path_temp):
+            # default config
+            return self._write_default_config()
         else:
-            self.conf.read(path_temp)
+            try:
+                self.conf.read(path_temp)
+            except Exception as e:
+                g_logger.debug(e)
+                return self._write_default_config() # return default config
             installed_engine_lib = self.conf['installed_engine_lib']
             installed_engine_path = self.conf['installed_engine_path']
         return installed_engine_lib, installed_engine_path
