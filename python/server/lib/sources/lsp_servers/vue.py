@@ -16,7 +16,7 @@ class Operate(scope_.Source_interface):
         """
         self._name = 'vue_vls'
         self.lsp_name = 'vls'
-        self.languageId = 'vue'
+        self.languageId = 'html'
 
         self._did_open_list = {}
         self._lsp = lsp.LSP()
@@ -31,7 +31,7 @@ class Operate(scope_.Source_interface):
     def GetInfo(self):
         return {'Name': self._name,
                 'WhiteList': ['vue'],
-                'Regex': r'[A-Za-z0-9\_\-]',
+                'Regex': r'[\w\-]',
                 'NotCache': self._is_incomplete_items,
                 'TriggerKey': [".",":","<","\"","'","/","@","*"," "]}
 
