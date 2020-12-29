@@ -37,7 +37,7 @@ class Operate(scope_.Source_interface):
         threading.Thread(target=self._handle_diagnosis).start()
 
     def GetInfo(self):
-        return {'Name': self._name, 'WhiteList': ['html', 'xhtml'],
+        return {'Name': self._name, 'WhiteList': ['html', 'xhtml', 'vue'],
                 'Regex': r'[A-Za-z0-9\_\-]',
                 'TriggerKey': ['.', ':', '"', '\'', '<', '=', '/']}
 
