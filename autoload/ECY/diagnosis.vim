@@ -45,6 +45,7 @@ function ECY#diagnosis#Init() abort
   let g:ECY_windows_are_showing['diagnosis'] = -1
   let g:ECY_diagnosis_items_all              = []
   let g:ECY_diagnosis_items_with_engine_name = {'nothing': []}
+  let g:ECY_show_diagnosis_when_cursor_hold = v:false
   " user don't want to update diagnosis in insert mode, but engine had
   " returned diagnosis, so we cache it and update after user leave insert
   " mode.
@@ -89,7 +90,7 @@ endpython
 endfunction
 
 function s:OnCursorHold() abort
-  if g:ECY_windows_are_showing['diagnosis'] == -1
+  if g:ECY_windows_are_showing['diagnosis'] == -1 && g:ECY_show_diagnosis_when_cursor_hold
     call ECY#diagnosis#ShowCurrentLineDiagnosis(v:true)
   endif
 endfunction
