@@ -45,7 +45,9 @@ class Operate(object):
         original_colum = version['StartPosition']['Colum']
         current_line = version['StartPosition']['Line']
         current_line_text = version['CurrentLineText']
-        pre_words = current_line_text[:original_colum]
+        temp = bytes(current_line_text, encoding='utf-8')
+        pre_words = str(temp[:original_colum], encoding='utf-8')
+        # pre_words = current_line_text[:original_colum]
         current_colum, filter_words, last_key = \
             self.FindStart(pre_words, source_info['Regex'])
         current_start_postion = \
@@ -60,8 +62,8 @@ class Operate(object):
             self.start_position[engine_name] = {'Line': 0, 'Colum': 0, 'OriginalColum': 0}
 
         cache_position = self.start_position[engine_name]
-        g_logger.debug(cache_position)
-        g_logger.debug(current_start_postion)
+        g_logger.debug(pre_words)
+        g_logger.debug(filter_words)
         if current_start_postion['Line'] != cache_position['Line']\
                 or current_start_postion['Colum'] != cache_position['Colum']\
                 or cache_position['OriginalColum'] >= original_colum\

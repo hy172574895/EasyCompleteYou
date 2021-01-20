@@ -469,7 +469,8 @@ endfunction
 function! ECY#diagnosis#PlaceSign(msg) abort
 "{{{Place Sign and highlight it. partly or all
   let l:engine_name = a:msg['EngineName']
-  if !g:ECY_enable_diagnosis || l:engine_name == ''
+  if !g:ECY_enable_diagnosis || l:engine_name == '' || type(a:msg) != 4 || 
+        \!has_key(a:msg, 'Lists') || type(a:msg['Lists']) != 3
     return
   endif
   call s:UpdateDiagnosisByEngineName(a:msg) " but don't show sign, just update variable.
@@ -519,6 +520,9 @@ function! s:InitDiagnosisLists() abort
 "{{{return lists
  let l:temp = []
  for [key, lists] in items(g:ECY_diagnosis_items_with_engine_name)
+   if type(lists) != 3 " is not list
+     continue
+   endif
    call extend(l:temp, lists)
  endfor
  let g:ECY_diagnosis_items_all = l:temp
